@@ -6,6 +6,8 @@ Overhaul the equipment system to make gear more interesting with formalized rari
 
 ---
 
+## 0. Save Equipment when you use "save game"
+
 ## 1. Formalize Rarity System
 
 **File:** `Items/Item.hpp`
