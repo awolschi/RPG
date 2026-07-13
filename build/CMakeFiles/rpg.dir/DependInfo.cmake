@@ -12,12 +12,18 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/awolschi/Desktop/OwnProjects/RPG/Characters/Classes/Classes.cpp" "CMakeFiles/rpg.dir/Characters/Classes/Classes.cpp.o" "gcc" "CMakeFiles/rpg.dir/Characters/Classes/Classes.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Characters/Monster.cpp" "CMakeFiles/rpg.dir/Characters/Monster.cpp.o" "gcc" "CMakeFiles/rpg.dir/Characters/Monster.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Characters/Player.cpp" "CMakeFiles/rpg.dir/Characters/Player.cpp.o" "gcc" "CMakeFiles/rpg.dir/Characters/Player.cpp.o.d"
+  "/home/awolschi/Desktop/OwnProjects/RPG/Characters/Races/Races.cpp" "CMakeFiles/rpg.dir/Characters/Races/Races.cpp.o" "gcc" "CMakeFiles/rpg.dir/Characters/Races/Races.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Characters/Stats/Stats.cpp" "CMakeFiles/rpg.dir/Characters/Stats/Stats.cpp.o" "gcc" "CMakeFiles/rpg.dir/Characters/Stats/Stats.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Engine/Combat.cpp" "CMakeFiles/rpg.dir/Engine/Combat.cpp.o" "gcc" "CMakeFiles/rpg.dir/Engine/Combat.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Engine/Game.cpp" "CMakeFiles/rpg.dir/Engine/Game.cpp.o" "gcc" "CMakeFiles/rpg.dir/Engine/Game.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Engine/LevelUp/LevelUp.cpp" "CMakeFiles/rpg.dir/Engine/LevelUp/LevelUp.cpp.o" "gcc" "CMakeFiles/rpg.dir/Engine/LevelUp/LevelUp.cpp.o.d"
+  "/home/awolschi/Desktop/OwnProjects/RPG/Engine/Religion.cpp" "CMakeFiles/rpg.dir/Engine/Religion.cpp.o" "gcc" "CMakeFiles/rpg.dir/Engine/Religion.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Engine/SaveGame.cpp" "CMakeFiles/rpg.dir/Engine/SaveGame.cpp.o" "gcc" "CMakeFiles/rpg.dir/Engine/SaveGame.cpp.o.d"
+  "/home/awolschi/Desktop/OwnProjects/RPG/Engine/Wiki.cpp" "CMakeFiles/rpg.dir/Engine/Wiki.cpp.o" "gcc" "CMakeFiles/rpg.dir/Engine/Wiki.cpp.o.d"
+  "/home/awolschi/Desktop/OwnProjects/RPG/Graphics/GRenderer.cpp" "CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.o" "gcc" "CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.o.d"
+  "/home/awolschi/Desktop/OwnProjects/RPG/Graphics/IconRenderer.cpp" "CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.o" "gcc" "CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Inventory/Inventory.cpp" "CMakeFiles/rpg.dir/Inventory/Inventory.cpp.o" "gcc" "CMakeFiles/rpg.dir/Inventory/Inventory.cpp.o.d"
+  "/home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/Crafting.cpp" "CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o" "gcc" "CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Items/Equipment/Equipment.cpp" "CMakeFiles/rpg.dir/Items/Equipment/Equipment.cpp.o" "gcc" "CMakeFiles/rpg.dir/Items/Equipment/Equipment.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Items/Loot.cpp" "CMakeFiles/rpg.dir/Items/Loot.cpp.o" "gcc" "CMakeFiles/rpg.dir/Items/Loot.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Items/Resources/Resources.cpp" "CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.o" "gcc" "CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.o.d"
@@ -26,6 +32,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/awolschi/Desktop/OwnProjects/RPG/Main.cpp" "CMakeFiles/rpg.dir/Main.cpp.o" "gcc" "CMakeFiles/rpg.dir/Main.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Archer/Archer.cpp" "CMakeFiles/rpg.dir/Skills/ClassSkills/Archer/Archer.cpp.o" "gcc" "CMakeFiles/rpg.dir/Skills/ClassSkills/Archer/Archer.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Mage/Mage.cpp" "CMakeFiles/rpg.dir/Skills/ClassSkills/Mage/Mage.cpp.o" "gcc" "CMakeFiles/rpg.dir/Skills/ClassSkills/Mage/Mage.cpp.o.d"
+  "/home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/Merchant.cpp" "CMakeFiles/rpg.dir/Skills/ClassSkills/Merchant/Merchant.cpp.o" "gcc" "CMakeFiles/rpg.dir/Skills/ClassSkills/Merchant/Merchant.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Priest/Priest.cpp" "CMakeFiles/rpg.dir/Skills/ClassSkills/Priest/Priest.cpp.o" "gcc" "CMakeFiles/rpg.dir/Skills/ClassSkills/Priest/Priest.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Warrior/Warrior.cpp" "CMakeFiles/rpg.dir/Skills/ClassSkills/Warrior/Warrior.cpp.o" "gcc" "CMakeFiles/rpg.dir/Skills/ClassSkills/Warrior/Warrior.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Skills/CommonSkills/CommonAttack.cpp" "CMakeFiles/rpg.dir/Skills/CommonSkills/CommonAttack.cpp.o" "gcc" "CMakeFiles/rpg.dir/Skills/CommonSkills/CommonAttack.cpp.o.d"
@@ -33,11 +40,14 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/awolschi/Desktop/OwnProjects/RPG/Skills/Skills.cpp" "CMakeFiles/rpg.dir/Skills/Skills.cpp.o" "gcc" "CMakeFiles/rpg.dir/Skills/Skills.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/World/Areas/Area.cpp" "CMakeFiles/rpg.dir/World/Areas/Area.cpp.o" "gcc" "CMakeFiles/rpg.dir/World/Areas/Area.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/World/Enemies/Enemies.cpp" "CMakeFiles/rpg.dir/World/Enemies/Enemies.cpp.o" "gcc" "CMakeFiles/rpg.dir/World/Enemies/Enemies.cpp.o.d"
+  "/home/awolschi/Desktop/OwnProjects/RPG/World/NPCs/NPC.cpp" "CMakeFiles/rpg.dir/World/NPCs/NPC.cpp.o" "gcc" "CMakeFiles/rpg.dir/World/NPCs/NPC.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/World/Quests/Quest.cpp" "CMakeFiles/rpg.dir/World/Quests/Quest.cpp.o" "gcc" "CMakeFiles/rpg.dir/World/Quests/Quest.cpp.o.d"
   )
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
+  "/home/awolschi/Desktop/OwnProjects/RPG/build/_deps/raylib-build/raylib/CMakeFiles/raylib.dir/DependInfo.cmake"
+  "/home/awolschi/Desktop/OwnProjects/RPG/build/_deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.

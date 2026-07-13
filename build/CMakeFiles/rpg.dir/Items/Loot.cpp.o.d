@@ -175,4 +175,19 @@ CMakeFiles/rpg.dir/Items/Loot.cpp.o: \
   /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/charconv.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/basic_string.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/ctime
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/map \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_tree.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/node_handle.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_map.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_multimap.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/erase_if.h \
+  /home/awolschi/Desktop/OwnProjects/RPG/Items/../Skills/Skill.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Items/Consumable.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Items/../Characters/Character.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Items/../Characters/Stats/Stats.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Items/../Characters/../Items/Equipment/Equipment.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Items/../Characters/../Items/Equipment/../Item.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Items/../Characters/../Skills/Skills.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Items/../Characters/Classes/Classes.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Items/../Characters/Classes/../Stats/Stats.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Items/../Characters/Classes/../../Items/Item.hpp

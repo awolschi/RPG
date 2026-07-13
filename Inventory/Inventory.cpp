@@ -1,14 +1,20 @@
 #include "Inventory.hpp"
 
-Inventory::Inventory(int maxSlots) : maxSlots(maxSlots), gold(0)
+Inventory::Inventory() : gold(0)
 {
 }
 
 bool Inventory::AddItem(std::shared_ptr<Item> item)
 {
-    if (!item || items.size() >= static_cast<size_t>(maxSlots))
+    if (!item) return false;
+
+    for (auto& entry : items)
     {
-        return false;
+        if (entry->IsSameAs(*item))
+        {
+            entry->count += item->count;
+            return true;
+        }
     }
 
     items.push_back(item);
@@ -25,13 +31,46 @@ bool Inventory::RemoveItem(size_t index)
     return false;
 }
 
-std::shared_ptr<Item> Inventory::GetItem(size_t index)
+bool Inventory::RemoveOneItem(size_t index)
+{
+    if (index < items.size())
+    {
+        auto& entry = items[index];
+        if (entry->count > 1)
+        {
+            entry->count--;
+            return true;
+        }
+        items.erase(items.begin() + index);
+        return true;
+    }
+    return false;
+}
+
+std::shared_ptr<Item> Inventory::GetItem(size_t index) const
 {
     if (index < items.size())
     {
         return items[index];
     }
     return nullptr;
+}
+
+int Inventory::GetStackCount(size_t index) const
+{
+    if (index < items.size())
+        return items[index]->count;
+    return 0;
+}
+
+int Inventory::GetItemIndex(std::shared_ptr<Item> item) const
+{
+    for (size_t i = 0; i < items.size(); ++i)
+    {
+        if (items[i] == item)
+            return static_cast<int>(i);
+    }
+    return -1;
 }
 
 bool Inventory::RemoveGold(int amount)

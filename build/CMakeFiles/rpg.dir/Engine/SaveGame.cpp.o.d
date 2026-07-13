@@ -169,23 +169,38 @@ CMakeFiles/rpg.dir/Engine/SaveGame.cpp.o: \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/backward/auto_ptr.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/pstl/glue_memory_defs.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/pstl/execution_defs.h \
-  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Player.hpp \
-  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Character.hpp \
-  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Stats/Stats.hpp \
-  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/Equipment.hpp \
-  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/../Item.hpp \
-  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Skills/Skills.hpp \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/vector \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_vector.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_bvector.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/vector.tcc \
-  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Skills/Skill.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Player.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Character.hpp \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/map \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_tree.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/node_handle.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_map.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_multimap.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/erase_if.h \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Stats/Stats.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/Equipment.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/../Item.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/../../Skills/Skill.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Skills/Skills.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Characters/Classes/Classes.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Characters/Classes/../Stats/Stats.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Characters/Classes/../../Items/Item.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Characters/Races/Races.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Characters/Races/../Stats/Stats.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Inventory/Inventory.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Inventory/../Items/Item.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Item.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/JobSystem.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/Job.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/../Items/Resources/Resources.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/../Items/Resources/../Item.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../World/Quests/Quest.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/Religion.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Quests/Quest.hpp \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/fstream \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/istream \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/ios \
@@ -236,4 +251,14 @@ CMakeFiles/rpg.dir/Engine/SaveGame.cpp.o: \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/codecvt \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/fs_dir.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/fs_ops.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/iostream
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/iostream \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/algorithm \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_algo.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/algorithmfwd.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_heap.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/uniform_int_dist.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/pstl/glue_algorithm_defs.h \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Skills/CommonSkills/CommonAttack.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Skills/CommonSkills/../Skill.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Consumable.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/../../Characters/Character.hpp

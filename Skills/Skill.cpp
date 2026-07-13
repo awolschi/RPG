@@ -1,19 +1,14 @@
 #include "Skill.hpp"
 #include "../Characters/Character.hpp"
 
-const int Skill::XP_TO_LEVEL = 100;
-
 void Skill::Use(Character& caster, Character& target)
 {
-    // Base skill does nothing - overridden by subclasses
 }
 
 void Skill::ReduceCooldown()
 {
     if (currentCooldown > 0)
-    {
         currentCooldown--;
-    }
 }
 
 bool Skill::IsReady() const
@@ -26,20 +21,28 @@ void Skill::ResetCooldown()
     currentCooldown = cooldown;
 }
 
+int Skill::GetXPToLevel(int currentLevel)
+{
+    return currentLevel * 80;
+}
+
 void Skill::GainXP(int xp)
 {
     experience += xp;
-    if (experience >= XP_TO_LEVEL)
+    int needed = GetXPToLevel(level);
+    while (experience >= needed)
     {
+        experience -= needed;
         LevelUp();
+        needed = GetXPToLevel(level);
+        if (level >= 50) { experience = 0; break; }
     }
 }
 
 void Skill::LevelUp()
 {
     level++;
-    experience = 0;
-    // Increase effectiveness with level
-    baseDamage += (baseDamage / 10) + 1;
-    manaCost += (manaCost / 20);
+    baseDamage = (int)(baseDamage * 1.12f) + 1;
+    if (level % 5 == 0 && cooldown > 1)
+        cooldown--;
 }

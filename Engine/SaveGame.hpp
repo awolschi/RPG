@@ -3,27 +3,39 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 #include "../Characters/Player.hpp"
+#include "Religion.hpp"
+#include "../World/Quests/Quest.hpp"
+
+struct SaveSlotInfo
+{
+    int slot;
+    std::string playerName;
+    CharacterClass characterClass;
+    int level;
+    bool occupied;
+};
 
 class SaveGameManager
 {
 public:
+    static constexpr int SLOT_COUNT = 5;
+
     SaveGameManager();
 
-    // Save and load functionality
-    bool SaveGame(const std::shared_ptr<Player>& player, const std::string& filename);
-    std::shared_ptr<Player> LoadGame(const std::string& filename);
+    bool SaveGame(const std::shared_ptr<Player>& player, int slot, int areaIndex, const ReligionSystem& religion);
+    std::shared_ptr<Player> LoadGame(int slot, int& outAreaIndex, ReligionSystem& outReligion);
 
-    // Utility
-    bool GameSaveExists(const std::string& filename);
+    bool IsSlotOccupied(int slot);
+    SaveSlotInfo GetSlotInfo(int slot);
+    std::vector<SaveSlotInfo> ListSlots();
+
     std::string GetSaveDirectory() const;
 
 private:
     std::string saveDirectory;
-
-    // Helper functions for serialization
-    void SerializePlayer(const std::shared_ptr<Player>& player, std::ofstream& file);
-    std::shared_ptr<Player> DeserializePlayer(std::ifstream& file);
+    std::string SlotPath(int slot) const;
 };
 
 #endif

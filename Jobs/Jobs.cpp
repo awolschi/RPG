@@ -1,25 +1,50 @@
 #include "Job.hpp"
 
-const int Job::XP_TO_LEVEL = 100;
-
-Job::Job(JobType type) : type(type), level(1), experience(0), resourcesCollected(0)
+Job::Job(JobType type) : type(type), level(1), experience(0)
 {
+}
+
+int Job::RequiredXP(int level)
+{
+    return 100 + (level - 1) * 50;
 }
 
 void Job::GainXP(int xp)
 {
     experience += xp;
-    if (experience >= XP_TO_LEVEL)
+    int required = RequiredXP(level);
+    while (experience >= required && level < 10)
     {
+        experience -= required;
         level++;
-        experience = 0;
+        required = RequiredXP(level);
     }
 }
 
-void Job::CollectResource()
+std::shared_ptr<Resource> Job::CollectResource()
 {
-    resourcesCollected++;
-    GainXP(10);
+    std::shared_ptr<Resource> resource;
+
+    switch (type)
+    {
+        case JobType::Mining:
+            resource = ResourceFactory::CreateMiningResource(level);
+            break;
+        case JobType::Lumberjacking:
+            resource = ResourceFactory::CreateLumberjackingResource(level);
+            break;
+        case JobType::Fishing:
+            resource = ResourceFactory::CreateFishingResource(level);
+            break;
+        case JobType::Smithing:
+            resource = ResourceFactory::CreateSmithingResource(level);
+            break;
+    }
+
+    int xpGain = 10 + level * 2;
+    GainXP(xpGain);
+
+    return resource;
 }
 
 std::string Job::GetJobName() const

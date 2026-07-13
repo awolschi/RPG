@@ -170,46 +170,63 @@ CMakeFiles/rpg.dir/Main.cpp.o: \
   /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/charconv.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/basic_string.tcc \
-  /home/awolschi/Desktop/OwnProjects/RPG/Engine/Combat.hpp \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/iostream \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/ostream \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/ios \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/ios_base.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/locale_classes.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/locale_classes.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/system_error \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/x86_64-linux-gnu/c++/12/bits/error_constants.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/stdexcept \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/streambuf \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/streambuf.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/basic_ios.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/locale_facets.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/cwctype \
-  /usr/include/wctype.h \
-  /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/x86_64-linux-gnu/c++/12/bits/ctype_base.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/streambuf_iterator.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/x86_64-linux-gnu/c++/12/bits/ctype_inline.h \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/locale_facets.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/basic_ios.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/ostream.tcc \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/istream \
-  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/istream.tcc \
-  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Character.hpp \
-  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Stats/Stats.hpp \
-  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/Equipment.hpp \
-  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/../Item.hpp \
-  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Skills/Skills.hpp \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/vector \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_vector.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_bvector.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/vector.tcc \
-  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Skills/Skill.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/Combat.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Character.hpp \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/map \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_tree.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/node_handle.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_map.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_multimap.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/erase_if.h \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Stats/Stats.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/Equipment.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/../Item.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/../../Skills/Skill.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Skills/Skills.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/SaveGame.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Player.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Characters/Classes/Classes.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Characters/Classes/../Stats/Stats.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Characters/Classes/../../Items/Item.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Characters/Races/Races.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Characters/Races/../Stats/Stats.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Inventory/Inventory.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Inventory/../Items/Item.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Item.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/JobSystem.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/Job.hpp \
-  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Monster.hpp
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/../Items/Resources/Resources.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/../Items/Resources/../Item.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../World/Quests/Quest.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/Religion.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Quests/Quest.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/Wiki.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Graphics/GRenderer.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/build/_deps/raylib-src/src/raylib.h \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Areas/Area.hpp \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/functional \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/std_function.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/unordered_map \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/hashtable.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/hashtable_policy.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/enable_special_members.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/unordered_map.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/array \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/compare \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_algo.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/algorithmfwd.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/stl_heap.h \
+  /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/uniform_int_dist.h \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Areas/../../Characters/Monster.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Classes/Classes.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Monster.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Races/Races.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/NPCs/NPC.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Crafting/Crafting.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Crafting/../Item.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Crafting/../Resources/Resources.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Crafting/../../Inventory/Inventory.hpp

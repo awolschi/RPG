@@ -8,12 +8,27 @@ void SkillSet::AddSkill(std::shared_ptr<Skill> skill)
     }
 }
 
+bool SkillSet::AddSkillIfLevelMet(std::shared_ptr<Skill> skill, int characterLevel)
+{
+    if (skill && characterLevel >= skill->requiredLevel)
+    {
+        skills.push_back(skill);
+        return true;
+    }
+    return false;
+}
+
 void SkillSet::RemoveSkill(size_t index)
 {
     if (index < skills.size())
     {
         skills.erase(skills.begin() + index);
     }
+}
+
+void SkillSet::ClearAll()
+{
+    skills.clear();
 }
 
 std::shared_ptr<Skill> SkillSet::GetSkill(size_t index)

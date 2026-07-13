@@ -2,6 +2,10 @@
 #define JOB_HPP
 
 #include <string>
+#include <memory>
+#include "../Items/Resources/Resources.hpp"
+
+class Inventory;
 
 enum class JobType
 {
@@ -19,13 +23,11 @@ public:
     JobType type;
     int level;
     int experience;
-    int resourcesCollected;
 
     void GainXP(int xp);
-    void CollectResource();
+    std::shared_ptr<Resource> CollectResource();
+    static int RequiredXP(int level);
     std::string GetJobName() const;
-
-    static const int XP_TO_LEVEL;
 };
 
 #endif

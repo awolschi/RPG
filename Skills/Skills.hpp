@@ -11,7 +11,9 @@ public:
     SkillSet() = default;
 
     void AddSkill(std::shared_ptr<Skill> skill);
+    bool AddSkillIfLevelMet(std::shared_ptr<Skill> skill, int characterLevel);
     void RemoveSkill(size_t index);
+    void ClearAll();
     std::shared_ptr<Skill> GetSkill(size_t index);
     std::shared_ptr<Skill> GetSkillByName(const std::string& name);
 

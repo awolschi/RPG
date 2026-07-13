@@ -9,6 +9,7 @@
 #include "Characters/Monster.hpp"
 #include "Characters/Stats/Stats.hpp"
 #include "Characters/Classes/Classes.hpp"
+#include "Characters/Races/Races.hpp"
 
 // Inventory and Equipment
 #include "Inventory/Inventory.hpp"
@@ -23,10 +24,12 @@
 #include "Skills/ClassSkills/Mage/Mage.hpp"
 #include "Skills/ClassSkills/Priest/Priest.hpp"
 #include "Skills/ClassSkills/Archer/Archer.hpp"
+#include "Skills/ClassSkills/Merchant/Merchant.hpp"
 
 // Game Engine
 #include "Engine/Game.hpp"
 #include "Engine/Combat.hpp"
 #include "Engine/SaveGame.hpp"
+#include "Engine/Religion.hpp"
 
 #endif

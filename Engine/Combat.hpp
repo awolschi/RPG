@@ -2,7 +2,8 @@
 #define COMBAT_HPP
 
 #include <memory>
-#include <iostream>
+#include <string>
+#include <vector>
 #include "../Characters/Character.hpp"
 
 enum class CombatAction
@@ -19,16 +20,18 @@ class CombatSystem
 public:
     CombatSystem() = default;
 
-    // Combat flow
+    // Initialize combat (returns false if invalid)
     bool StartCombat(std::shared_ptr<Character> player, std::shared_ptr<Character> enemy);
-    bool ExecuteTurn(std::shared_ptr<Character> attacker, std::shared_ptr<Character> defender, CombatAction action, int skillIndex = 0);
 
-    // Utility
-    void DisplayCombatStatus(std::shared_ptr<Character> player, std::shared_ptr<Character> enemy);
-    void DisplaySkillOptions(std::shared_ptr<Character> character);
+    // Execute a single turn; returns description of what happened
+    std::string ExecuteTurn(std::shared_ptr<Character> attacker,
+                            std::shared_ptr<Character> defender,
+                            CombatAction action,
+                            int skillIndex = 0);
 
-private:
-    void DisplayCombatLog(const std::string& message);
+    // Static helpers
+    static std::string GetStatusLine(std::shared_ptr<Character> c);
+    static std::vector<std::string> GetSkillOptions(std::shared_ptr<Character> c);
 };
 
 #endif

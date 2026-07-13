@@ -2,6 +2,8 @@
 #define EQUIPMENT_HPP
 
 #include <memory>
+#include <string>
+#include <vector>
 #include "../Item.hpp"
 
 class Equipment
@@ -28,9 +30,20 @@ public:
     // Calculate total defense from equipped armor
     int GetTotalDefense() const;
 
+    // Calculate total weapon damage from equipped weapons
+    int GetWeaponDamage() const;
+
     // Calculate total bonus stats from accessories
     int GetHealthBonus() const;
     int GetManaBonus() const;
+
+    // Elemental
+    ElementType GetWeaponElement() const;
+    int GetElementalDamage(ElementType element) const;
+    int GetElementalReduction(ElementType element) const;
+
+    // List equipment into a vector of strings (for display)
+    void ListEquipment(std::vector<std::string>& out) const;
 };
 
 #endif

@@ -14,7 +14,9 @@ ClassData ClassDatabase::Get(CharacterClass c)
                 {
                     15, 2,
                     3, 2, 0, 0, 1, 2
-                }
+                },
+                {WeaponType::Sword, WeaponType::Axe, WeaponType::Mace, WeaponType::Hammer},
+                {ArmorType::Plate, ArmorType::Leather}
             };
 
         case CharacterClass::Priest:
@@ -27,7 +29,9 @@ ClassData ClassDatabase::Get(CharacterClass c)
                 {
                     8, 8,
                     0, 1, 2, 3, 0, 1
-                }
+                },
+                {WeaponType::Mace, WeaponType::Scepter, WeaponType::Staff},
+                {ArmorType::Cloth, ArmorType::Leather}
             };
 
         case CharacterClass::Mage:
@@ -40,7 +44,9 @@ ClassData ClassDatabase::Get(CharacterClass c)
                 {
                     5, 10,
                     0, 1, 4, 2, 0, 0
-                }
+                },
+                {WeaponType::Staff, WeaponType::Wand},
+                {ArmorType::Cloth}
             };
 
         case CharacterClass::Archer:
@@ -53,7 +59,26 @@ ClassData ClassDatabase::Get(CharacterClass c)
                 {
                     10, 5,
                     2, 3, 1, 2, 1, 1
-                }
+                },
+                {WeaponType::Bow, WeaponType::Dagger},
+                {ArmorType::Leather}
+            };
+
+        case CharacterClass::Merchant:
+            return
+            {
+                {
+                    110, 110,
+                    4, 6, 6, 8, 5, 5
+                },
+                {
+                    12, 6,
+                    1, 2, 2, 2, 1, 1
+                },
+                {WeaponType::Sword, WeaponType::Axe, WeaponType::Bow, WeaponType::Staff,
+                 WeaponType::Dagger, WeaponType::Mace, WeaponType::Wand, WeaponType::Hammer,
+                 WeaponType::Scepter},
+                {ArmorType::Cloth, ArmorType::Leather, ArmorType::Plate}
             };
 
         default:

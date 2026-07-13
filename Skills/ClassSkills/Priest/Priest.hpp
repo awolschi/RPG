@@ -24,4 +24,39 @@ public:
     void Use(Character& caster, Character& target) override;
 };
 
+class DivineShield : public Skill
+{
+public:
+    DivineShield();
+    void Use(Character& caster, Character& target) override;
+};
+
+class Smite : public Skill
+{
+public:
+    Smite();
+    void Use(Character& caster, Character& target) override;
+};
+
+class Renew : public Skill
+{
+public:
+    Renew();
+    void Use(Character& caster, Character& target) override;
+};
+
+class HolyNova : public Skill
+{
+public:
+    HolyNova();
+    void Use(Character& caster, Character& target) override;
+};
+
+class DivineWrath : public Skill
+{
+public:
+    DivineWrath();
+    void Use(Character& caster, Character& target) override;
+};
+
 #endif

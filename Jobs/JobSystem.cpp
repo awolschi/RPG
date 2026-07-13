@@ -1,4 +1,5 @@
 #include "JobSystem.hpp"
+#include "../Inventory/Inventory.hpp"
 #include <iostream>
 
 JobSystem::JobSystem()
@@ -28,23 +29,43 @@ void JobSystem::DisplayAllJobs() const
     std::cout << "\n=== YOUR JOBS ===" << std::endl;
     for (size_t i = 0; i < jobs.size(); ++i)
     {
+        int required = Job::RequiredXP(jobs[i].level);
         std::cout << i + 1 << ". ";
-        std::cout << jobs[i].GetJobName() << " - Level " << jobs[i].level << ", XP: " << jobs[i].experience << "/100\n";
-        std::cout << "   Resources Collected: " << jobs[i].resourcesCollected << std::endl;
+        std::cout << jobs[i].GetJobName() << " - Level " << jobs[i].level
+                  << ", XP: " << jobs[i].experience << "/" << required << "\n";
     }
 }
 
-void JobSystem::WorkJob(JobType type, int hours)
+std::string JobSystem::WorkJob(JobType type, int hours, Inventory& inventory)
 {
     Job* job = FindJob(type);
-    if (job)
+    if (!job)
+        return "Job not found!";
+
+    std::string result = "You worked as a " + job->GetJobName() + " for " + std::to_string(hours) + " hours.\n";
+
+    int collected = 0;
+    int levelsGained = 0;
+    int startLevel = job->level;
+
+    for (int i = 0; i < hours; ++i)
     {
-        for (int i = 0; i < hours; ++i)
+        auto resource = job->CollectResource();
+        if (resource && inventory.AddItem(resource))
         {
-            job->CollectResource();
+            collected++;
         }
-        std::cout << "You worked for " << hours << " hours and collected resources!\n";
     }
+
+    result += "Resources collected: " + std::to_string(collected) + "\n";
+
+    if (job->level > startLevel)
+    {
+        levelsGained = job->level - startLevel;
+        result += "Job leveled up " + std::to_string(levelsGained) + " time(s)! Now level " + std::to_string(job->level) + ".\n";
+    }
+
+    return result;
 }
 
 Job* JobSystem::FindJob(JobType type)

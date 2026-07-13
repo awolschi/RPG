@@ -65,6 +65,26 @@ CMAKE_BINARY_DIR = /home/awolschi/Desktop/OwnProjects/RPG/build
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target package
+package: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool..."
+	/usr/bin/cpack --config ./CPackConfig.cmake
+.PHONY : package
+
+# Special rule for the target package
+package/fast: package
+.PHONY : package/fast
+
+# Special rule for the target package_source
+package_source:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool for source..."
+	/usr/bin/cpack --config ./CPackSourceConfig.cmake /home/awolschi/Desktop/OwnProjects/RPG/build/CPackSourceConfig.cmake
+.PHONY : package_source
+
+# Special rule for the target package_source
+package_source/fast: package_source
+.PHONY : package_source/fast
+
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -84,6 +104,51 @@ rebuild_cache:
 # Special rule for the target rebuild_cache
 rebuild_cache/fast: rebuild_cache
 .PHONY : rebuild_cache/fast
+
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+.PHONY : list_install_components/fast
+
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
+
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
+
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -128,6 +193,58 @@ rpg: cmake_check_build_system
 rpg/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/build
 .PHONY : rpg/fast
+
+#=============================================================================
+# Target rules for targets named uninstall
+
+# Build rule for target.
+uninstall: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 uninstall
+.PHONY : uninstall
+
+# fast build rule for target.
+uninstall/fast:
+	$(MAKE) $(MAKESILENT) -f _deps/raylib-build/CMakeFiles/uninstall.dir/build.make _deps/raylib-build/CMakeFiles/uninstall.dir/build
+.PHONY : uninstall/fast
+
+#=============================================================================
+# Target rules for targets named raylib
+
+# Build rule for target.
+raylib: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 raylib
+.PHONY : raylib
+
+# fast build rule for target.
+raylib/fast:
+	$(MAKE) $(MAKESILENT) -f _deps/raylib-build/raylib/CMakeFiles/raylib.dir/build.make _deps/raylib-build/raylib/CMakeFiles/raylib.dir/build
+.PHONY : raylib/fast
+
+#=============================================================================
+# Target rules for targets named glfw
+
+# Build rule for target.
+glfw: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 glfw
+.PHONY : glfw
+
+# fast build rule for target.
+glfw/fast:
+	$(MAKE) $(MAKESILENT) -f _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/build.make _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/build
+.PHONY : glfw/fast
+
+#=============================================================================
+# Target rules for targets named update_mappings
+
+# Build rule for target.
+update_mappings: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 update_mappings
+.PHONY : update_mappings
+
+# fast build rule for target.
+update_mappings/fast:
+	$(MAKE) $(MAKESILENT) -f _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build.make _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build
+.PHONY : update_mappings/fast
 
 Characters/Character.o: Characters/Character.cpp.o
 .PHONY : Characters/Character.o
@@ -225,6 +342,30 @@ Characters/Player.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Characters/Player.cpp.s
 .PHONY : Characters/Player.cpp.s
 
+Characters/Races/Races.o: Characters/Races/Races.cpp.o
+.PHONY : Characters/Races/Races.o
+
+# target to build an object file
+Characters/Races/Races.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Characters/Races/Races.cpp.o
+.PHONY : Characters/Races/Races.cpp.o
+
+Characters/Races/Races.i: Characters/Races/Races.cpp.i
+.PHONY : Characters/Races/Races.i
+
+# target to preprocess a source file
+Characters/Races/Races.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Characters/Races/Races.cpp.i
+.PHONY : Characters/Races/Races.cpp.i
+
+Characters/Races/Races.s: Characters/Races/Races.cpp.s
+.PHONY : Characters/Races/Races.s
+
+# target to generate assembly for a file
+Characters/Races/Races.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Characters/Races/Races.cpp.s
+.PHONY : Characters/Races/Races.cpp.s
+
 Characters/Stats/Stats.o: Characters/Stats/Stats.cpp.o
 .PHONY : Characters/Stats/Stats.o
 
@@ -321,6 +462,30 @@ Engine/LevelUp/LevelUp.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Engine/LevelUp/LevelUp.cpp.s
 .PHONY : Engine/LevelUp/LevelUp.cpp.s
 
+Engine/Religion.o: Engine/Religion.cpp.o
+.PHONY : Engine/Religion.o
+
+# target to build an object file
+Engine/Religion.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Engine/Religion.cpp.o
+.PHONY : Engine/Religion.cpp.o
+
+Engine/Religion.i: Engine/Religion.cpp.i
+.PHONY : Engine/Religion.i
+
+# target to preprocess a source file
+Engine/Religion.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Engine/Religion.cpp.i
+.PHONY : Engine/Religion.cpp.i
+
+Engine/Religion.s: Engine/Religion.cpp.s
+.PHONY : Engine/Religion.s
+
+# target to generate assembly for a file
+Engine/Religion.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Engine/Religion.cpp.s
+.PHONY : Engine/Religion.cpp.s
+
 Engine/SaveGame.o: Engine/SaveGame.cpp.o
 .PHONY : Engine/SaveGame.o
 
@@ -345,6 +510,78 @@ Engine/SaveGame.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Engine/SaveGame.cpp.s
 .PHONY : Engine/SaveGame.cpp.s
 
+Engine/Wiki.o: Engine/Wiki.cpp.o
+.PHONY : Engine/Wiki.o
+
+# target to build an object file
+Engine/Wiki.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Engine/Wiki.cpp.o
+.PHONY : Engine/Wiki.cpp.o
+
+Engine/Wiki.i: Engine/Wiki.cpp.i
+.PHONY : Engine/Wiki.i
+
+# target to preprocess a source file
+Engine/Wiki.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Engine/Wiki.cpp.i
+.PHONY : Engine/Wiki.cpp.i
+
+Engine/Wiki.s: Engine/Wiki.cpp.s
+.PHONY : Engine/Wiki.s
+
+# target to generate assembly for a file
+Engine/Wiki.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Engine/Wiki.cpp.s
+.PHONY : Engine/Wiki.cpp.s
+
+Graphics/GRenderer.o: Graphics/GRenderer.cpp.o
+.PHONY : Graphics/GRenderer.o
+
+# target to build an object file
+Graphics/GRenderer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.o
+.PHONY : Graphics/GRenderer.cpp.o
+
+Graphics/GRenderer.i: Graphics/GRenderer.cpp.i
+.PHONY : Graphics/GRenderer.i
+
+# target to preprocess a source file
+Graphics/GRenderer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.i
+.PHONY : Graphics/GRenderer.cpp.i
+
+Graphics/GRenderer.s: Graphics/GRenderer.cpp.s
+.PHONY : Graphics/GRenderer.s
+
+# target to generate assembly for a file
+Graphics/GRenderer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.s
+.PHONY : Graphics/GRenderer.cpp.s
+
+Graphics/IconRenderer.o: Graphics/IconRenderer.cpp.o
+.PHONY : Graphics/IconRenderer.o
+
+# target to build an object file
+Graphics/IconRenderer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.o
+.PHONY : Graphics/IconRenderer.cpp.o
+
+Graphics/IconRenderer.i: Graphics/IconRenderer.cpp.i
+.PHONY : Graphics/IconRenderer.i
+
+# target to preprocess a source file
+Graphics/IconRenderer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.i
+.PHONY : Graphics/IconRenderer.cpp.i
+
+Graphics/IconRenderer.s: Graphics/IconRenderer.cpp.s
+.PHONY : Graphics/IconRenderer.s
+
+# target to generate assembly for a file
+Graphics/IconRenderer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.s
+.PHONY : Graphics/IconRenderer.cpp.s
+
 Inventory/Inventory.o: Inventory/Inventory.cpp.o
 .PHONY : Inventory/Inventory.o
 
@@ -368,6 +605,30 @@ Inventory/Inventory.s: Inventory/Inventory.cpp.s
 Inventory/Inventory.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Inventory/Inventory.cpp.s
 .PHONY : Inventory/Inventory.cpp.s
+
+Items/Crafting/Crafting.o: Items/Crafting/Crafting.cpp.o
+.PHONY : Items/Crafting/Crafting.o
+
+# target to build an object file
+Items/Crafting/Crafting.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o
+.PHONY : Items/Crafting/Crafting.cpp.o
+
+Items/Crafting/Crafting.i: Items/Crafting/Crafting.cpp.i
+.PHONY : Items/Crafting/Crafting.i
+
+# target to preprocess a source file
+Items/Crafting/Crafting.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.i
+.PHONY : Items/Crafting/Crafting.cpp.i
+
+Items/Crafting/Crafting.s: Items/Crafting/Crafting.cpp.s
+.PHONY : Items/Crafting/Crafting.s
+
+# target to generate assembly for a file
+Items/Crafting/Crafting.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.s
+.PHONY : Items/Crafting/Crafting.cpp.s
 
 Items/Equipment/Equipment.o: Items/Equipment/Equipment.cpp.o
 .PHONY : Items/Equipment/Equipment.o
@@ -561,6 +822,30 @@ Skills/ClassSkills/Mage/Mage.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Skills/ClassSkills/Mage/Mage.cpp.s
 .PHONY : Skills/ClassSkills/Mage/Mage.cpp.s
 
+Skills/ClassSkills/Merchant/Merchant.o: Skills/ClassSkills/Merchant/Merchant.cpp.o
+.PHONY : Skills/ClassSkills/Merchant/Merchant.o
+
+# target to build an object file
+Skills/ClassSkills/Merchant/Merchant.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Skills/ClassSkills/Merchant/Merchant.cpp.o
+.PHONY : Skills/ClassSkills/Merchant/Merchant.cpp.o
+
+Skills/ClassSkills/Merchant/Merchant.i: Skills/ClassSkills/Merchant/Merchant.cpp.i
+.PHONY : Skills/ClassSkills/Merchant/Merchant.i
+
+# target to preprocess a source file
+Skills/ClassSkills/Merchant/Merchant.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Skills/ClassSkills/Merchant/Merchant.cpp.i
+.PHONY : Skills/ClassSkills/Merchant/Merchant.cpp.i
+
+Skills/ClassSkills/Merchant/Merchant.s: Skills/ClassSkills/Merchant/Merchant.cpp.s
+.PHONY : Skills/ClassSkills/Merchant/Merchant.s
+
+# target to generate assembly for a file
+Skills/ClassSkills/Merchant/Merchant.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Skills/ClassSkills/Merchant/Merchant.cpp.s
+.PHONY : Skills/ClassSkills/Merchant/Merchant.cpp.s
+
 Skills/ClassSkills/Priest/Priest.o: Skills/ClassSkills/Priest/Priest.cpp.o
 .PHONY : Skills/ClassSkills/Priest/Priest.o
 
@@ -729,6 +1014,30 @@ World/Enemies/Enemies.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/World/Enemies/Enemies.cpp.s
 .PHONY : World/Enemies/Enemies.cpp.s
 
+World/NPCs/NPC.o: World/NPCs/NPC.cpp.o
+.PHONY : World/NPCs/NPC.o
+
+# target to build an object file
+World/NPCs/NPC.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/World/NPCs/NPC.cpp.o
+.PHONY : World/NPCs/NPC.cpp.o
+
+World/NPCs/NPC.i: World/NPCs/NPC.cpp.i
+.PHONY : World/NPCs/NPC.i
+
+# target to preprocess a source file
+World/NPCs/NPC.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/World/NPCs/NPC.cpp.i
+.PHONY : World/NPCs/NPC.cpp.i
+
+World/NPCs/NPC.s: World/NPCs/NPC.cpp.s
+.PHONY : World/NPCs/NPC.s
+
+# target to generate assembly for a file
+World/NPCs/NPC.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/World/NPCs/NPC.cpp.s
+.PHONY : World/NPCs/NPC.cpp.s
+
 World/Quests/Quest.o: World/Quests/Quest.cpp.o
 .PHONY : World/Quests/Quest.o
 
@@ -760,7 +1069,17 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
+	@echo "... install"
+	@echo "... install/local"
+	@echo "... install/strip"
+	@echo "... list_install_components"
+	@echo "... package"
+	@echo "... package_source"
 	@echo "... rebuild_cache"
+	@echo "... uninstall"
+	@echo "... update_mappings"
+	@echo "... glfw"
+	@echo "... raylib"
 	@echo "... rpg"
 	@echo "... Characters/Character.o"
 	@echo "... Characters/Character.i"
@@ -774,6 +1093,9 @@ help:
 	@echo "... Characters/Player.o"
 	@echo "... Characters/Player.i"
 	@echo "... Characters/Player.s"
+	@echo "... Characters/Races/Races.o"
+	@echo "... Characters/Races/Races.i"
+	@echo "... Characters/Races/Races.s"
 	@echo "... Characters/Stats/Stats.o"
 	@echo "... Characters/Stats/Stats.i"
 	@echo "... Characters/Stats/Stats.s"
@@ -786,12 +1108,27 @@ help:
 	@echo "... Engine/LevelUp/LevelUp.o"
 	@echo "... Engine/LevelUp/LevelUp.i"
 	@echo "... Engine/LevelUp/LevelUp.s"
+	@echo "... Engine/Religion.o"
+	@echo "... Engine/Religion.i"
+	@echo "... Engine/Religion.s"
 	@echo "... Engine/SaveGame.o"
 	@echo "... Engine/SaveGame.i"
 	@echo "... Engine/SaveGame.s"
+	@echo "... Engine/Wiki.o"
+	@echo "... Engine/Wiki.i"
+	@echo "... Engine/Wiki.s"
+	@echo "... Graphics/GRenderer.o"
+	@echo "... Graphics/GRenderer.i"
+	@echo "... Graphics/GRenderer.s"
+	@echo "... Graphics/IconRenderer.o"
+	@echo "... Graphics/IconRenderer.i"
+	@echo "... Graphics/IconRenderer.s"
 	@echo "... Inventory/Inventory.o"
 	@echo "... Inventory/Inventory.i"
 	@echo "... Inventory/Inventory.s"
+	@echo "... Items/Crafting/Crafting.o"
+	@echo "... Items/Crafting/Crafting.i"
+	@echo "... Items/Crafting/Crafting.s"
 	@echo "... Items/Equipment/Equipment.o"
 	@echo "... Items/Equipment/Equipment.i"
 	@echo "... Items/Equipment/Equipment.s"
@@ -816,6 +1153,9 @@ help:
 	@echo "... Skills/ClassSkills/Mage/Mage.o"
 	@echo "... Skills/ClassSkills/Mage/Mage.i"
 	@echo "... Skills/ClassSkills/Mage/Mage.s"
+	@echo "... Skills/ClassSkills/Merchant/Merchant.o"
+	@echo "... Skills/ClassSkills/Merchant/Merchant.i"
+	@echo "... Skills/ClassSkills/Merchant/Merchant.s"
 	@echo "... Skills/ClassSkills/Priest/Priest.o"
 	@echo "... Skills/ClassSkills/Priest/Priest.i"
 	@echo "... Skills/ClassSkills/Priest/Priest.s"
@@ -837,6 +1177,9 @@ help:
 	@echo "... World/Enemies/Enemies.o"
 	@echo "... World/Enemies/Enemies.i"
 	@echo "... World/Enemies/Enemies.s"
+	@echo "... World/NPCs/NPC.o"
+	@echo "... World/NPCs/NPC.i"
+	@echo "... World/NPCs/NPC.s"
 	@echo "... World/Quests/Quest.o"
 	@echo "... World/Quests/Quest.i"
 	@echo "... World/Quests/Quest.s"
