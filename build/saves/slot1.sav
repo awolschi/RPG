@@ -1,0 +1,71 @@
+Kowalle
+2
+2
+11 440
+110 322
+130 250 3 13 55 28 5 2
+4 1674
+3|3|Mana Potion|2|10|C|0|58
+4|3|Minor Mana Potion|1|10|C|0|24
+3|3|Health Potion|2|10|C|70|0
+1|3|Minor Health Potion|1|10|C|40|0
+none
+none
+none
+none
+none
+none
+none
+none
+none
+none
+8
+Attack|2|28|0|29
+Arcane Bolt|1|0|0|20
+Meteor|1|0|0|80
+Frost Ward|1|0|0|0
+Arcane Surge|1|0|0|100
+Mana Siphon|1|0|0|30
+Chain Lightning|1|0|0|55
+Lightning Bolt|1|0|0|60
+4
+0 1 0
+1 1 0
+2 1 0
+3 1 0
+1
+0
+0
+0
+31
+Slime Exterminator|0|The slimes of Felrona have grown aggressive. Thin their numbers.|Slime|5|5|100|50|2|1
+Rat Catcher|0|Rats are infesting Felrona's buildings. Put a stop to it.|Rat|5|0|100|50|0|0
+Bandit Troubles|0|Bandits prey on travelers near Felrona. Teach them a lesson.|Bandit|5|0|150|75|0|0
+Gel Collection|1|Collect Slime Gel for the blacksmith's experiments.|Slime Gel|5|5|80|40|2|1
+Rat Tails|1|Gather Rat Tails to prove your hunting prowess.|Rat Tail|5|0|80|40|0|0
+Wolf Hunter|0|Wolves stalk the Dark Woods paths. Reduce their pack.|Wolf|5|1|200|100|1|0
+Spider Menace|0|Giant Spiders spin their webs across Dark Woods. Clear them out.|Giant Spider|5|0|200|100|0|0
+Wolf Pelts|1|Collect Wolf Pelts for warm winter clothing.|Wolf Pelt|3|0|150|75|1|0
+Silk Harvest|1|Gather Spider Silk for the weaver's workshop.|Spider Silk|3|0|160|80|0|0
+Pirate Scourge|0|Pirates raid coastal settlements. Sink their operation.|Pirate|5|0|300|150|0|0
+Pirate Bounty|1|Collect Doubloons from defeated pirates.|Doubloon|5|0|250|125|0|0
+Scale Collection|1|Gather Serpent Scales for alchemical research.|Serpent Scale|3|0|280|140|0|0
+Orc Bane|0|Orc warbands terrorize Dragon's Peak. Break their ranks.|Orc|5|0|400|200|0|0
+Dragon Slayer|0|The Elder Dragon threatens the realm. Only the bravest dare challenge it.|Elder Dragon|1|0|1000|500|0|0
+Orc Tusks|1|Collect Orc Tusks as proof of your victories.|Orc Tusk|5|0|350|175|0|0
+Essence Gathering|1|Gather Fire Essence for the Elementalist.|Fire Essence|3|0|400|200|0|0
+Highland Challenge|0|Highland Warriors seek worthy opponents. Show them one.|Highland Warrior|5|0|500|250|0|0
+Gryphon Hunt|0|Gryphons soar above the Highlands. Bring one down.|Gryphon|3|0|600|300|0|0
+Shadow Purge|0|Shadows lurk in the Dungeon's depths. Purge the darkness.|Shadow|5|0|600|300|0|0
+Shadow Research|1|Collect Shadow Essence for arcane research.|Shadow Essence|5|0|550|275|0|0
+Demon Parts|1|Gather Demon Horns for protective ward crafting.|Demon Horn|3|0|700|350|0|0
+Knight Fall|0|Corrupted Celestial Knights guard forbidden halls. Defeat them.|Celestial Knight|5|0|1200|600|0|0
+Void Purge|0|Void Walkers tear at reality itself. Seal them away.|Void Walker|5|0|2000|1000|0|0
+Farmland Liberation|2|The Abandoned Farm is overrun. Drive out the bandits and reclaim it.|Abandoned Farm|1|0|300|150|0|0
+Twilight Purification|2|Twilight Hollow teems with undead. Cleanse the catacombs.|Twilight Hollow|1|0|400|200|0|0
+Sunken Treasure|2|The Sunken Grotto holds ancient secrets — and ancient dangers.|Sunken Grotto|1|0|500|250|0|0
+Summit Conquest|2|The Summit is a proving ground for warriors. Claim victory.|The Summit|1|0|800|400|0|0
+Citadel Siege|2|Storm The Citadel and face the corrupted knights within.|The Citadel|1|0|1000|500|0|0
+Abyssal Victory|2|The Abyssal Depths test even the strongest. Survive and emerge triumphant.|Abyssal Depths|1|0|1500|750|0|0
+Heavenly Ascent|2|The Heavenly Ascent challenges body and spirit. Ascend to glory.|The Heavenly Ascent|1|0|3000|1500|0|0
+Void Conqueror|2|The Endless Void consumes all who enter. Be the one who conquers it.|The Endless Void|1|0|5000|2500|0|0
