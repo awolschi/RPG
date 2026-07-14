@@ -8,6 +8,8 @@ Overhaul the equipment system to make gear more interesting with formalized rari
 
 ## 0. Save Equipment when you use "save game"
 
+## 0.1 Add Skill leveling, like it is described in the SKILLREADME.md for every skill
+
 ## 1. Formalize Rarity System
 
 **File:** `Items/Item.hpp`

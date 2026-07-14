@@ -137,6 +137,20 @@ bool Player::CanEquip(const std::shared_ptr<Item>& item) const
         }
         return false;
     }
+    else if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
+    {
+        switch (oh->offhandType)
+        {
+            case OffhandType::Shield:
+                return characterClass == CharacterClass::Warrior || characterClass == CharacterClass::Archer;
+            case OffhandType::Orb:
+            case OffhandType::Book:
+                return characterClass == CharacterClass::Mage || characterClass == CharacterClass::Priest;
+            case OffhandType::Bag:
+                return true;
+        }
+        return true;
+    }
     // Accessories and consumables can be used by anyone
     return true;
 }
@@ -150,7 +164,26 @@ bool Player::EquipItem(std::shared_ptr<Item> item)
 
     if (!CanEquip(item)) return false;
 
-    if (auto weapon = std::dynamic_pointer_cast<Weapon>(item))
+    if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
+    {
+        int oldMaxHP = GetMaxHealth();
+        int oldMaxMP = GetMaxMana();
+
+        if (equipment.offhand)
+            inventory.AddItem(equipment.offhand);
+        equipment.offhand = oh->Clone();
+        inventory.RemoveOneItem(idx);
+
+        int hpDiff = GetMaxHealth() - oldMaxHP;
+        int mpDiff = GetMaxMana() - oldMaxMP;
+        if (hpDiff > 0) currentHealth += hpDiff;
+        if (currentHealth > GetMaxHealth()) currentHealth = GetMaxHealth();
+        if (mpDiff > 0) currentMana += mpDiff;
+        if (currentMana > GetMaxMana()) currentMana = GetMaxMana();
+
+        return true;
+    }
+    else if (auto weapon = std::dynamic_pointer_cast<Weapon>(item))
     {
         if (!equipment.weapon)
         {
@@ -253,7 +286,9 @@ void Player::ListEquipment() const
         if (item)
         {
             std::cout << item->name;
-            if (auto w = std::dynamic_pointer_cast<Weapon>(item))
+            if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
+                std::cout << " (DEF:" << oh->defense << " Mana:" << oh->manaBonus << ")";
+            else if (auto w = std::dynamic_pointer_cast<Weapon>(item))
                 std::cout << " (DMG:" << w->damage << " Mana:" << w->manaCost << ")";
             else if (auto a = std::dynamic_pointer_cast<Armor>(item))
                 std::cout << " (DEF:" << a->defense << ")";

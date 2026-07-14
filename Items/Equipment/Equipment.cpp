@@ -17,7 +17,6 @@ int Equipment::GetWeaponDamage() const
 {
     int dmg = 0;
     if (weapon) dmg += weapon->damage;
-    if (offhand) dmg += offhand->damage;
     return dmg;
 }
 
@@ -40,7 +39,23 @@ int Equipment::GetManaBonus() const
     if (ring2) bonus += ring2->bonusMana;
     if (amulet) bonus += amulet->bonusMana;
 
+    if (offhand)
+    {
+        if (auto oh = std::dynamic_pointer_cast<Offhand>(offhand))
+            bonus += oh->manaBonus;
+    }
+
     return bonus;
+}
+
+int Equipment::GetOffhandDefense() const
+{
+    if (offhand)
+    {
+        if (auto oh = std::dynamic_pointer_cast<Offhand>(offhand))
+            return oh->defense;
+    }
+    return 0;
 }
 
 void Equipment::ListEquipment(std::vector<std::string>& out) const
@@ -49,7 +64,16 @@ void Equipment::ListEquipment(std::vector<std::string>& out) const
         out.push_back(slot + ": " + name);
     };
     if (weapon)  add("Weapon", weapon->name);  else out.push_back("Weapon: (none)");
-    if (offhand) add("Offhand", offhand->name);
+    if (offhand)
+    {
+        if (auto oh = std::dynamic_pointer_cast<Offhand>(offhand))
+            add("Offhand", oh->name + " (" + OffhandTypeName(oh->offhandType) + ")");
+        else if (auto w = std::dynamic_pointer_cast<Weapon>(offhand))
+            add("Offhand", w->name);
+        else
+            add("Offhand", offhand->name);
+    }
+    else out.push_back("Offhand: (none)");
     if (helmet)  add("Helmet", helmet->name);   else out.push_back("Helmet: (none)");
     if (chest)   add("Chest", chest->name);     else out.push_back("Chest: (none)");
     if (gloves)  add("Gloves", gloves->name);   else out.push_back("Gloves: (none)");
@@ -64,8 +88,12 @@ ElementType Equipment::GetWeaponElement() const
 {
     if (weapon && weapon->element != ElementType::Physical)
         return weapon->element;
-    if (offhand && offhand->element != ElementType::Physical)
-        return offhand->element;
+    if (offhand)
+    {
+        if (auto w = std::dynamic_pointer_cast<Weapon>(offhand))
+            if (w->element != ElementType::Physical)
+                return w->element;
+    }
     return ElementType::Physical;
 }
 
@@ -74,8 +102,15 @@ int Equipment::GetElementalDamage(ElementType element) const
     int total = 0;
     if (weapon && weapon->element == element)
         total += weapon->elementDamage;
-    if (offhand && offhand->element == element)
-        total += offhand->elementDamage;
+    if (offhand)
+    {
+        if (auto w = std::dynamic_pointer_cast<Weapon>(offhand))
+            if (w->element == element)
+                total += w->elementDamage;
+        if (auto oh = std::dynamic_pointer_cast<Offhand>(offhand))
+            if (oh->arcaneDamage > 0 && element == ElementType::Arcane)
+                total += oh->arcaneDamage;
+    }
     if (ring1 && ring1->element == element)
         total += ring1->elementDamage;
     if (ring2 && ring2->element == element)

@@ -22,6 +22,8 @@ namespace ResourceFactory
     std::shared_ptr<Resource> CreateLumberjackingResource(int jobLevel);
     std::shared_ptr<Resource> CreateFishingResource(int jobLevel);
     std::shared_ptr<Resource> CreateSmithingResource(int jobLevel);
+    std::shared_ptr<Resource> CreateSkinningResource(int jobLevel);
+    std::shared_ptr<Resource> CreateArcaneResource(int jobLevel);
 }
 
 #endif

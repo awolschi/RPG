@@ -1,4 +1,5 @@
 #include "Combat.hpp"
+#include "../Items/Passives.hpp"
 #include <sstream>
 #include <cstdlib>
 
@@ -25,11 +26,27 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
     std::string effectLog = attacker->ProcessEffects();
     effectLog += defender->ProcessEffects();
 
-    // Check if attacker is stunned
+    // Turn start: Mana regen from passives
+    int manaRegen = Passives::GetManaRegenBonus(attacker->GetEquipment());
+    if (manaRegen > 0)
+    {
+        attacker->RestoreMana(manaRegen);
+        effectLog += attacker->GetName() + " regenerates " + std::to_string(manaRegen) + " mana. ";
+    }
+
+    // Check if attacker is stunned (immune check)
     if (attacker->IsStunned())
     {
-        attacker->GetSkills().UpdateCooldowns();
-        return attacker->GetName() + " is stunned and cannot act!";
+        if (!Passives::IsStunImmune(attacker->GetEquipment()))
+        {
+            attacker->GetSkills().UpdateCooldowns();
+            return effectLog + attacker->GetName() + " is stunned and cannot act!";
+        }
+        else
+        {
+            effectLog += attacker->GetName() + " resists stun! ";
+            attacker->RemoveEffect(EffectType::Stun);
+        }
     }
 
     std::string actionMsg;
@@ -37,11 +54,29 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
     {
         case CombatAction::Attack:
         {
+            // Dodge check
+            if (Passives::RollProc(Passives::GetDodgePercent(defender->GetEquipment())))
+            {
+                attacker->GetSkills().UpdateCooldowns();
+                actionMsg = defender->GetName() + " dodges the attack! ";
+                break;
+            }
+
             auto attackSkill = attacker->GetSkills().GetSkill(0);
             if (attackSkill)
             {
                 int hpBefore = defender->GetCurrentHealth();
                 attackSkill->Use(*attacker, *defender);
+
+                // Apply physical damage boost
+                int physBoost = Passives::GetPhysicalDamageBoostPercent(attacker->GetEquipment());
+                int baseDmg = hpBefore - defender->GetCurrentHealth();
+                if (physBoost > 0 && baseDmg > 0)
+                {
+                    int bonusDmg = baseDmg * physBoost / 100;
+                    defender->TakeDamage(bonusDmg, ElementType::Physical);
+                }
+
                 attacker->GetSkills().UpdateCooldowns();
                 int dmg = hpBefore - defender->GetCurrentHealth();
                 ElementType effective = attacker->GetEffectiveElement(attackSkill->element);
@@ -52,6 +87,16 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
                         + elemStr + " (" + std::to_string(dmg) + " damage)!";
                 else
                     actionMsg = attacker->GetName() + " attacks " + defender->GetName() + elemStr + "!";
+
+                // Lifesteal
+                int lifestealPct = Passives::GetLifestealPercent(attacker->GetEquipment());
+                if (lifestealPct > 0 && dmg > 0)
+                {
+                    int heal = dmg * lifestealPct / 100;
+                    if (heal < 1) heal = 1;
+                    attacker->RestoreHealth(heal);
+                    actionMsg += " (" + std::to_string(heal) + " lifesteal)";
+                }
             }
             else
                 actionMsg = attacker->GetName() + " has no attack!";
@@ -68,13 +113,35 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
                 return effectLog + skill->name + " is on cooldown! (" +
                        std::to_string(skill->currentCooldown) + " turns)";
 
-            if (attacker->GetCurrentMana() < skill->manaCost)
+            int effectiveManaCost = skill->GetEffectiveManaCost();
+            int manaCostReduction = Passives::GetManaCostReductionPercent(attacker->GetEquipment());
+            if (manaCostReduction > 0)
+                effectiveManaCost = effectiveManaCost * (100 - manaCostReduction) / 100;
+
+            if (attacker->GetCurrentMana() < effectiveManaCost)
                 return effectLog + "Not enough mana for " + skill->name + "!";
 
             int hpBefore = defender->GetCurrentHealth();
             skill->Use(*attacker, *defender);
-            attacker->ReduceMana(skill->manaCost);
+            attacker->ReduceMana(effectiveManaCost);
+
+            // Cooldown reduction from passives
+            int cdReduction = Passives::GetCooldownReductionTurns(attacker->GetEquipment());
+            for (int i = 0; i < cdReduction; ++i)
+                attacker->GetSkills().GetSkill(skillIndex)->ReduceCooldown();
+
             attacker->GetSkills().UpdateCooldowns();
+
+            // Mana on skill use
+            int manaOnSkill = Passives::GetManaOnSkillUseAmount(attacker->GetEquipment());
+            if (manaOnSkill > 0)
+                attacker->RestoreMana(manaOnSkill);
+
+            // HP on skill use
+            int hpOnSkill = Passives::GetHpOnSkillUseAmount(attacker->GetEquipment());
+            if (hpOnSkill > 0)
+                attacker->RestoreHealth(hpOnSkill);
+
             int hpAfter = defender->GetCurrentHealth();
             int diff = hpAfter - hpBefore;
             ElementType effective = attacker->GetEffectiveElement(skill->element);
@@ -88,6 +155,25 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
                     + " (" + std::to_string(-diff) + " damage)!";
             else
                 actionMsg = attacker->GetName() + " uses " + skill->name + elemStr + "!";
+
+            // Spell damage boost
+            int spellBoost = Passives::GetSpellDamageBoostPercent(attacker->GetEquipment());
+            if (spellBoost > 0 && diff < 0)
+            {
+                int bonusDmg = (-diff) * spellBoost / 100;
+                defender->TakeDamage(bonusDmg, effective);
+                actionMsg += " (+" + std::to_string(bonusDmg) + " spell boost)";
+            }
+
+            // Lifesteal on skill
+            int lifestealPct = Passives::GetLifestealPercent(attacker->GetEquipment());
+            if (lifestealPct > 0 && diff < 0)
+            {
+                int heal = (-diff) * lifestealPct / 100;
+                if (heal < 1) heal = 1;
+                attacker->RestoreHealth(heal);
+                actionMsg += " (+" + std::to_string(heal) + " lifesteal)";
+            }
             break;
         }
 
@@ -146,8 +232,8 @@ std::vector<std::string> CombatSystem::GetSkillOptions(std::shared_ptr<Character
         if (s)
         {
             std::string entry = std::to_string(i) + ". " + s->name
-                + " (Mana:" + std::to_string(s->manaCost)
-                + " CD:" + std::to_string(s->currentCooldown) + "/" + std::to_string(s->cooldown)
+                + " (Mana:" + std::to_string(s->GetEffectiveManaCost())
+                + " CD:" + std::to_string(s->currentCooldown) + "/" + std::to_string(s->GetEffectiveCooldown())
                 + " Req:" + std::to_string(s->requiredLevel) + ")";
             opts.push_back(entry);
         }

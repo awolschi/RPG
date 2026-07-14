@@ -186,6 +186,8 @@ CMakeFiles/rpg.dir/Engine/Combat.cpp.o: \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/../Item.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/../../Skills/Skill.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Skills/Skills.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Passives.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/../Equipment/Equipment.hpp \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/sstream \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/istream \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/ios \

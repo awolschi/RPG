@@ -7,13 +7,18 @@
 
 Color GetRarityColor(int rarity)
 {
-    switch (rarity)
+    return RarityColor(static_cast<Rarity>(rarity));
+}
+
+Color RarityColor(Rarity r)
+{
+    switch (r)
     {
-        case 1: return {160, 160, 160, 255};
-        case 2: return {220, 220, 220, 255};
-        case 3: return {76, 201, 76, 255};
-        case 4: return {76, 136, 255, 255};
-        case 5: return {255, 215, 0, 255};
+        case Rarity::Common:    return {255, 255, 255, 255};
+        case Rarity::Uncommon:  return {80, 220, 80, 255};
+        case Rarity::Rare:      return {80, 150, 255, 255};
+        case Rarity::Epic:      return {180, 80, 255, 255};
+        case Rarity::Legendary: return {255, 165, 0, 255};
         default: return {200, 200, 200, 255};
     }
 }

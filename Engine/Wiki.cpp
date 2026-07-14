@@ -1,5 +1,8 @@
 #include "Wiki.hpp"
 #include "../Graphics/Colors.hpp"
+#include "../Graphics/IconRenderer.hpp"
+#include "../Items/SetBonuses.hpp"
+#include "../Items/Uniques/UniqueItems.hpp"
 #include <algorithm>
 #include <sstream>
 #include <cstring>
@@ -13,6 +16,9 @@ Wiki::Wiki()
     BuildEnemyDatabase();
     BuildResourceDatabase();
     BuildCraftingDatabase();
+    BuildAreaDatabase();
+    BuildSetDatabase();
+    BuildUniqueDatabase();
 }
 
 void Wiki::SetAreas(const std::vector<Area>& areaList)
@@ -439,6 +445,277 @@ void Wiki::BuildCraftingDatabase()
 }
 
 // ============================================================
+//  SET DATABASE
+// ============================================================
+
+void Wiki::BuildSetDatabase()
+{
+    setEntries.clear();
+
+    SetBonuses::Initialize();
+    const auto& allSets = SetBonuses::GetAllSets();
+
+    for (const auto& s : allSets)
+    {
+        // Build pieces list
+        std::string pieces;
+        for (size_t i = 0; i < s.pieceNames.size(); ++i)
+        {
+            if (i > 0) pieces += ", ";
+            pieces += s.pieceNames[i];
+        }
+
+        // Build bonus description
+        std::string bonusDesc;
+        bonusDesc += "2pc:";
+        for (const auto& b : s.twoPiece)
+        {
+            bonusDesc += " +" + std::to_string(b.value);
+            switch (b.type)
+            {
+                case SetBonusType::DmgBoost:       bonusDesc += "% phys"; break;
+                case SetBonusType::DefBoost:       bonusDesc += "% DR"; break;
+                case SetBonusType::ManaCostReduce: bonusDesc += "% m-cost"; break;
+                case SetBonusType::CooldownReduce: bonusDesc += "t CD"; break;
+                case SetBonusType::StatusExtend:   bonusDesc += "t status"; break;
+                case SetBonusType::CritBoost:      bonusDesc += "% crit"; break;
+                case SetBonusType::SpellDmgBoost:  bonusDesc += "% spell"; break;
+                case SetBonusType::HpPerTurn:      bonusDesc += " hp/t"; break;
+                case SetBonusType::Dodge:          bonusDesc += "% dodge"; break;
+                case SetBonusType::HealOnKill:     bonusDesc += "% heal"; break;
+                case SetBonusType::Thorns:         bonusDesc += "% thorns"; break;
+                case SetBonusType::Revive:         bonusDesc += "% revive"; break;
+                case SetBonusType::ManaRegen:      bonusDesc += " mp/t"; break;
+                case SetBonusType::AllResist:      bonusDesc += " allres"; break;
+                case SetBonusType::DoubleCast:     bonusDesc += "% 2x"; break;
+                case SetBonusType::BurnImmune:     bonusDesc += " burn-imm"; break;
+            }
+        }
+        if (!s.fourPiece.empty())
+        {
+            bonusDesc += " | 4pc:";
+            for (const auto& b : s.fourPiece)
+            {
+                bonusDesc += " +" + std::to_string(b.value);
+                switch (b.type)
+                {
+                    case SetBonusType::DmgBoost:       bonusDesc += "% phys"; break;
+                    case SetBonusType::DefBoost:       bonusDesc += "% DR"; break;
+                    case SetBonusType::ManaCostReduce: bonusDesc += "% m-cost"; break;
+                    case SetBonusType::CooldownReduce: bonusDesc += "t CD"; break;
+                    case SetBonusType::StatusExtend:   bonusDesc += "t status"; break;
+                    case SetBonusType::CritBoost:      bonusDesc += "% crit"; break;
+                    case SetBonusType::SpellDmgBoost:  bonusDesc += "% spell"; break;
+                    case SetBonusType::HpPerTurn:      bonusDesc += " hp/t"; break;
+                    case SetBonusType::Dodge:          bonusDesc += "% dodge"; break;
+                    case SetBonusType::HealOnKill:     bonusDesc += "% heal"; break;
+                    case SetBonusType::Thorns:         bonusDesc += "% thorns"; break;
+                    case SetBonusType::Revive:         bonusDesc += "% revive"; break;
+                    case SetBonusType::ManaRegen:      bonusDesc += " mp/t"; break;
+                    case SetBonusType::AllResist:      bonusDesc += " allres"; break;
+                    case SetBonusType::DoubleCast:     bonusDesc += "% 2x"; break;
+                    case SetBonusType::BurnImmune:     bonusDesc += " burn-imm"; break;
+                }
+            }
+        }
+
+        // Determine rarity from set name (most are legendary/epic)
+        int rarity = 5;
+        if (s.name == "Archmage's Regalia" || s.name == "Elementalist's Vestments")
+            rarity = 4;
+
+        setEntries.push_back({s.name, "Set (" + std::to_string(s.pieceNames.size()) + " pieces)", pieces, bonusDesc, rarity});
+    }
+
+    std::sort(setEntries.begin(), setEntries.end(),
+        [](const WikiEntry& a, const WikiEntry& b) {
+            if (a.rarity != b.rarity) return a.rarity < b.rarity;
+            return a.name < b.name;
+        });
+}
+
+// ============================================================
+//  UNIQUE DATABASE (dynamically from UniqueItemRegistry)
+// ============================================================
+
+void Wiki::BuildUniqueDatabase()
+{
+    uniqueEntries.clear();
+
+    UniqueItemRegistry::Initialize();
+
+    auto passiveToStr = [](ItemPassive p) -> std::string {
+        switch (p)
+        {
+            case ItemPassive::FireNoCd20:       return "Fire 20% no CD";
+            case ItemPassive::IceFreezePlus1:    return "Ice freeze +1 turn";
+            case ItemPassive::LightningStun15:   return "Lightning 15% stun";
+            case ItemPassive::ArcaneCrit30:      return "Arcane 30% double";
+            case ItemPassive::PoisonDmgPlus25:   return "Poison +25% dmg";
+            case ItemPassive::HolyHealOnKill:    return "Holy heal on kill";
+            case ItemPassive::ManaCostReduce10:  return "-10% mana cost";
+            case ItemPassive::ManaCostReduce15:  return "-15% mana cost";
+            case ItemPassive::ManaRegen5:        return "+5 mana/turn";
+            case ItemPassive::ManaRegen10:       return "+10 mana/turn";
+            case ItemPassive::SpellDmgBoost15:   return "+15% spell dmg";
+            case ItemPassive::SpellDmgBoost20:   return "+20% spell dmg";
+            case ItemPassive::SpellDmgLowHp30:   return "+30% spell <50% HP";
+            case ItemPassive::PhysDmgBoost15:    return "+15% phys dmg";
+            case ItemPassive::PhysDmgBoost20:    return "+20% phys dmg";
+            case ItemPassive::PhysDmgLowHp30:    return "+30% phys <50% HP";
+            case ItemPassive::AtkSpeed20:        return "+20% atk speed";
+            case ItemPassive::CritChance20:      return "20% crit";
+            case ItemPassive::CritChance30:      return "30% crit";
+            case ItemPassive::Dodge15:           return "15% dodge";
+            case ItemPassive::Dodge20:           return "20% dodge";
+            case ItemPassive::DamageReduce10:    return "-10% damage";
+            case ItemPassive::DamageReduce15:    return "-15% damage";
+            case ItemPassive::HealOnKill10:      return "+10% HP on kill";
+            case ItemPassive::HealOnKill15:      return "+15% HP on kill";
+            case ItemPassive::Lifesteal15:       return "15% lifesteal";
+            case ItemPassive::Lifesteal25:       return "25% lifesteal";
+            case ItemPassive::Thorns25:          return "25% thorns";
+            case ItemPassive::Thorns40:          return "40% thorns";
+            case ItemPassive::PhoenixRevive:     return "Revive 30% HP";
+            case ItemPassive::Revive50:          return "Revive 50% HP";
+            case ItemPassive::TauntChance25:     return "25% taunt";
+            case ItemPassive::ManaShield30:      return "30% mana shield";
+            case ItemPassive::DoubleCast15:      return "15% double cast";
+            case ItemPassive::DoubleCast25:      return "25% double cast";
+            case ItemPassive::CooldownReduce1:   return "-1 turn CD";
+            case ItemPassive::CooldownReduce2:   return "-2 turns CD";
+            case ItemPassive::StatusExtend1:     return "Status +1 turn";
+            case ItemPassive::StatusExtend2:     return "Status +2 turns";
+            case ItemPassive::ExpBoost20:        return "+20% XP";
+            case ItemPassive::GoldFind30:        return "+30% gold";
+            case ItemPassive::AllResist5:        return "+5 all resist";
+            case ItemPassive::AllResist10:       return "+10 all resist";
+            case ItemPassive::StunImmune:        return "Stun immune";
+            case ItemPassive::FreezeImmune:      return "Freeze immune";
+            case ItemPassive::BurnImmune:        return "Burn immune";
+            case ItemPassive::PoisonImmune:      return "Poison immune";
+            case ItemPassive::ManaOnKill15:      return "+15 mana on kill";
+            case ItemPassive::ManaOnKill25:      return "+25 mana on kill";
+            case ItemPassive::ManaOnSkillUse10:  return "+10 mana/skill";
+            case ItemPassive::HpOnSkillUse10:    return "+10 HP/skill";
+            default: return "";
+        }
+    };
+
+    auto elemToStr = [](ElementType e) -> std::string {
+        switch (e)
+        {
+            case ElementType::Fire:      return "Fire";
+            case ElementType::Ice:       return "Ice";
+            case ElementType::Lightning: return "Lightning";
+            case ElementType::Arcane:    return "Arcane";
+            case ElementType::Poison:    return "Poison";
+            case ElementType::Holy:      return "Holy";
+            default:                     return "";
+        }
+    };
+
+    // Weapons
+    for (const auto& w : UniqueItemRegistry::GetAllWeapons())
+    {
+        std::string cat;
+        if (w.rarity == Rarity::Epic) cat = "Epic Weapon";
+        else cat = "Legendary Weapon";
+
+        std::string stats = "DMG:" + std::to_string(w.baseDamage)
+            + " MP:" + std::to_string(w.manaCost);
+        if (w.element != ElementType::Physical && w.baseElementDamage > 0)
+            stats += " " + elemToStr(w.element) + ":" + std::to_string(w.baseElementDamage);
+
+        std::string passives;
+        if (w.passive1 != ItemPassive::None) passives += passiveToStr(w.passive1);
+        if (w.passive2 != ItemPassive::None)
+        {
+            if (!passives.empty()) passives += ", ";
+            passives += passiveToStr(w.passive2);
+        }
+
+        std::string source = w.dropSource;
+        if (w.setId >= 0)
+        {
+            const SetInfo* set = SetBonuses::FindSetById(w.setId);
+            if (set) source += " [" + set->name + "]";
+        }
+
+        uniqueEntries.push_back({w.name, cat, stats + "  " + passives, source, static_cast<int>(w.rarity)});
+    }
+
+    // Armor
+    for (const auto& a : UniqueItemRegistry::GetAllArmor())
+    {
+        std::string cat;
+        if (a.rarity == Rarity::Epic) cat = "Epic Armor";
+        else cat = "Legendary Armor";
+
+        std::string stats = "DEF:" + std::to_string(a.baseDefense);
+        for (const auto& kv : a.baseResist)
+        {
+            if (kv.second > 0)
+                stats += " " + elemToStr(kv.first) + ":" + std::to_string(kv.second);
+        }
+
+        std::string passives;
+        if (a.passive1 != ItemPassive::None) passives += passiveToStr(a.passive1);
+        if (a.passive2 != ItemPassive::None)
+        {
+            if (!passives.empty()) passives += ", ";
+            passives += passiveToStr(a.passive2);
+        }
+
+        std::string source = a.dropSource;
+        if (a.setId >= 0)
+        {
+            const SetInfo* set = SetBonuses::FindSetById(a.setId);
+            if (set) source += " [" + set->name + "]";
+        }
+
+        uniqueEntries.push_back({a.name, cat, stats + "  " + passives, source, static_cast<int>(a.rarity)});
+    }
+
+    // Accessories
+    for (const auto& ac : UniqueItemRegistry::GetAllAccessories())
+    {
+        std::string cat;
+        if (ac.rarity == Rarity::Epic) cat = "Epic Accessory";
+        else cat = "Legendary Accessory";
+
+        std::string stats = "HP:" + std::to_string(ac.baseHealth)
+            + " MP:" + std::to_string(ac.baseMana);
+        if (ac.element != ElementType::Physical && ac.baseElementDamage > 0)
+            stats += " " + elemToStr(ac.element) + ":" + std::to_string(ac.baseElementDamage);
+
+        std::string passives;
+        if (ac.passive1 != ItemPassive::None) passives += passiveToStr(ac.passive1);
+        if (ac.passive2 != ItemPassive::None)
+        {
+            if (!passives.empty()) passives += ", ";
+            passives += passiveToStr(ac.passive2);
+        }
+
+        std::string source = ac.dropSource;
+        if (ac.setId >= 0)
+        {
+            const SetInfo* set = SetBonuses::FindSetById(ac.setId);
+            if (set) source += " [" + set->name + "]";
+        }
+
+        uniqueEntries.push_back({ac.name, cat, stats + "  " + passives, source, static_cast<int>(ac.rarity)});
+    }
+
+    std::sort(uniqueEntries.begin(), uniqueEntries.end(),
+        [](const WikiEntry& a, const WikiEntry& b) {
+            if (a.rarity != b.rarity) return a.rarity > b.rarity;
+            if (a.category != b.category) return a.category < b.category;
+            return a.name < b.name;
+        });
+}
+
+// ============================================================
 //  AREA DATABASE
 // ============================================================
 
@@ -484,15 +761,17 @@ void Wiki::Draw(GRenderer& renderer)
         case WikiTab::Resources: DrawTabPage(renderer, resourceEntries, "Resources"); break;
         case WikiTab::Crafting:  DrawTabPage(renderer, craftEntries, "Crafting Recipes"); break;
         case WikiTab::Areas:     DrawTabPage(renderer, areaEntries, "Areas"); break;
+        case WikiTab::Sets:      DrawTabPage(renderer, setEntries, "Set Bonuses"); break;
+        case WikiTab::Uniques:   DrawTabPage(renderer, uniqueEntries, "Unique Items"); break;
         default: break;
     }
 }
 
 void Wiki::DrawTabBar(GRenderer& renderer)
 {
-    const char* tabNames[] = { "Equipment", "Skills", "Enemies", "Resources", "Crafting", "Areas" };
+    const char* tabNames[] = { "Equipment", "Skills", "Enemies", "Resources", "Crafting", "Areas", "Sets", "Uniques" };
     int tabCount = static_cast<int>(WikiTab::COUNT);
-    int tabW = 100;
+    int tabW = 90;
     int startX = renderer.CenterX(tabCount * tabW);
     int y = 55;
 
@@ -591,11 +870,12 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
     // ---- Column setup ----
     int y = 126;
     int lineH = 18;
-    int rowLimit = 4;
+    int rowLimit = 1;
     int headerH = 18;
     int separatorH = 3;
     int totalHeaderH = headerH + separatorH;
-    int availableH = GRenderer::H - 160 - totalHeaderH;
+    int navBarH = 50;
+    int availableH = GRenderer::H - 160 - totalHeaderH - navBarH;
     int maxLines = availableH / (lineH + rowLimit);
     if (maxLines < 1) maxLines = 1;
     int totalEntries = static_cast<int>(filtered.size());
@@ -617,6 +897,20 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
         colX[0] = 40;   colW[0] = 200;
         colX[1] = 250;  colW[1] = 150;
         colX[2] = 410;  colW[2] = 290;
+        colX[3] = 710;  colW[3] = 210;
+    }
+    else if (currentTab == WikiTab::Sets)
+    {
+        colX[0] = 40;   colW[0] = 160;
+        colX[1] = 210;  colW[1] = 80;
+        colX[2] = 300;  colW[2] = 350;
+        colX[3] = 660;  colW[3] = 260;
+    }
+    else if (currentTab == WikiTab::Uniques)
+    {
+        colX[0] = 40;   colW[0] = 210;
+        colX[1] = 260;  colW[1] = 120;
+        colX[2] = 390;  colW[2] = 310;
         colX[3] = 710;  colW[3] = 210;
     }
     else
@@ -666,6 +960,18 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
             renderer.DrawText("Area", colX[0], y, 14, headerColor);
             renderer.DrawText("Info", colX[1], y, 14, headerColor);
             break;
+        case WikiTab::Sets:
+            renderer.DrawText("Set Name", colX[0], y, 14, headerColor);
+            renderer.DrawText("Pieces", colX[1], y, 14, headerColor);
+            renderer.DrawText("Set Pieces", colX[2], y, 14, headerColor);
+            renderer.DrawText("Bonuses", colX[3], y, 14, headerColor);
+            break;
+        case WikiTab::Uniques:
+            renderer.DrawText("Name", colX[0], y, 14, headerColor);
+            renderer.DrawText("Type", colX[1], y, 14, headerColor);
+            renderer.DrawText("Stats / Passives", colX[2], y, 14, headerColor);
+            renderer.DrawText("Source / Set", colX[3], y, 14, headerColor);
+            break;
         default: break;
     }
 
@@ -684,9 +990,7 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
         else
             renderer.DrawRect(38, y - 1, GRenderer::W - 76, lineH + 1, CQColors::BgPanel);
 
-        Color textColor = (e.rarity >= 5) ? CQColors::GoldBright
-                        : (e.rarity >= 3) ? CQColors::TextGreen
-                        : CQColors::TextLight;
+        Color textColor = RarityColor(static_cast<Rarity>(e.rarity));
 
         // Draw name (truncate if needed)
         std::string name = e.name;
@@ -723,16 +1027,21 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
 
     // ---- Page nav ----
     int navY = GRenderer::H - 90;
-    if (page > 0)
+    int totalPages = maxPage + 1;
+    int btnW = 80;
+    int btnH = 32;
+    int btnSpacing = 6;
+    int totalNavW = totalPages * (btnW + btnSpacing) - btnSpacing;
+    int navStartX = (GRenderer::W - totalNavW) / 2;
+
+    for (int p = 0; p < totalPages; ++p)
     {
-        if (renderer.Button("< Prev", renderer.CenterX(200) - 110, navY, 100, 32))
-            page--;
+        int bx = navStartX + p * (btnW + btnSpacing);
+        std::string label = std::to_string(p + 1);
+        if (renderer.Button(label, bx, navY, btnW, btnH))
+            page = p;
     }
-    if (page < maxPage)
-    {
-        if (renderer.Button("Next >", renderer.CenterX(200) + 10, navY, 100, 32))
-            page++;
-    }
-    std::string pg = "Page " + std::to_string(page + 1) + "/" + std::to_string(maxPage + 1);
-    renderer.DrawCenteredText(pg, navY + 8, 16, CQColors::TextDim);
+
+    std::string pg = "Page " + std::to_string(page + 1) + "/" + std::to_string(totalPages);
+    renderer.DrawCenteredText(pg, navY - 16, 13, CQColors::TextDim);
 }

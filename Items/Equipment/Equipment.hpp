@@ -13,7 +13,7 @@ public:
 
     // Weapons
     std::shared_ptr<Weapon> weapon;
-    std::shared_ptr<Weapon> offhand;
+    std::shared_ptr<Item> offhand;
 
     // Armor
     std::shared_ptr<Armor> helmet;
@@ -33,9 +33,12 @@ public:
     // Calculate total weapon damage from equipped weapons
     int GetWeaponDamage() const;
 
-    // Calculate total bonus stats from accessories
+    // Calculate total bonus stats from accessories and offhand
     int GetHealthBonus() const;
     int GetManaBonus() const;
+
+    // Offhand defense (from shields)
+    int GetOffhandDefense() const;
 
     // Elemental
     ElementType GetWeaponElement() const;

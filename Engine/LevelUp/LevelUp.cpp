@@ -6,9 +6,7 @@ LevelUpManager::LevelUpManager()
 
 int LevelUpManager::CalculateRequiredXP(int level)
 {
-    // XP requirement increases with level
-    // Formula: 100 + (level - 1) * 50
-    return 100 + (level - 1) * 50;
+    return 100 + (level - 1) * 100 + (level - 1) * (level - 1) * 15;
 }
 
 void LevelUpManager::ApplyLevelUp(Character& character)

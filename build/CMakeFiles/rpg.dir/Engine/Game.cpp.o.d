@@ -232,14 +232,20 @@ CMakeFiles/rpg.dir/Engine/Game.cpp.o: \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Crafting/../../Inventory/Inventory.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Graphics/Colors.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Graphics/IconRenderer.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Graphics/../Items/Item.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Skills/CommonSkills/CommonAttack.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Skills/CommonSkills/../Skill.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Loot.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/../Consumable.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/../../Characters/Character.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/../../Characters/Classes/Classes.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Passives.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/../Equipment/Equipment.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/SetBonuses.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Consumable.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Resources/Resources.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Uniques/UniqueItems.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Uniques/../Item.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Enemies/Enemies.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Enemies/../../Characters/Monster.hpp \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/ctime \

@@ -1,4 +1,5 @@
 #include "Character.hpp"
+#include "../Items/Passives.hpp"
 #include <iostream>
 #include <algorithm>
 
@@ -10,7 +11,7 @@ Character::Character(const std::string& name, const Stats& baseStats)
 
 int Character::CalculateRequiredXP(int level)
 {
-    return 100 + (level - 1) * 50;
+    return 100 + (level - 1) * 100 + (level - 1) * (level - 1) * 15;
 }
 
 void Character::TakeDamage(int damage, ElementType element)
@@ -18,8 +19,30 @@ void Character::TakeDamage(int damage, ElementType element)
     float resist = GetResistance(element);
     int elemReduction = GetElementalReduction(element);
     int totalDefense = stats.defense + equipment.GetTotalDefense() + tempDefenseBonus;
+
+    // All resist bonus from passives
+    int allResist = Passives::GetAllResistBonus(equipment);
+    elemReduction += allResist;
+
     int mitigatedDamage = std::max(1, damage - totalDefense / 2 - elemReduction);
+
+    // Damage reduction from passives
+    int dmgReducePct = Passives::GetDamageReductionPercent(equipment);
+    if (dmgReducePct > 0)
+        mitigatedDamage = mitigatedDamage * (100 - dmgReducePct) / 100;
+
     mitigatedDamage = static_cast<int>(mitigatedDamage * resist);
+
+    // Mana shield: absorb damage with mana
+    int manaShieldPct = Passives::GetManaShieldPercent(equipment);
+    if (manaShieldPct > 0 && currentMana > 0)
+    {
+        int absorbed = mitigatedDamage * manaShieldPct / 100;
+        if (absorbed > currentMana) absorbed = currentMana;
+        mitigatedDamage -= absorbed;
+        currentMana -= absorbed;
+    }
+
     mitigatedDamage = std::max(1, mitigatedDamage);
     currentHealth -= mitigatedDamage;
 
@@ -103,6 +126,17 @@ int Character::GetElementalBonus(ElementType skillElement) const
 void Character::ApplyEffect(EffectType type, int duration, int potency, const std::string& source)
 {
     if (type == EffectType::None) return;
+
+    // Status immunity from passives
+    if (type == EffectType::Stun && Passives::IsStunImmune(equipment)) return;
+    if (type == EffectType::Freeze && Passives::IsFreezeImmune(equipment)) return;
+    if (type == EffectType::Burn && Passives::IsBurnImmune(equipment)) return;
+    if (type == EffectType::Poison && Passives::IsPoisonImmune(equipment)) return;
+
+    // Status extend from passives
+    int extendTurns = Passives::GetStatusExtendTurns(equipment);
+    duration += extendTurns;
+
     for (auto& e : effects)
     {
         if (e.type == type)

@@ -190,4 +190,6 @@ CMakeFiles/rpg.dir/Items/Loot.cpp.o: \
   /home/awolschi/Desktop/OwnProjects/RPG/Items/../Characters/../Skills/Skills.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Items/../Characters/Classes/Classes.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Items/../Characters/Classes/../Stats/Stats.hpp \
-  /home/awolschi/Desktop/OwnProjects/RPG/Items/../Characters/Classes/../../Items/Item.hpp
+  /home/awolschi/Desktop/OwnProjects/RPG/Items/../Characters/Classes/../../Items/Item.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Items/Uniques/UniqueItems.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Items/Uniques/../Item.hpp

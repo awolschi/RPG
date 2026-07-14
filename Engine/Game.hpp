@@ -36,6 +36,7 @@ enum class GameState
     DungeonExplore,
     DungeonComplete,
     SkillLoadout,
+    SkillUpgrade,
     SavePrompt,
     LoadPrompt,
     Wiki,
@@ -103,6 +104,9 @@ private:
     int craftPage;
     int craftMaxPage;
 
+    // Inventory UI state
+    int inventoryTab;
+
     // Main game states
     void StateMainMenu();
     void StateCharacterCreation();
@@ -114,6 +118,7 @@ private:
     void StateReligion();
     void StateShop();
     void StateSkillLoadout();
+    void StateSkillUpgrade();
     void StateAreaSelect();
     void StateQuestLog();
     void StateWiki();

@@ -206,6 +206,12 @@ CMakeFiles/rpg.dir/Engine/Wiki.cpp.o: \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Classes/../Stats/Stats.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Classes/../../Items/Item.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Graphics/Colors.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Graphics/IconRenderer.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Graphics/../Items/Item.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/SetBonuses.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Areas/../../Characters/../Items/Equipment/../Equipment/Equipment.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Uniques/UniqueItems.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Uniques/../Item.hpp \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/algorithm \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/pstl/glue_algorithm_defs.h \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/sstream \

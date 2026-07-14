@@ -19,6 +19,10 @@ public:
     // Legendary class-specific gear (from Primordial One)
     static std::vector<std::shared_ptr<Item>> GenerateLegendaryClassLoot(CharacterClass charClass);
 
+    // Roll for a unique (Epic/Legendary) drop from the UniqueItemRegistry
+    static std::shared_ptr<Item> GenerateUniqueDrop(
+        const std::string& enemyName, int difficulty, bool isBoss);
+
     // Individual item generators (public for shop)
     static std::shared_ptr<Item> CreateCommonWeapon(int difficulty);
     static std::shared_ptr<Item> CreateCommonArmor(int difficulty);

@@ -46,3 +46,19 @@ std::shared_ptr<Resource> ResourceFactory::CreateSmithingResource(int jobLevel)
     if (jobLevel >= 3) return std::make_shared<Resource>("Steel Ingot", 2, 15);
     return std::make_shared<Resource>("Simple Ingot", 1, 8);
 }
+
+std::shared_ptr<Resource> ResourceFactory::CreateSkinningResource(int jobLevel)
+{
+    if (jobLevel >= 7) return std::make_shared<Resource>("Enchanted Hide", 4, 35);
+    if (jobLevel >= 5) return std::make_shared<Resource>("Hardened Leather", 3, 22);
+    if (jobLevel >= 3) return std::make_shared<Resource>("Leather", 2, 12);
+    return std::make_shared<Resource>("Hide", 1, 6);
+}
+
+std::shared_ptr<Resource> ResourceFactory::CreateArcaneResource(int jobLevel)
+{
+    if (jobLevel >= 9) return std::make_shared<Resource>("Void Essence", 5, 65);
+    if (jobLevel >= 7) return std::make_shared<Resource>("Arcane Crystal", 4, 42);
+    if (jobLevel >= 5) return std::make_shared<Resource>("Mana Shard", 3, 24);
+    return std::make_shared<Resource>("Arcane Dust", 1, 8);
+}

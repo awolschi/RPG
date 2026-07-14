@@ -184,6 +184,8 @@ CMakeFiles/rpg.dir/Characters/Character.cpp.o: \
   /home/awolschi/Desktop/OwnProjects/RPG/Characters/../Items/Equipment/../Item.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Characters/../Items/Equipment/../../Skills/Skill.hpp \
   /home/awolschi/Desktop/OwnProjects/RPG/Characters/../Skills/Skills.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Characters/../Items/Passives.hpp \
+  /home/awolschi/Desktop/OwnProjects/RPG/Characters/../Items/Equipment/../Equipment/Equipment.hpp \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/iostream \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/ostream \
   /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/ios \

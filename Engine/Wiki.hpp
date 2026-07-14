@@ -15,6 +15,8 @@ enum class WikiTab
     Resources,
     Crafting,
     Areas,
+    Sets,
+    Uniques,
     COUNT
 };
 
@@ -51,6 +53,8 @@ private:
     std::vector<WikiEntry> resourceEntries;
     std::vector<WikiEntry> craftEntries;
     std::vector<WikiEntry> areaEntries;
+    std::vector<WikiEntry> setEntries;
+    std::vector<WikiEntry> uniqueEntries;
 
     void BuildEquipmentDatabase();
     void BuildSkillDatabase();
@@ -58,6 +62,8 @@ private:
     void BuildResourceDatabase();
     void BuildCraftingDatabase();
     void BuildAreaDatabase();
+    void BuildSetDatabase();
+    void BuildUniqueDatabase();
 
     void DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, const std::string& title);
     void DrawTabBar(GRenderer& renderer);

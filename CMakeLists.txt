@@ -38,6 +38,9 @@ set(SOURCES
     Inventory/Inventory.cpp
     Items/Equipment/Equipment.cpp
     Items/Loot.cpp
+    Items/Uniques/UniqueItems.cpp
+    Items/Passives.cpp
+    Items/SetBonuses.cpp
 
     # Engine
     Engine/Game.cpp

@@ -231,4 +231,174 @@ void CraftingManager::InitializeRecipes()
         {{"Mythril Ingot", 2}, {"Magical Wood", 2}},
         []() { return std::make_shared<Armor>("Mythril Armor", ArmorType::Plate, ArmorPiece::Chest, 28, 4); }
     });
+
+    // === TIER 3 MAGE (job level 5-6) — Cloth Armor + Offhand ===
+
+    recipes.push_back({
+        "Reinforced Cloth Robe",
+        "Sturdy cloth robes reinforced with silver thread.",
+        {{"Silver Ingot", 2}, {"Maple Wood", 2}},
+        []() { return std::make_shared<Armor>("Reinforced Cloth Robe", ArmorType::Cloth, ArmorPiece::Chest, 10, 2); }
+    });
+
+    recipes.push_back({
+        "Arcane Circlet",
+        "A circlet humming with faint arcane energy.",
+        {{"Silver Ingot", 1}, {"Maple Wood", 1}, {"Salmon", 1}},
+        []() { return std::make_shared<Armor>("Arcane Circlet", ArmorType::Cloth, ArmorPiece::Helmet, 7, 2); }
+    });
+
+    recipes.push_back({
+        "Mana Focus Orb",
+        "A crystal orb that amplifies mana flow.",
+        {{"Silver Ingot", 1}, {"Maple Wood", 1}},
+        []() { return std::make_shared<Offhand>("Mana Focus Orb", OffhandType::Orb, 0, 20, 5, 2); }
+    });
+
+    // === TIER 4 MAGE (job level 7-8) — Enchanted Cloth + Staff + Tome ===
+
+    recipes.push_back({
+        "Enchanted Cloth Armor",
+        "Cloth armor woven with enchanted fibers.",
+        {{"Gold Ingot", 2}, {"Ebony Wood", 2}},
+        []() { return std::make_shared<Armor>("Enchanted Cloth Armor", ArmorType::Cloth, ArmorPiece::Chest, 16, 3); }
+    });
+
+    recipes.push_back({
+        "Ebony Staff",
+        "A dark staff crackling with arcane potential.",
+        {{"Ebony Wood", 2}, {"Gold Ingot", 1}},
+        []() { return std::make_shared<Weapon>("Ebony Staff", 20, 35, 3, ElementType::Physical, 0, WeaponType::Staff); }
+    });
+
+    recipes.push_back({
+        "Arcane Tome",
+        "A tome inscribed with arcane runes of power.",
+        {{"Ebony Wood", 1}, {"Gold Ingot", 1}, {"Arcane Crystal", 1}},
+        []() { return std::make_shared<Offhand>("Arcane Tome", OffhandType::Book, 0, 40, 10, 3); }
+    });
+
+    // === TIER 5 MAGE (job level 9-10) — Mythril Cloth + Wand + Orb ===
+
+    recipes.push_back({
+        "Mythril Woven Robes",
+        "Legendary robes woven from mythril threads.",
+        {{"Mythril Ingot", 2}, {"Magical Wood", 2}},
+        []() { return std::make_shared<Armor>("Mythril Woven Robes", ArmorType::Cloth, ArmorPiece::Chest, 24, 4); }
+    });
+
+    recipes.push_back({
+        "Mythril Focus",
+        "A wand forged from mythril and magical wood.",
+        {{"Mythril Ingot", 1}, {"Magical Wood", 2}},
+        []() { return std::make_shared<Weapon>("Mythril Focus", 28, 55, 4, ElementType::Physical, 0, WeaponType::Wand); }
+    });
+
+    recipes.push_back({
+        "Void Shard Focus",
+        "An orb infused with void shards and arcane crystals.",
+        {{"Mythril Ingot", 2}, {"Arcane Crystal", 2}},
+        []() { return std::make_shared<Offhand>("Void Shard Focus", OffhandType::Orb, 0, 80, 18, 4); }
+    });
+
+    // === OFFHAND RECIPES (all classes) ===
+
+    recipes.push_back({
+        "Wooden Buckler",
+        "A simple shield carved from sturdy wood.",
+        {{"Maple Wood", 3}},
+        []() { return std::make_shared<Offhand>("Wooden Buckler", OffhandType::Shield, 8, 0, 0, 1); }
+    });
+
+    recipes.push_back({
+        "Iron Buckler",
+        "A shield reinforced with iron bands.",
+        {{"Iron Ingot", 2}, {"Maple Wood", 1}},
+        []() { return std::make_shared<Offhand>("Iron Buckler", OffhandType::Shield, 15, 0, 0, 2); }
+    });
+
+    recipes.push_back({
+        "Reinforced Shield",
+        "A heavy shield forged with gold and iron.",
+        {{"Gold Ingot", 2}, {"Iron Ingot", 1}},
+        []() { return std::make_shared<Offhand>("Reinforced Shield", OffhandType::Shield, 22, 0, 0, 3); }
+    });
+
+    recipes.push_back({
+        "Mythril Aegis",
+        "An impenetrable shield forged from mythril.",
+        {{"Mythril Ingot", 2}, {"Gold Ingot", 1}},
+        []() { return std::make_shared<Offhand>("Mythril Aegis", OffhandType::Shield, 30, 0, 0, 4); }
+    });
+
+    recipes.push_back({
+        "Leather Satchel",
+        "A simple leather bag for storing supplies.",
+        {{"Leather", 3}},
+        []() { return std::make_shared<Offhand>("Leather Satchel", OffhandType::Bag, 0, 0, 0, 1); }
+    });
+
+    recipes.push_back({
+        "Reinforced Satchel",
+        "A reinforced leather satchel with iron buckles.",
+        {{"Leather", 2}, {"Iron Ingot", 1}},
+        []() { return std::make_shared<Offhand>("Reinforced Satchel", OffhandType::Bag, 0, 0, 0, 2); }
+    });
+
+    recipes.push_back({
+        "Woven Tome",
+        "A basic tome bound in woven wood fibers.",
+        {{"Maple Wood", 2}, {"Magical Wood", 1}},
+        []() { return std::make_shared<Offhand>("Woven Tome", OffhandType::Book, 0, 25, 3, 1); }
+    });
+
+    // === SET ITEM CRAFTING (Archmage's Regalia — Epic Set) ===
+
+    recipes.push_back({
+        "Archmage's Circlet",
+        "A set piece from the Archmage's Regalia. Arcane circlet of immense power.",
+        {{"Arcane Crystal", 3}, {"Mythril Ingot", 2}, {"Silver Ingot", 1}},
+        []() {
+            auto item = std::make_shared<Armor>("Archmage's Circlet", ArmorType::Cloth, ArmorPiece::Helmet, 14, 4,
+                std::map<ElementType, int>{{ElementType::Arcane, 5}}, ItemPassive::SpellDmgBoost15);
+            item->setId = 1;
+            return item;
+        }
+    });
+
+    recipes.push_back({
+        "Archmage's Mantle",
+        "A set piece from the Archmage's Regalia. Mantle of arcane mastery.",
+        {{"Arcane Crystal", 3}, {"Mythril Ingot", 3}},
+        []() {
+            auto item = std::make_shared<Armor>("Archmage's Mantle", ArmorType::Cloth, ArmorPiece::Chest, 18, 4,
+                std::map<ElementType, int>{{ElementType::Arcane, 8}}, ItemPassive::ManaCostReduce10);
+            item->setId = 1;
+            return item;
+        }
+    });
+
+    recipes.push_back({
+        "Archmage's Handwraps",
+        "A set piece from the Archmage's Regalia. Handwraps of spell weaving.",
+        {{"Arcane Crystal", 2}, {"Mythril Ingot", 1}, {"Magical Wood", 1}},
+        []() {
+            auto item = std::make_shared<Armor>("Archmage's Handwraps", ArmorType::Cloth, ArmorPiece::Gloves, 11, 4,
+                std::map<ElementType, int>{{ElementType::Arcane, 4}}, ItemPassive::ManaRegen5);
+            item->setId = 1;
+            return item;
+        }
+    });
+
+    recipes.push_back({
+        "Archmage's Focus",
+        "A set piece from the Archmage's Regalia. Orb of supreme arcane focus.",
+        {{"Arcane Crystal", 4}, {"Mythril Ingot", 2}},
+        []() {
+            auto item = std::make_shared<Offhand>("Archmage's Focus", OffhandType::Orb, 0, 30, 5, 4,
+                ItemPassive::ManaRegen5);
+            item->setId = 1;
+            return item;
+        }
+    });
 }

@@ -678,6 +678,30 @@ Items/Loot.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/Loot.cpp.s
 .PHONY : Items/Loot.cpp.s
 
+Items/Passives.o: Items/Passives.cpp.o
+.PHONY : Items/Passives.o
+
+# target to build an object file
+Items/Passives.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/Passives.cpp.o
+.PHONY : Items/Passives.cpp.o
+
+Items/Passives.i: Items/Passives.cpp.i
+.PHONY : Items/Passives.i
+
+# target to preprocess a source file
+Items/Passives.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/Passives.cpp.i
+.PHONY : Items/Passives.cpp.i
+
+Items/Passives.s: Items/Passives.cpp.s
+.PHONY : Items/Passives.s
+
+# target to generate assembly for a file
+Items/Passives.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/Passives.cpp.s
+.PHONY : Items/Passives.cpp.s
+
 Items/Resources/Resources.o: Items/Resources/Resources.cpp.o
 .PHONY : Items/Resources/Resources.o
 
@@ -701,6 +725,54 @@ Items/Resources/Resources.s: Items/Resources/Resources.cpp.s
 Items/Resources/Resources.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.s
 .PHONY : Items/Resources/Resources.cpp.s
+
+Items/SetBonuses.o: Items/SetBonuses.cpp.o
+.PHONY : Items/SetBonuses.o
+
+# target to build an object file
+Items/SetBonuses.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/SetBonuses.cpp.o
+.PHONY : Items/SetBonuses.cpp.o
+
+Items/SetBonuses.i: Items/SetBonuses.cpp.i
+.PHONY : Items/SetBonuses.i
+
+# target to preprocess a source file
+Items/SetBonuses.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/SetBonuses.cpp.i
+.PHONY : Items/SetBonuses.cpp.i
+
+Items/SetBonuses.s: Items/SetBonuses.cpp.s
+.PHONY : Items/SetBonuses.s
+
+# target to generate assembly for a file
+Items/SetBonuses.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/SetBonuses.cpp.s
+.PHONY : Items/SetBonuses.cpp.s
+
+Items/Uniques/UniqueItems.o: Items/Uniques/UniqueItems.cpp.o
+.PHONY : Items/Uniques/UniqueItems.o
+
+# target to build an object file
+Items/Uniques/UniqueItems.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/Uniques/UniqueItems.cpp.o
+.PHONY : Items/Uniques/UniqueItems.cpp.o
+
+Items/Uniques/UniqueItems.i: Items/Uniques/UniqueItems.cpp.i
+.PHONY : Items/Uniques/UniqueItems.i
+
+# target to preprocess a source file
+Items/Uniques/UniqueItems.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/Uniques/UniqueItems.cpp.i
+.PHONY : Items/Uniques/UniqueItems.cpp.i
+
+Items/Uniques/UniqueItems.s: Items/Uniques/UniqueItems.cpp.s
+.PHONY : Items/Uniques/UniqueItems.s
+
+# target to generate assembly for a file
+Items/Uniques/UniqueItems.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/Uniques/UniqueItems.cpp.s
+.PHONY : Items/Uniques/UniqueItems.cpp.s
 
 Jobs/JobSystem.o: Jobs/JobSystem.cpp.o
 .PHONY : Jobs/JobSystem.o
@@ -1135,9 +1207,18 @@ help:
 	@echo "... Items/Loot.o"
 	@echo "... Items/Loot.i"
 	@echo "... Items/Loot.s"
+	@echo "... Items/Passives.o"
+	@echo "... Items/Passives.i"
+	@echo "... Items/Passives.s"
 	@echo "... Items/Resources/Resources.o"
 	@echo "... Items/Resources/Resources.i"
 	@echo "... Items/Resources/Resources.s"
+	@echo "... Items/SetBonuses.o"
+	@echo "... Items/SetBonuses.i"
+	@echo "... Items/SetBonuses.s"
+	@echo "... Items/Uniques/UniqueItems.o"
+	@echo "... Items/Uniques/UniqueItems.i"
+	@echo "... Items/Uniques/UniqueItems.s"
 	@echo "... Jobs/JobSystem.o"
 	@echo "... Jobs/JobSystem.i"
 	@echo "... Jobs/JobSystem.s"
