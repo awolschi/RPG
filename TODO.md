@@ -1,37 +1,9 @@
-# RPG Project — TODO
+1. Make the game playable without a mouse by implementing keyboard controls for all actions.
 
-## Quick Wins (high impact, low effort)
+2. Make fish from fishing eatable a make it heal you.
 
-- [x] **1. Add a Shop** — Buy/sell UI in town; potions and gear for sale.
+3. Add pages to skills, allowing players to view their progress and unlock new abilities as they level up.
 
-- [x] **2. Fix Religion** — Karosh devotion now sets `attackBonus` on Character, integrated into `GetWeaponDamage()`.
+4. Make the enemies in the codex clickable, allowing players to view detailed information about each enemy, including their strengths, weaknesses, and strategies for defeating them and the loot they can drop.
 
-- [x] **3. Save Quest Progress** — Save/load now persists area index, religion state, and full quest data.
-
-- [x] **4. Show Offhand Slot** — Added to inventory equipment display.
-
-- [x] **5. Add Consumables** — `Consumable` class with health/mana potions, dropped as loot and sold in shop.
-
-- [x] **6. Make enemy loot visible** — Combat log shows loot on victory; item names appear with rarity icons.
-
-- [x] **10. Remove the duplicate Fireball** — Deleted `Mage/Fire/Fireball.cpp` and `.hpp`.
-
-## Medium Improvements
-
-- [x] **7. Status effects** — Poison (DoT), Burn (DoT), Stun (skip turn), Freeze (skip turn). Archer PiercingShot poisons, Mage Fireball burns, LightningBolt stuns, FrostNova freezes. Effects shown in status line and combat log.
-
-- [x] **8. Enemy AI variety** — Every enemy uses the same random attack/skill/defend AI. Giving different enemy types different behaviors (e.g., beasts always attack, mages always use skills) would add tactical depth.
-
-- [x] **9. Equipment comparison** — When clicking an item in inventory, show the currently equipped item's stats alongside it.
-
-- [x] **11. Make skill `requiredLevel` work** — Skills have `requiredLevel` but it's not enforced by the skill system; instead `Player::InitializeClassSkills()` uses `if (level >= X)` blocks. Centralizing this would be cleaner.
-
-## Bigger Features
-
-- [x] **13. Quest givers** — Added NPC dialogue system with quest acceptance/completion. NPCs placed in each area with unique dialogue.
-
-- [x] **14. Elemental types** — Fire/Ice/Lightning are just names. An actual rock-paper-scissors resistance system would make skill choice matter.
-
----
-
-*Generated from codebase analysis on 2026-07-09.*
+5. Can you make better graphics for the game, including improved textures, animations, and visual effects to enhance the overall player experience.
