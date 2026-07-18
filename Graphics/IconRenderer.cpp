@@ -1,5 +1,6 @@
 #include "IconRenderer.hpp"
 #include <cctype>
+#include <cmath>
 
 // ============================================================
 //  COLOR PALETTE
@@ -307,6 +308,31 @@ void DrawItemIcon(const std::string& itemName, int rarity, int x, int y, int siz
         case ItemShape::Star:         DrawShape_Star(c, x, y, size); break;
         default:                      DrawShape_Sword(c, x, y, size); break;
     }
+
+    // Rarity-colored frame around the icon
+    Color rc = GetRarityColor(rarity);
+    DrawRectangleLines(x - 1, y - 1, size + 2, size + 2, rc);
+
+    // Animated sparkle effect for Legendary items (rarity 5)
+    if (rarity == 5)
+    {
+        float t = static_cast<float>(::GetTime());
+        for (int i = 0; i < 3; ++i)
+        {
+            float phase = t * 3.0f + i * 2.094f; // 120 degrees apart
+            float alpha = (std::sin(phase) + 1.0f) * 0.5f;
+            if (alpha < 0.3f) continue;
+            unsigned char sa = static_cast<unsigned char>(255.0f * alpha);
+            Color sparkColor = {255, 230, 100, sa};
+            // Star-shaped sparkle at different positions around the icon
+            int sx = x + static_cast<int>(size * (0.2f + 0.6f * std::sin(t * 1.5f + i * 2.0f)));
+            int sy = y + static_cast<int>(size * (0.2f + 0.6f * std::cos(t * 1.8f + i * 1.5f)));
+            DrawLine(sx - 2, sy, sx + 2, sy, sparkColor);
+            DrawLine(sx, sy - 2, sx, sy + 2, sparkColor);
+            DrawLine(sx - 1, sy - 1, sx + 1, sy + 1, sparkColor);
+            DrawLine(sx + 1, sy - 1, sx - 1, sy + 1, sparkColor);
+        }
+    }
 }
 
 // ============================================================
@@ -314,23 +340,32 @@ void DrawItemIcon(const std::string& itemName, int rarity, int x, int y, int siz
 // ============================================================
 
 enum class EnemyShape {
-    Blob, Beast, Humanoid, Undead, Elemental, Dragon, Eldritch, Angel, Flying, Default
+    Blob, Beast, Humanoid, Undead, Elemental, Dragon, Eldritch, Angel, Flying,
+    UndeadArmy, Insectoid, Plant, Default
 };
 
 static EnemyShape DetectEnemyShape(const std::string& name)
 {
     if (NameContains(name, "Slime") || NameContains(name, "Gelatinous") || NameContains(name, "Blob"))
         return EnemyShape::Blob;
+    if (NameContains(name, "Skeleton") || NameContains(name, "Bone"))
+        return EnemyShape::UndeadArmy;
+    if (NameContains(name, "Spider") || NameContains(name, "Scorpion") || NameContains(name, "Insect")
+        || NameContains(name, "Wasp") || NameContains(name, "Beetle"))
+        return EnemyShape::Insectoid;
+    if (NameContains(name, "Treant") || NameContains(name, "Ent") || NameContains(name, "Thorn")
+        || NameContains(name, "Vine") || NameContains(name, "Dryad") || NameContains(name, "Briar")
+        || NameContains(name, "Root") || NameContains(name, "Bramble"))
+        return EnemyShape::Plant;
     if (NameContains(name, "Rat") || NameContains(name, "Wolf") || NameContains(name, "Bear")
-        || NameContains(name, "Spider") || NameContains(name, "Scorpion") || NameContains(name, "Boar")
-        || NameContains(name, "Viper") || NameContains(name, "Serpent"))
+        || NameContains(name, "Boar") || NameContains(name, "Viper") || NameContains(name, "Serpent"))
         return EnemyShape::Beast;
     if (NameContains(name, "Bandit") || NameContains(name, "Goblin") || NameContains(name, "Orc")
         || NameContains(name, "Knight") || NameContains(name, "Mage") || NameContains(name, "Guardian")
         || NameContains(name, "Thug") || NameContains(name, "Cultist") || NameContains(name, "Archer")
         || NameContains(name, "Warlock") || NameContains(name, "Assassin") || NameContains(name, "Warrior"))
         return EnemyShape::Humanoid;
-    if (NameContains(name, "Skeleton") || NameContains(name, "Zombie") || NameContains(name, "Ghost")
+    if (NameContains(name, "Zombie") || NameContains(name, "Ghost")
         || NameContains(name, "Wraith") || NameContains(name, "Lich") || NameContains(name, "Soul")
         || NameContains(name, "Banshee") || NameContains(name, "Ghoul"))
         return EnemyShape::Undead;
@@ -467,6 +502,53 @@ static void DrawEnemyShape_Flying(Color c, int x, int y, int s)
     DrawCircle(cx - 1, cy + 1, 1, Dim(c, 0.3f));
 }
 
+static void DrawEnemyShape_UndeadArmy(Color c, int x, int y, int s)
+{
+    int cx = x + s / 2;
+    int cy = y + s / 2;
+    DrawCircle(cx - 8, cy - 4, 5, c);
+    DrawCircle(cx - 8, cy - 4, 2, Dim(c, 0.3f));
+    DrawCircle(cx - 10, cy - 6, 1, Dim(c, 0.3f));
+    DrawCircle(cx - 6, cy - 6, 1, Dim(c, 0.3f));
+    DrawRectangle(cx - 10, cy, 5, 3, Dim(c, 0.3f));
+    DrawCircle(cx + 8, cy - 4, 5, Dim(c, 0.9f));
+    DrawCircle(cx + 8, cy - 4, 2, Dim(c, 0.3f));
+    DrawCircle(cx + 6, cy - 6, 1, Dim(c, 0.3f));
+    DrawCircle(cx + 10, cy - 6, 1, Dim(c, 0.3f));
+    DrawRectangle(cx + 6, cy, 5, 3, Dim(c, 0.3f));
+    DrawCircle(cx, cy + 6, 6, Dim(c, 0.8f));
+    DrawCircle(cx, cy + 6, 3, Dim(c, 0.3f));
+    DrawRectangle(cx - 2, cy + 10, 4, 2, Dim(c, 0.3f));
+}
+
+static void DrawEnemyShape_Insectoid(Color c, int x, int y, int s)
+{
+    int cx = x + s / 2;
+    int cy = y + s / 2;
+    DrawEllipse(cx, cy, s / 3, s / 4, c);
+    DrawCircle(cx, cy - s / 4, s / 5, Dim(c, 1.2f));
+    DrawCircle(cx - 1, cy - s / 4 - 1, 1, Dim(c, 0.3f));
+    DrawCircle(cx + 2, cy - s / 4 - 1, 1, Dim(c, 0.3f));
+    DrawLine(cx - s / 3, cy - 2, cx - s / 2, cy - 6, Dim(c, 0.7f));
+    DrawLine(cx - s / 3, cy + 2, cx - s / 2, cy + 6, Dim(c, 0.7f));
+    DrawLine(cx + s / 3, cy - 2, cx + s / 2, cy - 6, Dim(c, 0.7f));
+    DrawLine(cx + s / 3, cy + 2, cx + s / 2, cy + 6, Dim(c, 0.7f));
+    DrawLine(cx - s / 4, cy - s / 5, cx - s / 3, cy - s / 3, Dim(c, 0.6f));
+    DrawLine(cx + s / 4, cy - s / 5, cx + s / 3, cy - s / 3, Dim(c, 0.6f));
+}
+
+static void DrawEnemyShape_Plant(Color c, int x, int y, int s)
+{
+    int cx = x + s / 2;
+    int cy = y + s / 2;
+    DrawRectangle(cx - 3, cy + 2, 6, s / 2 - 2, Dim(c, 0.5f));
+    DrawTriangle(V2(cx, cy - s / 3), V2(cx - s / 3, cy + 4), V2(cx + s / 3, cy + 4), c);
+    DrawTriangle(V2(cx - s / 5, cy - s / 5), V2(cx - s / 3 - 4, cy - 2), V2(cx - s / 6, cy - 2), Dim(c, 0.8f));
+    DrawTriangle(V2(cx + s / 5, cy - s / 5), V2(cx + s / 3 + 4, cy - 2), V2(cx + s / 6, cy - 2), Dim(c, 0.8f));
+    DrawCircle(cx - s / 6, cy - s / 4 + 2, 2, Dim(c, 1.3f));
+    DrawCircle(cx + s / 6, cy - s / 4 + 2, 2, Dim(c, 1.3f));
+}
+
 static void DrawEnemyShape_Default(Color c, int x, int y, int s)
 {
     int cx = x + s / 2;
@@ -482,22 +564,91 @@ static void DrawEnemyShape_Default(Color c, int x, int y, int s)
 //  PUBLIC: DRAW ENEMY ICON
 // ============================================================
 
+static bool IsBossEnemy(const std::string& name)
+{
+    return NameContains(name, "BOSS") || NameContains(name, "King") || NameContains(name, "Lord")
+        || NameContains(name, "Overseer") || NameContains(name, "Council")
+        || NameContains(name, "Primordial") || NameContains(name, "Construct")
+        || NameContains(name, "Chronos") || NameContains(name, "Dragon");
+}
+
 void DrawEnemyIcon(const std::string& enemyName, int x, int y, int size)
 {
+    // Subtle floating animation
+    float bob = std::sin(static_cast<float>(::GetTime()) * 2.0f) * 2.0f;
+    int drawY = y + static_cast<int>(bob);
+
     Color c = EnemyColor(enemyName);
     EnemyShape shape = DetectEnemyShape(enemyName);
 
     switch (shape)
     {
-        case EnemyShape::Blob:      DrawEnemyShape_Blob(c, x, y, size); break;
-        case EnemyShape::Beast:     DrawEnemyShape_Beast(c, x, y, size); break;
-        case EnemyShape::Humanoid:  DrawEnemyShape_Humanoid(c, x, y, size); break;
-        case EnemyShape::Undead:    DrawEnemyShape_Undead(c, x, y, size); break;
-        case EnemyShape::Elemental: DrawEnemyShape_Elemental(c, x, y, size); break;
-        case EnemyShape::Dragon:    DrawEnemyShape_Dragon(c, x, y, size); break;
-        case EnemyShape::Eldritch:  DrawEnemyShape_Eldritch(c, x, y, size); break;
-        case EnemyShape::Angel:     DrawEnemyShape_Angel(c, x, y, size); break;
-        case EnemyShape::Flying:    DrawEnemyShape_Flying(c, x, y, size); break;
-        default:                    DrawEnemyShape_Default(c, x, y, size); break;
+        case EnemyShape::Blob:       DrawEnemyShape_Blob(c, x, drawY, size); break;
+        case EnemyShape::Beast:      DrawEnemyShape_Beast(c, x, drawY, size); break;
+        case EnemyShape::Humanoid:   DrawEnemyShape_Humanoid(c, x, drawY, size); break;
+        case EnemyShape::Undead:     DrawEnemyShape_Undead(c, x, drawY, size); break;
+        case EnemyShape::Elemental:  DrawEnemyShape_Elemental(c, x, drawY, size); break;
+        case EnemyShape::Dragon:     DrawEnemyShape_Dragon(c, x, drawY, size); break;
+        case EnemyShape::Eldritch:   DrawEnemyShape_Eldritch(c, x, drawY, size); break;
+        case EnemyShape::Angel:      DrawEnemyShape_Angel(c, x, drawY, size); break;
+        case EnemyShape::Flying:     DrawEnemyShape_Flying(c, x, drawY, size); break;
+        case EnemyShape::UndeadArmy: DrawEnemyShape_UndeadArmy(c, x, drawY, size); break;
+        case EnemyShape::Insectoid:  DrawEnemyShape_Insectoid(c, x, drawY, size); break;
+        case EnemyShape::Plant:      DrawEnemyShape_Plant(c, x, drawY, size); break;
+        default:                     DrawEnemyShape_Default(c, x, drawY, size); break;
+    }
+
+    // Boss pulsing glowing outline
+    if (IsBossEnemy(enemyName))
+    {
+        float t = static_cast<float>(::GetTime());
+        unsigned char goldAlpha = static_cast<unsigned char>(120.0f + 100.0f * std::sin(t * 4.0f));
+        Color bossGlow = {255, 215, 0, goldAlpha};
+        DrawRectangleLines(x - 2, drawY - 2, size + 4, size + 4, bossGlow);
+        Color bossGlowOuter = {255, 200, 0, static_cast<unsigned char>(goldAlpha / 2)};
+        DrawRectangleLines(x - 4, drawY - 4, size + 8, size + 8, bossGlowOuter);
+    }
+}
+
+// ============================================================
+//  PUBLIC: DRAW STATUS ICON
+// ============================================================
+
+void DrawStatusIcon(const std::string& statusName, int x, int y, int size)
+{
+    int cx = x + size / 2;
+    int cy = y + size / 2;
+
+    if (NameContains(statusName, "Poison"))
+    {
+        Color gc = {50, 200, 50, 255};
+        float t = static_cast<float>(::GetTime());
+        DrawCircle(cx, cy, size / 2 - 2, {30, 120, 30, 200});
+        DrawCircle(cx - 3, cy - 2 + static_cast<int>(std::sin(t * 3.0f) * 2), 3, gc);
+        DrawCircle(cx + 2, cy + 1 + static_cast<int>(std::cos(t * 4.0f) * 2), 2, {80, 220, 80, 200});
+        DrawCircle(cx, cy - 4 + static_cast<int>(std::sin(t * 5.0f + 1.0f) * 2), 2, gc);
+    }
+    else if (NameContains(statusName, "Burn") || NameContains(statusName, "Fire"))
+    {
+        Color fc = {255, 120, 30, 255};
+        Color fh = {255, 200, 50, 200};
+        DrawTriangle(V2(cx, cy - size / 2 + 2), V2(cx - size / 3, cy + size / 3),
+                     V2(cx + size / 3, cy + size / 3), fc);
+        DrawTriangle(V2(cx, cy - size / 4), V2(cx - size / 6, cy + size / 4),
+                     V2(cx + size / 6, cy + size / 4), fh);
+    }
+    else if (NameContains(statusName, "Stun"))
+    {
+        Color sc = {255, 255, 50, 255};
+        DrawTriangle(V2(cx, cy - size / 2 + 2), V2(cx + 4, cy - 2), V2(cx - 2, cy + 2), sc);
+        DrawTriangle(V2(cx - 2, cy + 2), V2(cx + 2, cy - 2), V2(cx - 4, cy + size / 2 - 2), sc);
+    }
+    else if (NameContains(statusName, "Freeze") || NameContains(statusName, "Ice"))
+    {
+        Color ic = {100, 180, 255, 255};
+        DrawRectangle(cx - 1, cy - size / 3, 2, size * 2 / 3, ic);
+        DrawRectangle(cx - size / 3, cy - 1, size * 2 / 3, 2, ic);
+        DrawRectangle(cx - size / 4, cy - size / 4, size / 2, 2, ic);
+        DrawRectangle(cx - size / 4, cy + size / 4 - 2, size / 2, 2, ic);
     }
 }

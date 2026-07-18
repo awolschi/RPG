@@ -132,3 +132,40 @@ void WarStomp::Use(Character& caster, Character& target)
     GainXP(3);
     ResetCooldown();
 }
+
+std::string PowerStrike::GetDamageFormula() const { return "base/4 + STR/2 + Weapon"; }
+int PowerStrike::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.strength / 2) + weaponDamage + elementalBonus);
+}
+
+std::string Whirlwind::GetDamageFormula() const { return "base/4 + STR/3 + Weapon (2 hits, 2nd at 50%)"; }
+int Whirlwind::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    int hit = ApplyDamageBonus((baseDamage / 4) + (stats.strength / 3) + weaponDamage + elementalBonus);
+    return hit + hit / 2;
+}
+
+std::string DefensiveStance::GetDamageFormula() const { return "+DEF & Heal (self)"; }
+
+std::string WarCry::GetDamageFormula() const { return "+DEF & Heal (self)"; }
+
+std::string ShieldBash::GetDamageFormula() const { return "base/4 + STR/2 + Weapon"; }
+int ShieldBash::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.strength / 2) + weaponDamage + elementalBonus);
+}
+
+std::string BattleCry::GetDamageFormula() const { return "+DEF & Heal (self)"; }
+
+std::string Execute::GetDamageFormula() const { return "base/4 + STR*2 + Weapon"; }
+int Execute::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.strength * 2) + weaponDamage + elementalBonus);
+}
+
+std::string WarStomp::GetDamageFormula() const { return "base/4 + STR + Weapon, drains 25 mana"; }
+int WarStomp::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + stats.strength + weaponDamage + elementalBonus);
+}

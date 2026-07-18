@@ -7,6 +7,7 @@
 #include "../Characters/Player.hpp"
 #include "Religion.hpp"
 #include "../World/Quests/Quest.hpp"
+#include "../Achievements/Achievement.hpp"
 
 struct SaveSlotInfo
 {
@@ -21,11 +22,12 @@ class SaveGameManager
 {
 public:
     static constexpr int SLOT_COUNT = 5;
+    static constexpr int SAVE_VERSION = 3;  // v3: added achievements
 
     SaveGameManager();
 
-    bool SaveGame(const std::shared_ptr<Player>& player, int slot, int areaIndex, const ReligionSystem& religion);
-    std::shared_ptr<Player> LoadGame(int slot, int& outAreaIndex, ReligionSystem& outReligion);
+    bool SaveGame(const std::shared_ptr<Player>& player, int slot, int areaIndex, const ReligionSystem& religion, const AchievementSystem& achievements);
+    std::shared_ptr<Player> LoadGame(int slot, int& outAreaIndex, ReligionSystem& outReligion, AchievementSystem& outAchievements);
 
     bool IsSlotOccupied(int slot);
     SaveSlotInfo GetSlotInfo(int slot);

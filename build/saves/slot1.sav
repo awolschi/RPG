@@ -2,56 +2,57 @@ Kowalle
 2
 2
 50 0
-560 856
+305 730
 325 640 3 52 211 106 5 2
-6 66659
+7 66845
 12|3|Health Potion|2|10|C|70|0
 2|3|Refreshing Draft|2|10|C|60|50
-1|5|Star Core|8|40
 2|3|Minor Mana Potion|1|10|C|0|60
 1|3|Minor Health Potion|1|10|C|80|0
-1|5|Celestial Shard|7|35
-Wand of the Void
-Tome of Elements
-Elemental Circlet
-Apprentice Robe
-Hands of the Weave
-Leggings of Eternity
-Elemental Sandals
-Arcane Signet
-Elemental Loop
-Seal of Power
+2|3|Mana Potion|2|10|C|0|130
+1|0|Scepter of Stars|3|10|W|115|60|6|35
+1|5|Farm Key|3|15
+1|0|Wooden Staff|1|10|W|50|19|0|0
+none
+none
+none
+none
+none
+none
+1|2|Orb of Focus|3|10|AC|0|120|0|0
+none
+none
 24
-Attack|3|96|0|33
-Arcane Bolt|1|61|0|20
-Meteor|1|39|0|80
-Frost Ward|1|3|0|0
-Arcane Surge|1|21|0|100
-Mana Siphon|1|0|0|30
-Chain Lightning|1|0|0|55
-Lightning Bolt|1|0|0|60
-Arcane Missiles|1|0|0|70
-Frost Shield|1|0|0|0
-Mana Bomb|1|0|0|90
-Blazing Orb|1|0|0|65
-Frost Nova|1|0|0|70
-Arcane Barrage|1|0|0|85
-Time Warp|1|0|0|55
-Glacial Spike|1|0|0|105
-Mana Shield|1|0|0|0
-Pyroblast|1|0|0|135
-Blizzard|1|0|0|145
-Arcane Power|1|0|0|0
-Ice Lance|1|0|0|125
-Inferno|1|0|0|220
-Elemental Fury|1|0|0|200
-Archmage's Cataclysm|1|0|0|300
+Attack|3|96|0|33|0|6|0|0|0|0|0|0
+Arcane Bolt|1|67|0|20|0|6|0|0|0|0|0|0
+Meteor|1|39|0|80|0|6|0|0|0|0|0|0
+Frost Ward|1|3|0|0|0|6|0|0|0|0|0|0
+Arcane Surge|1|21|0|100|0|6|0|0|0|0|0|0
+Mana Siphon|1|0|0|30|0|6|0|0|0|0|0|0
+Chain Lightning|1|0|0|55|0|6|0|0|0|0|0|0
+Lightning Bolt|1|0|0|60|0|6|0|0|0|0|0|0
+Arcane Missiles|1|0|0|70|0|6|0|0|0|0|0|0
+Frost Shield|1|0|0|0|0|6|0|0|0|0|0|0
+Mana Bomb|1|0|0|90|0|6|0|0|0|0|0|0
+Blazing Orb|1|0|0|65|0|6|0|0|0|0|0|0
+Frost Nova|1|0|0|70|0|6|0|0|0|0|0|0
+Arcane Barrage|1|0|0|85|0|6|0|0|0|0|0|0
+Time Warp|1|0|0|55|0|6|0|0|0|0|0|0
+Glacial Spike|1|0|0|105|0|6|0|0|0|0|0|0
+Mana Shield|1|0|0|0|0|6|0|0|0|0|0|0
+Pyroblast|1|0|0|135|0|6|0|0|0|0|0|0
+Blizzard|1|0|0|145|0|6|0|0|0|0|0|0
+Arcane Power|1|0|0|0|0|6|0|0|0|0|0|0
+Ice Lance|1|0|0|125|0|6|0|0|0|0|0|0
+Inferno|1|0|0|220|0|6|0|0|0|0|0|0
+Elemental Fury|1|0|0|200|0|6|0|0|0|0|0|0
+Archmage's Cataclysm|1|0|0|300|0|6|0|0|0|0|0|0
 4
 0 1 0
 1 1 0
 2 1 0
 3 1 0
-6
+0
 0
 0
 0

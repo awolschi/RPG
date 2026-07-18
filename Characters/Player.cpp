@@ -41,73 +41,83 @@ void Player::InitializeClassSkills()
     switch (characterClass)
     {
         case CharacterClass::Warrior:
-            skills.AddSkill(std::make_shared<PowerStrike>());
-            skills.AddSkill(std::make_shared<Whirlwind>());
-            skills.AddSkillIfLevelMet(std::make_shared<DefensiveStance>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<WarCry>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<ShieldBash>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<BattleCry>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<Execute>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<WarStomp>(), level);
+            {
+                auto ps = std::make_shared<PowerStrike>(); ps->characterClass = CharacterClass::Warrior; skills.AddSkill(ps);
+                auto ww = std::make_shared<Whirlwind>(); ww->characterClass = CharacterClass::Warrior; skills.AddSkill(ww);
+                auto ds = std::make_shared<DefensiveStance>(); ds->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(ds, level);
+                auto wc = std::make_shared<WarCry>(); wc->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(wc, level);
+                auto sb = std::make_shared<ShieldBash>(); sb->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(sb, level);
+                auto bc = std::make_shared<BattleCry>(); bc->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(bc, level);
+                auto ex = std::make_shared<Execute>(); ex->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(ex, level);
+                auto ws = std::make_shared<WarStomp>(); ws->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(ws, level);
+            }
             break;
 
         case CharacterClass::Mage:
-            skills.AddSkill(std::make_shared<Fireball>());
-            skills.AddSkill(std::make_shared<IceBolt>());
-            skills.AddSkillIfLevelMet(std::make_shared<ArcaneBolt>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<Meteor>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<FrostWard>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<ArcaneSurge>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<ManaSiphon>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<ChainLightning>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<LightningBolt>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<ArcaneMissiles>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<FrostShield>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<ManaBomb>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<BlazingOrb>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<FrostNova>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<ArcaneBarrage>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<TimeWarp>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<GlacialSpike>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<ManaShield>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<Pyroblast>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<Blizzard>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<ArcanePower>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<IceLance>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<Inferno>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<ElementalFury>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<ArchmageCataclysm>(), level);
+            {
+                auto fb = std::make_shared<Fireball>(); fb->characterClass = CharacterClass::Mage; skills.AddSkill(fb);
+                auto ib = std::make_shared<IceBolt>(); ib->characterClass = CharacterClass::Mage; skills.AddSkill(ib);
+                auto ab = std::make_shared<ArcaneBolt>(); ab->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(ab, level);
+                auto mt = std::make_shared<Meteor>(); mt->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(mt, level);
+                auto fw = std::make_shared<FrostWard>(); fw->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(fw, level);
+                auto as = std::make_shared<ArcaneSurge>(); as->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(as, level);
+                auto ms = std::make_shared<ManaSiphon>(); ms->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(ms, level);
+                auto cl = std::make_shared<ChainLightning>(); cl->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(cl, level);
+                auto lb = std::make_shared<LightningBolt>(); lb->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(lb, level);
+                auto am = std::make_shared<ArcaneMissiles>(); am->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(am, level);
+                auto fs = std::make_shared<FrostShield>(); fs->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(fs, level);
+                auto mb = std::make_shared<ManaBomb>(); mb->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(mb, level);
+                auto bo = std::make_shared<BlazingOrb>(); bo->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(bo, level);
+                auto fn = std::make_shared<FrostNova>(); fn->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(fn, level);
+                auto abr = std::make_shared<ArcaneBarrage>(); abr->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(abr, level);
+                auto tw = std::make_shared<TimeWarp>(); tw->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(tw, level);
+                auto gs = std::make_shared<GlacialSpike>(); gs->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(gs, level);
+                auto ms2 = std::make_shared<ManaShield>(); ms2->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(ms2, level);
+                auto pb = std::make_shared<Pyroblast>(); pb->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(pb, level);
+                auto bl = std::make_shared<Blizzard>(); bl->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(bl, level);
+                auto ap = std::make_shared<ArcanePower>(); ap->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(ap, level);
+                auto il = std::make_shared<IceLance>(); il->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(il, level);
+                auto inf = std::make_shared<Inferno>(); inf->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(inf, level);
+                auto ef = std::make_shared<ElementalFury>(); ef->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(ef, level);
+                auto ac = std::make_shared<ArchmageCataclysm>(); ac->characterClass = CharacterClass::Mage; skills.AddSkillIfLevelMet(ac, level);
+            }
             break;
 
         case CharacterClass::Priest:
-            skills.AddSkill(std::make_shared<HolySmite>());
-            skills.AddSkill(std::make_shared<Heal>());
-            skills.AddSkillIfLevelMet(std::make_shared<MassHeal>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<DivineShield>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<Smite>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<Renew>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<HolyNova>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<DivineWrath>(), level);
+            {
+                auto hs = std::make_shared<HolySmite>(); hs->characterClass = CharacterClass::Priest; skills.AddSkill(hs);
+                auto hl = std::make_shared<Heal>(); hl->characterClass = CharacterClass::Priest; skills.AddSkill(hl);
+                auto mh = std::make_shared<MassHeal>(); mh->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(mh, level);
+                auto ds = std::make_shared<DivineShield>(); ds->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(ds, level);
+                auto sm = std::make_shared<Smite>(); sm->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(sm, level);
+                auto rn = std::make_shared<Renew>(); rn->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(rn, level);
+                auto hn = std::make_shared<HolyNova>(); hn->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(hn, level);
+                auto dw = std::make_shared<DivineWrath>(); dw->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(dw, level);
+            }
             break;
 
         case CharacterClass::Archer:
-            skills.AddSkill(std::make_shared<PiercingShot>());
-            skills.AddSkillIfLevelMet(std::make_shared<MultiShot>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<RainOfArrows>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<QuickShot>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<Snipe>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<ArrowStorm>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<DeathMark>(), level);
+            {
+                auto ps = std::make_shared<PiercingShot>(); ps->characterClass = CharacterClass::Archer; skills.AddSkill(ps);
+                auto ms = std::make_shared<MultiShot>(); ms->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(ms, level);
+                auto ra = std::make_shared<RainOfArrows>(); ra->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(ra, level);
+                auto qs = std::make_shared<QuickShot>(); qs->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(qs, level);
+                auto sn = std::make_shared<Snipe>(); sn->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(sn, level);
+                auto ast = std::make_shared<ArrowStorm>(); ast->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(ast, level);
+                auto dm = std::make_shared<DeathMark>(); dm->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(dm, level);
+            }
             break;
 
         case CharacterClass::Merchant:
-            skills.AddSkill(std::make_shared<ThrowCoin>());
-            skills.AddSkillIfLevelMet(std::make_shared<Appraise>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<Haggle>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<Bribery>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<Invest>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<CoinStorm>(), level);
-            skills.AddSkillIfLevelMet(std::make_shared<GoldenHurricane>(), level);
+            {
+                auto tc = std::make_shared<ThrowCoin>(); tc->characterClass = CharacterClass::Merchant; skills.AddSkill(tc);
+                auto ap = std::make_shared<Appraise>(); ap->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(ap, level);
+                auto hg = std::make_shared<Haggle>(); hg->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(hg, level);
+                auto br = std::make_shared<Bribery>(); br->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(br, level);
+                auto iv = std::make_shared<Invest>(); iv->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(iv, level);
+                auto cs = std::make_shared<CoinStorm>(); cs->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(cs, level);
+                auto gh = std::make_shared<GoldenHurricane>(); gh->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(gh, level);
+            }
             break;
 
         default:
@@ -373,6 +383,7 @@ void Player::CheckNewSkills()
         if (!skills.GetSkillByName(name))
         {
             auto skill = factory();
+            skill->characterClass = characterClass;
             if (level >= skill->requiredLevel)
             {
                 skills.AddSkill(skill);

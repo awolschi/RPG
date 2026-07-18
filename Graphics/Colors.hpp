@@ -2,6 +2,7 @@
 #define COLORS_HPP
 
 #include "raylib.h"
+#include "../Characters/Classes/Classes.hpp"
 
 namespace CQColors
 {
@@ -44,6 +45,21 @@ const Color TextGold    = { 201, 168, 76, 255 };
 const Color BorderLight = { 160, 130, 90, 255 };
 const Color LogBg       = { 20, 12, 8, 200 };
 const Color CardBg      = { 55, 38, 25, 255 };
+const Color FocusBorder = { 230, 200, 100, 255 };
+
+// Class-specific skill card tints
+inline Color SkillCardBg(CharacterClass cc)
+{
+    switch (cc)
+    {
+        case CharacterClass::Warrior:  return { 80, 30, 25, 255 };
+        case CharacterClass::Priest:   return { 80, 70, 40, 255 };
+        case CharacterClass::Mage:     return { 25, 30, 70, 255 };
+        case CharacterClass::Archer:   return { 25, 50, 30, 255 };
+        case CharacterClass::Merchant: return { 70, 60, 25, 255 };
+    }
+    return CardBg;
+}
 
 }
 

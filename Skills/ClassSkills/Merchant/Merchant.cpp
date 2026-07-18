@@ -116,3 +116,38 @@ void GoldenHurricane::Use(Character& caster, Character& target)
     GainXP(4);
     ResetCooldown();
 }
+
+std::string ThrowCoin::GetDamageFormula() const { return "base/4 + DEX/3 + Weapon"; }
+int ThrowCoin::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.dexterity / 3) + weaponDamage + elementalBonus);
+}
+
+std::string Appraise::GetDamageFormula() const { return "+DEF & Restore mana (self)"; }
+
+std::string Haggle::GetDamageFormula() const { return "Heal: 25 + VIT, drain 10 enemy mana"; }
+int Haggle::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return 25 + stats.vitality + GetTotalHealBonus();
+}
+
+std::string Bribery::GetDamageFormula() const { return "base/4 + WIS/2 + Weapon"; }
+int Bribery::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.wisdom / 2) + weaponDamage + elementalBonus);
+}
+
+std::string Invest::GetDamageFormula() const { return "+DEF & Restore mana (self)"; }
+
+std::string CoinStorm::GetDamageFormula() const { return "base/4 + DEX/4 + Weapon (3 full-damage hits)"; }
+int CoinStorm::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    int hit = ApplyDamageBonus((baseDamage / 4) + (stats.dexterity / 4) + weaponDamage + elementalBonus);
+    return hit * 3;
+}
+
+std::string GoldenHurricane::GetDamageFormula() const { return "base/4 + DEX*2 + Weapon"; }
+int GoldenHurricane::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.dexterity * 2) + weaponDamage + elementalBonus);
+}

@@ -133,3 +133,47 @@ void DivineWrath::Use(Character& caster, Character& target)
     GainXP(4);
     ResetCooldown();
 }
+
+std::string HolySmite::GetDamageFormula() const { return "base/4 + WIS/2 + Weapon"; }
+int HolySmite::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.wisdom / 2) + weaponDamage + elementalBonus);
+}
+
+std::string Heal::GetDamageFormula() const { return "Heal: 40 + WIS/2"; }
+int Heal::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return 40 + (stats.wisdom / 2) + GetTotalHealBonus();
+}
+
+std::string MassHeal::GetDamageFormula() const { return "Heal: 60 + WIS"; }
+int MassHeal::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return 60 + stats.wisdom + GetTotalHealBonus();
+}
+
+std::string DivineShield::GetDamageFormula() const { return "+DEF & Heal (self)"; }
+
+std::string Smite::GetDamageFormula() const { return "base/4 + WIS/2 + Weapon"; }
+int Smite::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.wisdom / 2) + weaponDamage + elementalBonus);
+}
+
+std::string Renew::GetDamageFormula() const { return "Heal: 90 + WIS"; }
+int Renew::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return 90 + stats.wisdom + GetTotalHealBonus();
+}
+
+std::string HolyNova::GetDamageFormula() const { return "base/4 + WIS + Weapon, heals self"; }
+int HolyNova::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + stats.wisdom + weaponDamage + elementalBonus);
+}
+
+std::string DivineWrath::GetDamageFormula() const { return "base/4 + WIS*2 + Weapon"; }
+int DivineWrath::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.wisdom * 2) + weaponDamage + elementalBonus);
+}

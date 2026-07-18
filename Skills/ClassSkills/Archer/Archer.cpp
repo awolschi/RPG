@@ -130,3 +130,48 @@ void DeathMark::Use(Character& caster, Character& target)
     GainXP(4);
     ResetCooldown();
 }
+
+std::string PiercingShot::GetDamageFormula() const { return "base/4 + DEX/2 + Weapon, Poison 3 turns"; }
+int PiercingShot::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.dexterity / 2) + weaponDamage + elementalBonus);
+}
+
+std::string MultiShot::GetDamageFormula() const { return "base/4 + DEX/3 + Weapon (2 hits, 2nd at 50%)"; }
+int MultiShot::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    int hit = ApplyDamageBonus((baseDamage / 4) + (stats.dexterity / 3) + weaponDamage + elementalBonus);
+    return hit + hit / 2;
+}
+
+std::string RainOfArrows::GetDamageFormula() const { return "base/4 + DEX + Weapon (2 hits, 2nd at 50%)"; }
+int RainOfArrows::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    int hit = ApplyDamageBonus((baseDamage / 4) + stats.dexterity + weaponDamage + elementalBonus);
+    return hit + hit / 2;
+}
+
+std::string QuickShot::GetDamageFormula() const { return "base/4 + DEX/3 + Weapon (no CD)"; }
+int QuickShot::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.dexterity / 3) + weaponDamage + elementalBonus);
+}
+
+std::string Snipe::GetDamageFormula() const { return "base/4 + DEX + Weapon"; }
+int Snipe::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + stats.dexterity + weaponDamage + elementalBonus);
+}
+
+std::string ArrowStorm::GetDamageFormula() const { return "base/4 + DEX/3 + Weapon (2 full-damage hits)"; }
+int ArrowStorm::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    int hit = ApplyDamageBonus((baseDamage / 4) + (stats.dexterity / 3) + weaponDamage + elementalBonus);
+    return hit * 2;
+}
+
+std::string DeathMark::GetDamageFormula() const { return "base/4 + DEX*2 + Weapon"; }
+int DeathMark::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.dexterity * 2) + weaponDamage + elementalBonus);
+}

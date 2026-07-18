@@ -8,6 +8,8 @@ class HolySmite : public Skill
 public:
     HolySmite();
     void Use(Character& caster, Character& target) override;
+    std::string GetDamageFormula() const override;
+    int EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const override;
 };
 
 class Heal : public Skill
@@ -15,6 +17,8 @@ class Heal : public Skill
 public:
     Heal();
     void Use(Character& caster, Character& target) override;
+    std::string GetDamageFormula() const override;
+    int EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const override;
 };
 
 class MassHeal : public Skill
@@ -22,6 +26,8 @@ class MassHeal : public Skill
 public:
     MassHeal();
     void Use(Character& caster, Character& target) override;
+    std::string GetDamageFormula() const override;
+    int EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const override;
 };
 
 class DivineShield : public Skill
@@ -29,6 +35,7 @@ class DivineShield : public Skill
 public:
     DivineShield();
     void Use(Character& caster, Character& target) override;
+    std::string GetDamageFormula() const override;
 };
 
 class Smite : public Skill
@@ -36,6 +43,8 @@ class Smite : public Skill
 public:
     Smite();
     void Use(Character& caster, Character& target) override;
+    std::string GetDamageFormula() const override;
+    int EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const override;
 };
 
 class Renew : public Skill
@@ -43,6 +52,8 @@ class Renew : public Skill
 public:
     Renew();
     void Use(Character& caster, Character& target) override;
+    std::string GetDamageFormula() const override;
+    int EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const override;
 };
 
 class HolyNova : public Skill
@@ -50,6 +61,8 @@ class HolyNova : public Skill
 public:
     HolyNova();
     void Use(Character& caster, Character& target) override;
+    std::string GetDamageFormula() const override;
+    int EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const override;
 };
 
 class DivineWrath : public Skill
@@ -57,6 +70,8 @@ class DivineWrath : public Skill
 public:
     DivineWrath();
     void Use(Character& caster, Character& target) override;
+    std::string GetDamageFormula() const override;
+    int EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const override;
 };
 
 #endif

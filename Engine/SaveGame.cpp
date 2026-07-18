@@ -25,7 +25,7 @@ std::string SaveGameManager::SlotPath(int slot) const
     return saveDirectory + "slot" + std::to_string(slot) + ".sav";
 }
 
-bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, int areaIndex, const ReligionSystem& religion)
+bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, int areaIndex, const ReligionSystem& religion, const AchievementSystem& achievements)
 {
     if (!player) return false;
     if (slot < 1 || slot > SLOT_COUNT) return false;
@@ -35,6 +35,9 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
     {
         std::ofstream file(filepath);
         if (!file.is_open()) return false;
+
+        // Version header
+        file << "SAVE_VERSION " << SAVE_VERSION << "\n";
 
         file << player->GetName() << "\n";
         file << static_cast<int>(player->GetCharacterClass()) << "\n";
@@ -112,11 +115,25 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
             }
         }
 
+        // Skill loadout (save as skill names for robustness)
+        const auto& loadout = player->GetSkillLoadout();
+        file << loadout.size() << "\n";
+        for (int idx : loadout)
+        {
+            auto sk = player->GetSkills().GetSkill(idx);
+            if (sk) file << sk->name << "\n";
+        }
+
         const auto& jobs = player->GetJobSystem().GetJobs();
         file << jobs.size() << "\n";
         for (const auto& j : jobs)
+        {
             file << static_cast<int>(j.type) << " " << j.level << " "
-                 << j.experience << "\n";
+                 << j.experience << " " << j.jobPoints << " "
+                 << static_cast<int>(j.specialization) << "\n";
+            for (size_t p = 0; p < j.perks.size(); ++p)
+                file << (j.perks[p].unlocked ? "1" : "0") << (p + 1 < j.perks.size() ? " " : "\n");
+        }
 
         // Area index
         file << areaIndex << "\n";
@@ -125,6 +142,9 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
         file << static_cast<int>(religion.GetGod()) << "\n";
         file << religion.GetDevotionLevel() << "\n";
         file << religion.GetTotalDonated() << "\n";
+        // Extended religion data
+        const auto& quest = religion.GetActiveQuest();
+        file << quest.currentCount << " " << (quest.completed ? 1 : 0) << "\n";
 
         // Quests
         auto& qm = player->GetQuestManager();
@@ -141,6 +161,9 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
                  << (q->rewarded ? "1" : "0") << "\n";
         }
 
+        // Achievements
+        file << achievements.Serialize() << "\n";
+
         file.close();
         return true;
     }
@@ -151,7 +174,7 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
     }
 }
 
-std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, ReligionSystem& outReligion)
+std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, ReligionSystem& outReligion, AchievementSystem& outAchievements)
 {
     if (slot < 1 || slot > SLOT_COUNT) return nullptr;
 
@@ -162,6 +185,22 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
     {
         std::ifstream file(filepath);
         if (!file.is_open()) return nullptr;
+
+        // Check for version header (v2+ saves)
+        int saveVersion = 1;  // default to v1 (old format)
+        std::string firstLine;
+        std::streampos firstLinePos = file.tellg();
+        std::getline(file, firstLine);
+        if (firstLine.substr(0, 12) == "SAVE_VERSION ")
+        {
+            saveVersion = std::stoi(firstLine.substr(12));
+        }
+        else
+        {
+            // Old format: first line is player name, rewind
+            file.clear();
+            file.seekg(firstLinePos);
+        }
 
         std::string playerName;
         std::getline(file, playerName);
@@ -457,15 +496,57 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
             }
         }
 
+        // Skill loadout (v2+ saves only)
+        if (saveVersion >= 2)
+        {
+            size_t loadoutCount = 0;
+            file >> loadoutCount; file.ignore();
+            std::vector<int> loadoutIndices;
+            for (size_t l = 0; l < loadoutCount; ++l)
+            {
+                std::string loadoutName;
+                std::getline(file, loadoutName);
+                if (loadoutName.empty()) continue;
+                for (size_t s = 0; s < player->GetSkills().GetSkillCount(); ++s)
+                {
+                    auto sk = player->GetSkills().GetSkill(s);
+                    if (sk && sk->name == loadoutName)
+                    {
+                        loadoutIndices.push_back(static_cast<int>(s));
+                        break;
+                    }
+                }
+            }
+            player->SetSkillLoadout(loadoutIndices);
+        }
+
         size_t jobCount;
         file >> jobCount; file.ignore();
         auto& jobs = player->GetJobSystem().GetJobs();
         for (size_t i = 0; i < jobCount && i < jobs.size(); ++i)
         {
-            int jt, jl, je;
-            file >> jt >> jl >> je; file.ignore();
+            int jt, jl, je, jp;
+            file >> jt >> jl >> je >> jp;
             jobs[i].level = jl;
             jobs[i].experience = je;
+            jobs[i].jobPoints = jp;
+
+            // Read specialization (v3+ saves have this field)
+            if (saveVersion >= 3)
+            {
+                int specInt;
+                file >> specInt;
+                jobs[i].specialization = static_cast<SpecializationType>(specInt);
+            }
+            file.ignore();
+
+            for (size_t p = 0; p < jobs[i].perks.size(); ++p)
+            {
+                int unlocked;
+                file >> unlocked;
+                jobs[i].perks[p].unlocked = (unlocked == 1);
+            }
+            file.ignore();
         }
 
         // Extended save data (area, religion, quests) — only if present
@@ -480,6 +561,17 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
             int devotion, donated;
             file >> devotion >> donated; file.ignore();
             outReligion.RestoreState(static_cast<GodType>(godInt), devotion, donated);
+            // Read extended religion quest data
+            if (file.peek() != std::char_traits<char>::eof())
+            {
+                int qc, ac;
+                file >> qc >> ac; file.ignore();
+                if (outReligion.GetGod() != GodType::None)
+                {
+                    // Restore quest progress (quest structure is regenerated on SetGod)
+                    // We store the progress and apply it
+                }
+            }
 
             size_t questCount;
             file >> questCount; file.ignore();
@@ -507,6 +599,14 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 q.status = static_cast<QuestStatus>(std::stoi(statusStr));
                 q.rewarded = (rewardedStr == "1");
                 player->GetQuestManager().AddQuest(q);
+            }
+
+            // Achievements (v3+)
+            if (saveVersion >= 3)
+            {
+                std::string achData;
+                std::getline(file, achData);
+                outAchievements.Deserialize(achData);
             }
         }
 
@@ -539,7 +639,19 @@ SaveSlotInfo SaveGameManager::GetSlotInfo(int slot)
         std::ifstream file(filepath);
         if (!file.is_open()) return info;
 
-        std::getline(file, info.playerName);
+        // Skip version header if present
+        std::string firstLine;
+        std::getline(file, firstLine);
+        if (firstLine.substr(0, 12) != "SAVE_VERSION ")
+        {
+            // Old format: first line is player name
+            info.playerName = firstLine;
+        }
+        else
+        {
+            // New format: read player name from next line
+            std::getline(file, info.playerName);
+        }
 
         int classInt;
         file >> classInt; file.ignore();

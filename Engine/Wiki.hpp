@@ -1,6 +1,7 @@
 #ifndef WIKI_HPP
 #define WIKI_HPP
 
+#include <set>
 #include <string>
 #include <vector>
 #include "../Graphics/GRenderer.hpp"
@@ -27,6 +28,8 @@ public:
 
     void Draw(GRenderer& renderer);
     void SetAreas(const std::vector<Area>& areaList);
+    void MarkEnemyDefeated(const std::string& name);
+    bool IsEnemyDefeated(const std::string& name) const;
 
 private:
     WikiTab currentTab;
@@ -36,6 +39,16 @@ private:
 
     std::string searchQuery;
     char searchBuf[64];
+
+    // Enemy detail view
+    int selectedEnemyIdx;  // index into filtered list, -1 = none
+    bool showEnemyDetail;
+
+    // Keyboard navigation state
+    int focusedEntry;      // which entry row is keyboard-focused (-1 = none)
+    int wikiFocusPhase;    // 0=tab bar, 1=search, 2=entries, 3=page nav, 4=detail back
+
+    std::set<std::string> defeatedEnemies;
 
     struct WikiEntry
     {

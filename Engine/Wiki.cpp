@@ -8,7 +8,9 @@
 #include <cstring>
 
 Wiki::Wiki()
-    : currentTab(WikiTab::Equipment), page(0), maxPage(0), areas(nullptr)
+    : currentTab(WikiTab::Equipment), page(0), maxPage(0), areas(nullptr),
+      selectedEnemyIdx(-1), showEnemyDetail(false),
+      focusedEntry(-1), wikiFocusPhase(0)
 {
     searchBuf[0] = '\0';
     BuildEquipmentDatabase();
@@ -25,6 +27,16 @@ void Wiki::SetAreas(const std::vector<Area>& areaList)
 {
     areas = &areaList;
     BuildAreaDatabase();
+}
+
+void Wiki::MarkEnemyDefeated(const std::string& name)
+{
+    defeatedEnemies.insert(name);
+}
+
+bool Wiki::IsEnemyDefeated(const std::string& name) const
+{
+    return defeatedEnemies.find(name) != defeatedEnemies.end();
 }
 
 // ============================================================
@@ -400,11 +412,16 @@ void Wiki::BuildResourceDatabase()
     resourceEntries.push_back({"Ebony Wood", "Lumberjacking", "Tier 4 lumber resource", "Lumber Lv.7", 4});
     resourceEntries.push_back({"Magical Wood", "Lumberjacking", "Tier 5 lumber resource", "Lumber Lv.9", 5});
 
-    resourceEntries.push_back({"Raw Fish", "Fishing", "Tier 1 fishing resource", "Fishing Lv.1", 1});
-    resourceEntries.push_back({"Salmon", "Fishing", "Tier 2 fishing resource", "Fishing Lv.3", 2});
-    resourceEntries.push_back({"Tuna", "Fishing", "Tier 3 fishing resource", "Fishing Lv.5", 3});
-    resourceEntries.push_back({"Exotic Fish", "Fishing", "Tier 4 fishing resource", "Fishing Lv.7", 4});
-    resourceEntries.push_back({"Legendary Fish", "Fishing", "Tier 5 fishing resource", "Fishing Lv.9", 5});
+    resourceEntries.push_back({"Raw Fish", "Fishing", "Tier 1: Restores 20 HP", "Fishing Lv.1", 1});
+    resourceEntries.push_back({"Cooked Fish", "Fishing", "Tier 1: Restores 35 HP", "Cook (Raw Fish)", 1});
+    resourceEntries.push_back({"Salmon", "Fishing", "Tier 2: Restores 40 HP, 8 MP", "Fishing Lv.3", 2});
+    resourceEntries.push_back({"Cooked Salmon", "Fishing", "Tier 2: Restores 65 HP, 15 MP", "Cook (Salmon)", 2});
+    resourceEntries.push_back({"Tuna", "Fishing", "Tier 3: Restores 70 HP, 15 MP", "Fishing Lv.5", 3});
+    resourceEntries.push_back({"Cooked Tuna", "Fishing", "Tier 3: Restores 110 HP, 25 MP", "Cook (Tuna)", 3});
+    resourceEntries.push_back({"Exotic Fish", "Fishing", "Tier 4: Restores 120 HP, 30 MP", "Fishing Lv.7", 4});
+    resourceEntries.push_back({"Cooked Exotic Fish", "Fishing", "Tier 4: Restores 180 HP, 50 MP", "Cook (Exotic Fish)", 4});
+    resourceEntries.push_back({"Legendary Fish", "Fishing", "Tier 5: Restores 200 HP, 50 MP", "Fishing Lv.9", 5});
+    resourceEntries.push_back({"Cooked Legendary Fish", "Fishing", "Tier 5: Restores 320 HP, 80 MP", "Cook (Legendary Fish)", 5});
 
     resourceEntries.push_back({"Simple Ingot", "Smithing", "Tier 1 smithing resource", "Smithing Lv.1", 1});
     resourceEntries.push_back({"Steel Ingot", "Smithing", "Tier 2 smithing resource", "Smithing Lv.3", 2});
@@ -751,6 +768,71 @@ void Wiki::Draw(GRenderer& renderer)
 {
     renderer.DrawPanel(20, 40, GRenderer::W - 40, GRenderer::H - 80, "Codex");
 
+    // ---- Keyboard navigation ----
+    int tabCount = static_cast<int>(WikiTab::COUNT);
+
+    // Handle enemy detail popup keyboard input
+    if (showEnemyDetail)
+    {
+        if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_ENTER))
+        {
+            showEnemyDetail = false;
+            selectedEnemyIdx = -1;
+        }
+        DrawTabBar(renderer);
+        switch (currentTab)
+        {
+            case WikiTab::Equipment: DrawTabPage(renderer, equipEntries, "Equipment"); break;
+            case WikiTab::Skills:    DrawTabPage(renderer, skillEntries, "Skills"); break;
+            case WikiTab::Enemies:   DrawTabPage(renderer, enemyEntries, "Enemies"); break;
+            case WikiTab::Resources: DrawTabPage(renderer, resourceEntries, "Resources"); break;
+            case WikiTab::Crafting:  DrawTabPage(renderer, craftEntries, "Crafting Recipes"); break;
+            case WikiTab::Areas:     DrawTabPage(renderer, areaEntries, "Areas"); break;
+            case WikiTab::Sets:      DrawTabPage(renderer, setEntries, "Set Bonuses"); break;
+            case WikiTab::Uniques:   DrawTabPage(renderer, uniqueEntries, "Unique Items"); break;
+            default: break;
+        }
+        return;
+    }
+
+    // Tab switching with number keys 1-8
+    for (int i = 0; i < tabCount; ++i)
+    {
+        if (IsKeyPressed(static_cast<int>(KEY_ONE + i)))
+        {
+            currentTab = static_cast<WikiTab>(i);
+            page = 0;
+            focusedEntry = -1;
+            searchBuf[0] = '\0';
+            searchQuery.clear();
+        }
+    }
+
+    // Left/Right arrows for tab switching when focus is on tab bar
+    if (wikiFocusPhase == 0)
+    {
+        if (IsKeyPressed(KEY_RIGHT))
+        {
+            int next = (static_cast<int>(currentTab) + 1) % tabCount;
+            currentTab = static_cast<WikiTab>(next);
+            page = 0;
+            focusedEntry = -1;
+            searchBuf[0] = '\0';
+            searchQuery.clear();
+        }
+        if (IsKeyPressed(KEY_LEFT))
+        {
+            int prev = (static_cast<int>(currentTab) - 1 + tabCount) % tabCount;
+            currentTab = static_cast<WikiTab>(prev);
+            page = 0;
+            focusedEntry = -1;
+            searchBuf[0] = '\0';
+            searchQuery.clear();
+        }
+        if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_TAB))
+            wikiFocusPhase = 2; // jump to entries
+    }
+
     DrawTabBar(renderer);
 
     switch (currentTab)
@@ -793,6 +875,8 @@ void Wiki::DrawTabBar(GRenderer& renderer)
             page = 0;
             searchQuery.clear();
             searchBuf[0] = '\0';
+            showEnemyDetail = false;
+            selectedEnemyIdx = -1;
         }
     }
 }
@@ -884,6 +968,72 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
 
     int startIdx = page * maxLines;
     int endIdx = std::min(startIdx + maxLines, totalEntries);
+
+    // ---- Entry keyboard navigation ----
+    if (wikiFocusPhase == 2 && !filtered.empty())
+    {
+        int visibleCount = endIdx - startIdx;
+        if (IsKeyPressed(KEY_DOWN))
+        {
+            focusedEntry++;
+            if (focusedEntry >= visibleCount) focusedEntry = 0;
+        }
+        if (IsKeyPressed(KEY_UP))
+        {
+            focusedEntry--;
+            if (focusedEntry < 0) focusedEntry = visibleCount - 1;
+        }
+        if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_PAGE_DOWN))
+        {
+            if (page < maxPage) { page++; focusedEntry = 0; }
+        }
+        if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_PAGE_UP))
+        {
+            if (page > 0) { page--; focusedEntry = 0; }
+        }
+        // Enter to open enemy detail
+        if (IsKeyPressed(KEY_ENTER) && currentTab == WikiTab::Enemies && focusedEntry >= 0)
+        {
+            int actualIdx = startIdx + focusedEntry;
+            if (actualIdx >= 0 && actualIdx < static_cast<int>(filtered.size()))
+            {
+                selectedEnemyIdx = actualIdx;
+                showEnemyDetail = true;
+            }
+        }
+        // Tab to move to page nav
+        if (IsKeyPressed(KEY_TAB))
+            wikiFocusPhase = 3;
+        // Shift+Tab or Up at top to go back to tabs
+        if (IsKeyPressed(KEY_UP) && focusedEntry == 0)
+            wikiFocusPhase = 0;
+    }
+    else if (wikiFocusPhase == 3)
+    {
+        // Page navigation with Left/Right
+        if (IsKeyPressed(KEY_LEFT) && page > 0) page--;
+        if (IsKeyPressed(KEY_RIGHT) && page < maxPage) page++;
+        if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_TAB))
+            wikiFocusPhase = 2;
+        if (IsKeyPressed(KEY_DOWN))
+            wikiFocusPhase = 2;
+    }
+    else
+    {
+        // Default: focus on entries if Down is pressed
+        if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_TAB))
+        {
+            wikiFocusPhase = 2;
+            if (focusedEntry < 0) focusedEntry = 0;
+        }
+    }
+
+    // Clamp focusedEntry to visible count
+    {
+        int visibleCount = endIdx - startIdx;
+        if (focusedEntry >= visibleCount) focusedEntry = visibleCount - 1;
+        if (focusedEntry < 0 && visibleCount > 0) focusedEntry = 0;
+    }
 
     // Define column layouts per tab
     struct Col { int x; int w; };
@@ -983,17 +1133,51 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
     for (int i = startIdx; i < endIdx; ++i)
     {
         const auto& e = filtered[i];
+        int rowIdx = i - startIdx;
 
         // Alternating row background
-        if ((i - startIdx) % 2 == 0)
+        if (rowIdx % 2 == 0)
             renderer.DrawRect(38, y - 1, GRenderer::W - 76, lineH + 1, CQColors::BgDark);
         else
             renderer.DrawRect(38, y - 1, GRenderer::W - 76, lineH + 1, CQColors::BgPanel);
 
+        // Keyboard focus highlight
+        bool isFocused = (wikiFocusPhase == 2 && rowIdx == focusedEntry);
+        if (isFocused)
+            renderer.DrawRect(38, y - 1, GRenderer::W - 76, lineH + 1, CQColors::BtnHover);
+
+        // Make enemy entries clickable
+        bool isClickable = (currentTab == WikiTab::Enemies);
+        bool isRowHover = isClickable && renderer.IsMouseInRect(38, y - 1, GRenderer::W - 76, lineH + 1);
+        if (isRowHover)
+            renderer.DrawRect(38, y - 1, GRenderer::W - 76, lineH + 1, CQColors::BtnHover);
+
         Color textColor = RarityColor(static_cast<Rarity>(e.rarity));
 
+        // Enemy defeated/undiscovered visual treatment
+        std::string namePrefix;
+        if (currentTab == WikiTab::Enemies)
+        {
+            bool defeated = IsEnemyDefeated(e.name);
+            if (defeated)
+            {
+                namePrefix = "[DEFEATED] ";
+                // Slightly brighter variant
+                textColor.r = std::min(255, static_cast<int>(textColor.r * 1.15f));
+                textColor.g = std::min(255, static_cast<int>(textColor.g * 1.15f));
+                textColor.b = std::min(255, static_cast<int>(textColor.b * 1.15f));
+            }
+            else
+            {
+                // Undiscovered: dim the text color
+                textColor.r = static_cast<unsigned char>(textColor.r * 0.6f);
+                textColor.g = static_cast<unsigned char>(textColor.g * 0.6f);
+                textColor.b = static_cast<unsigned char>(textColor.b * 0.6f);
+            }
+        }
+
         // Draw name (truncate if needed)
-        std::string name = e.name;
+        std::string name = namePrefix + e.name;
         int maxNameW = colW[0] - 5;
         while (!name.empty() && MeasureText(name.c_str(), 14) > maxNameW)
             name.pop_back();
@@ -1014,6 +1198,14 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
             renderer.DrawText(e.lootInfo, colX[3], y, 12, CQColors::TextDim);
         else if (!e.source.empty())
             renderer.DrawText(e.source, colX[3], y, 12, CQColors::TextDim);
+
+        // Handle click or Enter on enemy row
+        if (isClickable && ((isRowHover && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+            || (isFocused && IsKeyPressed(KEY_ENTER))))
+        {
+            selectedEnemyIdx = i;
+            showEnemyDetail = true;
+        }
 
         y += lineH + rowLimit;
     }
@@ -1044,4 +1236,120 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
 
     std::string pg = "Page " + std::to_string(page + 1) + "/" + std::to_string(totalPages);
     renderer.DrawCenteredText(pg, navY - 16, 13, CQColors::TextDim);
+
+    // ---- Enemy detail panel ----
+    if (showEnemyDetail && selectedEnemyIdx >= 0 && selectedEnemyIdx < static_cast<int>(filtered.size()))
+    {
+        const auto& e = filtered[selectedEnemyIdx];
+
+        // Semi-transparent overlay
+        renderer.DrawRect(0, 0, GRenderer::W, GRenderer::H, {0, 0, 0, 150});
+
+        // Detail panel
+        int px = 100, py = 60, pw = GRenderer::W - 200, ph = GRenderer::H - 120;
+        renderer.DrawPanel(px, py, pw, ph, e.name + " — " + e.category);
+
+        int dy = py + 45;
+        int dx = px + 20;
+
+        // Enemy portrait
+        DrawEnemyIcon(e.name, px + pw - 120, py + 10, 72);
+
+        // Stats breakdown
+        renderer.DrawText("Stats:", dx, dy, 18, CQColors::TextGold);
+        dy += 24;
+        renderer.DrawText(e.info, dx + 10, dy, 14, CQColors::TextLight);
+        dy += 30;
+
+        // Defeated status
+        if (IsEnemyDefeated(e.name))
+        {
+            renderer.DrawText("[DEFEATED]", dx, dy, 16, CQColors::TextGreen);
+            dy += 24;
+        }
+        else
+        {
+            renderer.DrawText("[UNDISCOVERED]", dx, dy, 16, CQColors::TextDim);
+            dy += 24;
+        }
+
+        // Loot info
+        if (!e.lootInfo.empty())
+        {
+            renderer.DrawText("Loot:", dx, dy, 18, CQColors::TextGold);
+            dy += 24;
+            renderer.DrawText(e.lootInfo, dx + 10, dy, 14, CQColors::TextLight);
+            dy += 30;
+        }
+
+        // Area info
+        renderer.DrawText("Found in:", dx, dy, 18, CQColors::TextGold);
+        dy += 24;
+        renderer.DrawText(e.category + " (" + e.source + ")", dx + 10, dy, 14, CQColors::TextLight);
+        dy += 30;
+
+        // Strategy hints based on enemy type
+        renderer.DrawText("Strategy:", dx, dy, 18, CQColors::TextGold);
+        dy += 24;
+        std::string nameLower = e.name;
+        for (auto& c : nameLower) c = std::tolower(c);
+
+        if (nameLower.find("mage") != std::string::npos || nameLower.find("lich") != std::string::npos
+            || nameLower.find("seraphim") != std::string::npos || nameLower.find("astral") != std::string::npos)
+        {
+            renderer.DrawText("High magic damage. Use magic resistance gear and close distance quickly.", dx + 10, dy, 13, CQColors::TextDim);
+            dy += 20;
+            renderer.DrawText("Weak to physical attacks. Bring potions to counter burst damage.", dx + 10, dy, 13, CQColors::TextDim);
+        }
+        else if (nameLower.find("golem") != std::string::npos || nameLower.find("elemental") != std::string::npos)
+        {
+            renderer.DrawText("High defense. Use armor-piercing skills and elemental weaknesses.", dx + 10, dy, 13, CQColors::TextDim);
+            dy += 20;
+            renderer.DrawText("Slow but powerful hits. Stay healed and chip away at HP.", dx + 10, dy, 13, CQColors::TextDim);
+        }
+        else if (nameLower.find("dragon") != std::string::npos || nameLower.find("drake") != std::string::npos)
+        {
+            renderer.DrawText("Fire-based attacks. Equip fire resistance gear.", dx + 10, dy, 13, CQColors::TextDim);
+            dy += 20;
+            renderer.DrawText("High HP and damage. UseDefend wisely and heal often.", dx + 10, dy, 13, CQColors::TextDim);
+        }
+        else if (nameLower.find("void") != std::string::npos || nameLower.find("cosmic") != std::string::npos
+                 || nameLower.find("nether") != std::string::npos)
+        {
+            renderer.DrawText("Arcane/void damage. High stats — bring your best gear.", dx + 10, dy, 13, CQColors::TextDim);
+            dy += 20;
+            renderer.DrawText("UseDefend to mitigate heavy hits. Stack defensive passives.", dx + 10, dy, 13, CQColors::TextDim);
+        }
+        else if (nameLower.find("slime") != std::string::npos || nameLower.find("rat") != std::string::npos
+                 || nameLower.find("chicken") != std::string::npos)
+        {
+            renderer.DrawText("Weak early-game enemy. Safe to fight at any level.", dx + 10, dy, 13, CQColors::TextDim);
+            dy += 20;
+            renderer.DrawText("Good for farming early resources and XP.", dx + 10, dy, 13, CQColors::TextDim);
+        }
+        else if (nameLower.find("boss") != std::string::npos || nameLower.find("overseer") != std::string::npos
+                 || nameLower.find("treant king") != std::string::npos || nameLower.find("kraken") != std::string::npos
+                 || nameLower.find("elder dragon") != std::string::npos || nameLower.find("warlord") != std::string::npos
+                 || nameLower.find("lord") != std::string::npos || nameLower.find("seraphim council") != std::string::npos
+                 || nameLower.find("primordial") != std::string::npos || nameLower.find("construct") != std::string::npos
+                 || nameLower.find("chronos") != std::string::npos)
+        {
+            renderer.DrawText("BOSS — Powerful enemy with special abilities.", dx + 10, dy, 13, CQColors::TextRed);
+            dy += 20;
+            renderer.DrawText("May heal or use devastating skills. Bring potions and best gear.", dx + 10, dy, 13, CQColors::TextDim);
+        }
+        else
+        {
+            renderer.DrawText("Physical attacks. Stack defense and HP to survive.", dx + 10, dy, 13, CQColors::TextDim);
+            dy += 20;
+            renderer.DrawText("Use skills with elemental damage for bonus effectiveness.", dx + 10, dy, 13, CQColors::TextDim);
+        }
+
+        // Back button
+        if (renderer.Button("Back", px + pw / 2 - 60, py + ph - 50, 120, 36))
+        {
+            showEnemyDetail = false;
+            selectedEnemyIdx = -1;
+        }
+    }
 }

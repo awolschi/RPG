@@ -16,3 +16,14 @@ void CommonAttack::Use(Character& caster, Character& target)
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(1);
 }
+
+std::string CommonAttack::GetDamageFormula() const
+{
+    return "base/4 + STR/3 + Weapon";
+}
+
+int CommonAttack::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    int damage = (baseDamage / 4) + (stats.strength / 3) + weaponDamage + elementalBonus;
+    return ApplyDamageBonus(damage);
+}

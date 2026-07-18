@@ -553,3 +553,137 @@ void ArchmageCataclysm::Use(Character& caster, Character& target)
     GainXP(5);
     ResetCooldown();
 }
+
+std::string Fireball::GetDamageFormula() const { return "base/4 + INT/2 + Weapon, Burn 2 turns"; }
+int Fireball::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.intelligence / 2) + weaponDamage + elementalBonus);
+}
+
+std::string IceBolt::GetDamageFormula() const { return "base/4 + INT/3 + Weapon"; }
+int IceBolt::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.intelligence / 3) + weaponDamage + elementalBonus);
+}
+
+std::string ArcaneBolt::GetDamageFormula() const { return "base/4 + INT/4 + Weapon (no CD)"; }
+int ArcaneBolt::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.intelligence / 4) + weaponDamage + elementalBonus);
+}
+
+std::string Meteor::GetDamageFormula() const { return "base/4 + INT + Weapon"; }
+int Meteor::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + stats.intelligence + weaponDamage + elementalBonus);
+}
+
+std::string FrostWard::GetDamageFormula() const { return "+DEF & Heal (self)"; }
+
+std::string ArcaneSurge::GetDamageFormula() const { return "base/4 + INT*2 + Weapon"; }
+int ArcaneSurge::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.intelligence * 2) + weaponDamage + elementalBonus);
+}
+
+std::string ManaSiphon::GetDamageFormula() const { return "base/4 + INT/2 + Weapon, restores mana"; }
+int ManaSiphon::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.intelligence / 2) + weaponDamage + elementalBonus);
+}
+
+std::string ChainLightning::GetDamageFormula() const { return "base/4 + INT + Weapon"; }
+int ChainLightning::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + stats.intelligence + weaponDamage + elementalBonus);
+}
+
+std::string LightningBolt::GetDamageFormula() const { return "base/4 + INT/2 + Weapon, Stun 1 turn"; }
+int LightningBolt::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.intelligence / 2) + weaponDamage + elementalBonus);
+}
+
+std::string ArcaneMissiles::GetDamageFormula() const { return "base/4 + INT*1.5 + Weapon"; }
+int ArcaneMissiles::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.intelligence * 3 / 2) + weaponDamage + elementalBonus);
+}
+
+std::string FrostShield::GetDamageFormula() const { return "+DEF & Restore mana (self)"; }
+
+std::string ManaBomb::GetDamageFormula() const { return "base/4 + INT*2 + Weapon, +3 dmg per extra mana"; }
+int ManaBomb::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.intelligence * 2) + weaponDamage + elementalBonus);
+}
+
+std::string BlazingOrb::GetDamageFormula() const { return "base/4 + INT + Weapon, heals self"; }
+int BlazingOrb::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + stats.intelligence + weaponDamage + elementalBonus);
+}
+
+std::string FrostNova::GetDamageFormula() const { return "base/4 + INT + Weapon, Freeze 1 turn"; }
+int FrostNova::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + stats.intelligence + weaponDamage + elementalBonus);
+}
+
+std::string ArcaneBarrage::GetDamageFormula() const { return "base/4 + INT*2 + Weapon"; }
+int ArcaneBarrage::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.intelligence * 2) + weaponDamage + elementalBonus);
+}
+
+std::string TimeWarp::GetDamageFormula() const { return "base/4 + INT + Weapon, +6 DEF (self)"; }
+int TimeWarp::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + stats.intelligence + weaponDamage + elementalBonus);
+}
+
+std::string GlacialSpike::GetDamageFormula() const { return "base/4 + INT*1.5 + Weapon (1.5x vs low HP)"; }
+int GlacialSpike::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.intelligence * 3 / 2) + weaponDamage + elementalBonus);
+}
+
+std::string ManaShield::GetDamageFormula() const { return "+DEF & Restore mana (self)"; }
+
+std::string Pyroblast::GetDamageFormula() const { return "base/4 + INT*2 + Weapon"; }
+int Pyroblast::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.intelligence * 2) + weaponDamage + elementalBonus);
+}
+
+std::string Blizzard::GetDamageFormula() const { return "base/4 + INT*1.5 + Weapon, drains 15 mana"; }
+int Blizzard::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.intelligence * 3 / 2) + weaponDamage + elementalBonus);
+}
+
+std::string ArcanePower::GetDamageFormula() const { return "+DEF, restore mana & HP (self)"; }
+
+std::string IceLance::GetDamageFormula() const { return "base/4 + INT*2 + Weapon (1.6x vs low mana)"; }
+int IceLance::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.intelligence * 2) + weaponDamage + elementalBonus);
+}
+
+std::string Inferno::GetDamageFormula() const { return "base/4 + INT*2 + Weapon"; }
+int Inferno::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.intelligence * 2) + weaponDamage + elementalBonus);
+}
+
+std::string ElementalFury::GetDamageFormula() const { return "base/4 + INT*3 + Weapon"; }
+int ElementalFury::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.intelligence * 3) + weaponDamage + elementalBonus);
+}
+
+std::string ArchmageCataclysm::GetDamageFormula() const { return "base/4 + INT*4 + Weapon, restores 20 mana"; }
+int ArchmageCataclysm::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    return ApplyDamageBonus((baseDamage / 4) + (stats.intelligence * 4) + weaponDamage + elementalBonus);
+}

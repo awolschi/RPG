@@ -246,6 +246,30 @@ update_mappings/fast:
 	$(MAKE) $(MAKESILENT) -f _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build.make _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build
 .PHONY : update_mappings/fast
 
+Achievements/Achievement.o: Achievements/Achievement.cpp.o
+.PHONY : Achievements/Achievement.o
+
+# target to build an object file
+Achievements/Achievement.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Achievements/Achievement.cpp.o
+.PHONY : Achievements/Achievement.cpp.o
+
+Achievements/Achievement.i: Achievements/Achievement.cpp.i
+.PHONY : Achievements/Achievement.i
+
+# target to preprocess a source file
+Achievements/Achievement.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Achievements/Achievement.cpp.i
+.PHONY : Achievements/Achievement.cpp.i
+
+Achievements/Achievement.s: Achievements/Achievement.cpp.s
+.PHONY : Achievements/Achievement.s
+
+# target to generate assembly for a file
+Achievements/Achievement.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Achievements/Achievement.cpp.s
+.PHONY : Achievements/Achievement.cpp.s
+
 Characters/Character.o: Characters/Character.cpp.o
 .PHONY : Characters/Character.o
 
@@ -438,6 +462,30 @@ Engine/Game.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Engine/Game.cpp.s
 .PHONY : Engine/Game.cpp.s
 
+Engine/KeyboardNav.o: Engine/KeyboardNav.cpp.o
+.PHONY : Engine/KeyboardNav.o
+
+# target to build an object file
+Engine/KeyboardNav.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Engine/KeyboardNav.cpp.o
+.PHONY : Engine/KeyboardNav.cpp.o
+
+Engine/KeyboardNav.i: Engine/KeyboardNav.cpp.i
+.PHONY : Engine/KeyboardNav.i
+
+# target to preprocess a source file
+Engine/KeyboardNav.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Engine/KeyboardNav.cpp.i
+.PHONY : Engine/KeyboardNav.cpp.i
+
+Engine/KeyboardNav.s: Engine/KeyboardNav.cpp.s
+.PHONY : Engine/KeyboardNav.s
+
+# target to generate assembly for a file
+Engine/KeyboardNav.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Engine/KeyboardNav.cpp.s
+.PHONY : Engine/KeyboardNav.cpp.s
+
 Engine/LevelUp/LevelUp.o: Engine/LevelUp/LevelUp.cpp.o
 .PHONY : Engine/LevelUp/LevelUp.o
 
@@ -534,6 +582,78 @@ Engine/Wiki.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Engine/Wiki.cpp.s
 .PHONY : Engine/Wiki.cpp.s
 
+Graphics/BattleLayout.o: Graphics/BattleLayout.cpp.o
+.PHONY : Graphics/BattleLayout.o
+
+# target to build an object file
+Graphics/BattleLayout.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/BattleLayout.cpp.o
+.PHONY : Graphics/BattleLayout.cpp.o
+
+Graphics/BattleLayout.i: Graphics/BattleLayout.cpp.i
+.PHONY : Graphics/BattleLayout.i
+
+# target to preprocess a source file
+Graphics/BattleLayout.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/BattleLayout.cpp.i
+.PHONY : Graphics/BattleLayout.cpp.i
+
+Graphics/BattleLayout.s: Graphics/BattleLayout.cpp.s
+.PHONY : Graphics/BattleLayout.s
+
+# target to generate assembly for a file
+Graphics/BattleLayout.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/BattleLayout.cpp.s
+.PHONY : Graphics/BattleLayout.cpp.s
+
+Graphics/BattleRenderer.o: Graphics/BattleRenderer.cpp.o
+.PHONY : Graphics/BattleRenderer.o
+
+# target to build an object file
+Graphics/BattleRenderer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.o
+.PHONY : Graphics/BattleRenderer.cpp.o
+
+Graphics/BattleRenderer.i: Graphics/BattleRenderer.cpp.i
+.PHONY : Graphics/BattleRenderer.i
+
+# target to preprocess a source file
+Graphics/BattleRenderer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.i
+.PHONY : Graphics/BattleRenderer.cpp.i
+
+Graphics/BattleRenderer.s: Graphics/BattleRenderer.cpp.s
+.PHONY : Graphics/BattleRenderer.s
+
+# target to generate assembly for a file
+Graphics/BattleRenderer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.s
+.PHONY : Graphics/BattleRenderer.cpp.s
+
+Graphics/CreatureImageMapper.o: Graphics/CreatureImageMapper.cpp.o
+.PHONY : Graphics/CreatureImageMapper.o
+
+# target to build an object file
+Graphics/CreatureImageMapper.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/CreatureImageMapper.cpp.o
+.PHONY : Graphics/CreatureImageMapper.cpp.o
+
+Graphics/CreatureImageMapper.i: Graphics/CreatureImageMapper.cpp.i
+.PHONY : Graphics/CreatureImageMapper.i
+
+# target to preprocess a source file
+Graphics/CreatureImageMapper.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/CreatureImageMapper.cpp.i
+.PHONY : Graphics/CreatureImageMapper.cpp.i
+
+Graphics/CreatureImageMapper.s: Graphics/CreatureImageMapper.cpp.s
+.PHONY : Graphics/CreatureImageMapper.s
+
+# target to generate assembly for a file
+Graphics/CreatureImageMapper.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/CreatureImageMapper.cpp.s
+.PHONY : Graphics/CreatureImageMapper.cpp.s
+
 Graphics/GRenderer.o: Graphics/GRenderer.cpp.o
 .PHONY : Graphics/GRenderer.o
 
@@ -581,6 +701,54 @@ Graphics/IconRenderer.s: Graphics/IconRenderer.cpp.s
 Graphics/IconRenderer.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.s
 .PHONY : Graphics/IconRenderer.cpp.s
+
+Graphics/PhotoEffects.o: Graphics/PhotoEffects.cpp.o
+.PHONY : Graphics/PhotoEffects.o
+
+# target to build an object file
+Graphics/PhotoEffects.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.o
+.PHONY : Graphics/PhotoEffects.cpp.o
+
+Graphics/PhotoEffects.i: Graphics/PhotoEffects.cpp.i
+.PHONY : Graphics/PhotoEffects.i
+
+# target to preprocess a source file
+Graphics/PhotoEffects.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.i
+.PHONY : Graphics/PhotoEffects.cpp.i
+
+Graphics/PhotoEffects.s: Graphics/PhotoEffects.cpp.s
+.PHONY : Graphics/PhotoEffects.s
+
+# target to generate assembly for a file
+Graphics/PhotoEffects.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.s
+.PHONY : Graphics/PhotoEffects.cpp.s
+
+Graphics/TextureManager.o: Graphics/TextureManager.cpp.o
+.PHONY : Graphics/TextureManager.o
+
+# target to build an object file
+Graphics/TextureManager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.o
+.PHONY : Graphics/TextureManager.cpp.o
+
+Graphics/TextureManager.i: Graphics/TextureManager.cpp.i
+.PHONY : Graphics/TextureManager.i
+
+# target to preprocess a source file
+Graphics/TextureManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.i
+.PHONY : Graphics/TextureManager.cpp.i
+
+Graphics/TextureManager.s: Graphics/TextureManager.cpp.s
+.PHONY : Graphics/TextureManager.s
+
+# target to generate assembly for a file
+Graphics/TextureManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.s
+.PHONY : Graphics/TextureManager.cpp.s
 
 Inventory/Inventory.o: Inventory/Inventory.cpp.o
 .PHONY : Inventory/Inventory.o
@@ -774,6 +942,54 @@ Items/Uniques/UniqueItems.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/Uniques/UniqueItems.cpp.s
 .PHONY : Items/Uniques/UniqueItems.cpp.s
 
+Jobs/JobQuest.o: Jobs/JobQuest.cpp.o
+.PHONY : Jobs/JobQuest.o
+
+# target to build an object file
+Jobs/JobQuest.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/JobQuest.cpp.o
+.PHONY : Jobs/JobQuest.cpp.o
+
+Jobs/JobQuest.i: Jobs/JobQuest.cpp.i
+.PHONY : Jobs/JobQuest.i
+
+# target to preprocess a source file
+Jobs/JobQuest.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/JobQuest.cpp.i
+.PHONY : Jobs/JobQuest.cpp.i
+
+Jobs/JobQuest.s: Jobs/JobQuest.cpp.s
+.PHONY : Jobs/JobQuest.s
+
+# target to generate assembly for a file
+Jobs/JobQuest.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/JobQuest.cpp.s
+.PHONY : Jobs/JobQuest.cpp.s
+
+Jobs/JobSpecialization.o: Jobs/JobSpecialization.cpp.o
+.PHONY : Jobs/JobSpecialization.o
+
+# target to build an object file
+Jobs/JobSpecialization.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/JobSpecialization.cpp.o
+.PHONY : Jobs/JobSpecialization.cpp.o
+
+Jobs/JobSpecialization.i: Jobs/JobSpecialization.cpp.i
+.PHONY : Jobs/JobSpecialization.i
+
+# target to preprocess a source file
+Jobs/JobSpecialization.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/JobSpecialization.cpp.i
+.PHONY : Jobs/JobSpecialization.cpp.i
+
+Jobs/JobSpecialization.s: Jobs/JobSpecialization.cpp.s
+.PHONY : Jobs/JobSpecialization.s
+
+# target to generate assembly for a file
+Jobs/JobSpecialization.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/JobSpecialization.cpp.s
+.PHONY : Jobs/JobSpecialization.cpp.s
+
 Jobs/JobSystem.o: Jobs/JobSystem.cpp.o
 .PHONY : Jobs/JobSystem.o
 
@@ -821,6 +1037,30 @@ Jobs/Jobs.s: Jobs/Jobs.cpp.s
 Jobs/Jobs.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/Jobs.cpp.s
 .PHONY : Jobs/Jobs.cpp.s
+
+Jobs/ResourceChain.o: Jobs/ResourceChain.cpp.o
+.PHONY : Jobs/ResourceChain.o
+
+# target to build an object file
+Jobs/ResourceChain.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/ResourceChain.cpp.o
+.PHONY : Jobs/ResourceChain.cpp.o
+
+Jobs/ResourceChain.i: Jobs/ResourceChain.cpp.i
+.PHONY : Jobs/ResourceChain.i
+
+# target to preprocess a source file
+Jobs/ResourceChain.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/ResourceChain.cpp.i
+.PHONY : Jobs/ResourceChain.cpp.i
+
+Jobs/ResourceChain.s: Jobs/ResourceChain.cpp.s
+.PHONY : Jobs/ResourceChain.s
+
+# target to generate assembly for a file
+Jobs/ResourceChain.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/ResourceChain.cpp.s
+.PHONY : Jobs/ResourceChain.cpp.s
 
 Main.o: Main.cpp.o
 .PHONY : Main.o
@@ -1153,6 +1393,9 @@ help:
 	@echo "... glfw"
 	@echo "... raylib"
 	@echo "... rpg"
+	@echo "... Achievements/Achievement.o"
+	@echo "... Achievements/Achievement.i"
+	@echo "... Achievements/Achievement.s"
 	@echo "... Characters/Character.o"
 	@echo "... Characters/Character.i"
 	@echo "... Characters/Character.s"
@@ -1177,6 +1420,9 @@ help:
 	@echo "... Engine/Game.o"
 	@echo "... Engine/Game.i"
 	@echo "... Engine/Game.s"
+	@echo "... Engine/KeyboardNav.o"
+	@echo "... Engine/KeyboardNav.i"
+	@echo "... Engine/KeyboardNav.s"
 	@echo "... Engine/LevelUp/LevelUp.o"
 	@echo "... Engine/LevelUp/LevelUp.i"
 	@echo "... Engine/LevelUp/LevelUp.s"
@@ -1189,12 +1435,27 @@ help:
 	@echo "... Engine/Wiki.o"
 	@echo "... Engine/Wiki.i"
 	@echo "... Engine/Wiki.s"
+	@echo "... Graphics/BattleLayout.o"
+	@echo "... Graphics/BattleLayout.i"
+	@echo "... Graphics/BattleLayout.s"
+	@echo "... Graphics/BattleRenderer.o"
+	@echo "... Graphics/BattleRenderer.i"
+	@echo "... Graphics/BattleRenderer.s"
+	@echo "... Graphics/CreatureImageMapper.o"
+	@echo "... Graphics/CreatureImageMapper.i"
+	@echo "... Graphics/CreatureImageMapper.s"
 	@echo "... Graphics/GRenderer.o"
 	@echo "... Graphics/GRenderer.i"
 	@echo "... Graphics/GRenderer.s"
 	@echo "... Graphics/IconRenderer.o"
 	@echo "... Graphics/IconRenderer.i"
 	@echo "... Graphics/IconRenderer.s"
+	@echo "... Graphics/PhotoEffects.o"
+	@echo "... Graphics/PhotoEffects.i"
+	@echo "... Graphics/PhotoEffects.s"
+	@echo "... Graphics/TextureManager.o"
+	@echo "... Graphics/TextureManager.i"
+	@echo "... Graphics/TextureManager.s"
 	@echo "... Inventory/Inventory.o"
 	@echo "... Inventory/Inventory.i"
 	@echo "... Inventory/Inventory.s"
@@ -1219,12 +1480,21 @@ help:
 	@echo "... Items/Uniques/UniqueItems.o"
 	@echo "... Items/Uniques/UniqueItems.i"
 	@echo "... Items/Uniques/UniqueItems.s"
+	@echo "... Jobs/JobQuest.o"
+	@echo "... Jobs/JobQuest.i"
+	@echo "... Jobs/JobQuest.s"
+	@echo "... Jobs/JobSpecialization.o"
+	@echo "... Jobs/JobSpecialization.i"
+	@echo "... Jobs/JobSpecialization.s"
 	@echo "... Jobs/JobSystem.o"
 	@echo "... Jobs/JobSystem.i"
 	@echo "... Jobs/JobSystem.s"
 	@echo "... Jobs/Jobs.o"
 	@echo "... Jobs/Jobs.i"
 	@echo "... Jobs/Jobs.s"
+	@echo "... Jobs/ResourceChain.o"
+	@echo "... Jobs/ResourceChain.i"
+	@echo "... Jobs/ResourceChain.s"
 	@echo "... Main.o"
 	@echo "... Main.i"
 	@echo "... Main.s"

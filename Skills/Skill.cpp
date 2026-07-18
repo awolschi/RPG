@@ -172,3 +172,16 @@ int Skill::GetEffectiveCooldown() const
 {
     return std::max(0, cooldown - GetTotalCooldownReduction());
 }
+
+std::string Skill::GetDamageFormula() const
+{
+    return description;
+}
+
+int Skill::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
+{
+    if (baseDamage <= 0) return 0;
+    int damage = (baseDamage / 4) + weaponDamage + elementalBonus;
+    damage = ApplyDamageBonus(damage);
+    return damage;
+}

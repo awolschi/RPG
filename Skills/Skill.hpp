@@ -3,8 +3,10 @@
 
 #include <string>
 #include <vector>
+#include "../Characters/Stats/Stats.hpp"
 
 class Character;
+enum class CharacterClass : int;
 
 enum class ElementType
 {
@@ -53,7 +55,7 @@ class Skill
 {
 public:
     Skill(const std::string& name = "", int manaCost = 0, int cooldown = 0, int baseDamage = 0, int requiredLevel = 1)
-        : name(name), manaCost(manaCost), cooldown(cooldown), currentCooldown(0), baseDamage(baseDamage), level(1), experience(0), requiredLevel(requiredLevel)
+        : name(name), characterClass(static_cast<CharacterClass>(0)), manaCost(manaCost), cooldown(cooldown), currentCooldown(0), baseDamage(baseDamage), level(1), experience(0), requiredLevel(requiredLevel)
     {
     }
 
@@ -85,8 +87,13 @@ public:
     int GetEffectiveManaCost() const;
     int GetEffectiveCooldown() const;
 
+    // Damage info for UI display
+    virtual std::string GetDamageFormula() const;
+    virtual int EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const;
+
     std::string name;
     std::string description;
+    CharacterClass characterClass;
     ElementType element = ElementType::Physical;
     int manaCost;
     int cooldown;

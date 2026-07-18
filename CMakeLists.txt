@@ -4,6 +4,10 @@ project(RPG)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Disable PIE to avoid linker issues with raylib static library
+set(CMAKE_POSITION_INDEPENDENT_CODE OFF)
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -no-pie")
+
 # --- Raylib via FetchContent ---
 include(FetchContent)
 FetchContent_Declare(
@@ -48,6 +52,7 @@ set(SOURCES
     Engine/SaveGame.cpp
     Engine/LevelUp/LevelUp.cpp
     Engine/Religion.cpp
+    Engine/KeyboardNav.cpp
 
     # World
     Engine/Wiki.cpp
@@ -59,12 +64,23 @@ set(SOURCES
     # Jobs
     Jobs/Jobs.cpp
     Jobs/JobSystem.cpp
+    Jobs/ResourceChain.cpp
+    Jobs/JobQuest.cpp
+    Jobs/JobSpecialization.cpp
     Items/Resources/Resources.cpp
     Items/Crafting/Crafting.cpp
+
+    # Achievements
+    Achievements/Achievement.cpp
 
     # Graphics
     Graphics/GRenderer.cpp
     Graphics/IconRenderer.cpp
+    Graphics/TextureManager.cpp
+    Graphics/PhotoEffects.cpp
+    Graphics/BattleLayout.cpp
+    Graphics/BattleRenderer.cpp
+    Graphics/CreatureImageMapper.cpp
 )
 
 # Executable
