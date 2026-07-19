@@ -24,7 +24,11 @@ static std::string StripPrefixes(const std::string& name)
     static const std::vector<std::string> prefixes = {
         "greater ", "lesser ", "elder ", "ancient ", "shadow ",
         "dire ", "feral ", "corrupted ", "cursed ", "forsaken ",
-        "fallen ", "exalted ", "primordial "
+        "fallen ", "exalted ", "primordial ", "cosmic ", "star ",
+        "mana ", "crystal ", "arcane ", "void ", "bone ",
+        "stone ", "fire ", "earth ", "light ", "sea ",
+        "time ", "chrono ", "temporal ", "nether ",
+        "the ", "farm ", "aran ", "astral "
     };
     std::string lower = ToLower(name);
     for (const auto& prefix : prefixes)
@@ -45,12 +49,16 @@ static std::string ExtractKeyword(const std::string& name)
 }
 
 static const std::vector<std::string> knownCreatures = {
-    "goat", "wolf", "spider", "skeleton", "slime", "rat",
+    "wolf", "spider", "slime", "rat",
     "chicken", "boar", "treant", "wraith", "pirate",
-    "serpent", "crab", "siren", "orc", "harpy", "drake",
+    "serpent", "crab", "siren", "orc", "harpy",
     "golem", "gryphon", "phantom", "demon", "knight",
-    "lich", "dragon", "phoenix", "seraphim", "mage",
-    "construct", "elemental", "beast", "horror"
+    "lich", "phoenix", "seraphim",
+    "construct", "beast", "horror",
+    "bandit", "dark elf", "shadow", "kraken",
+    "overseer", "warlord", "lord", "chronos",
+    "guardian", "wisp", "spellblade", "weaver",
+    "primeordeal", "warrior"
 };
 
 static std::string FindBestMatch(const std::string& normalized)
@@ -78,7 +86,18 @@ Texture2D CreatureImageMapper::GetCreatureTexture(TextureManager& tm, const std:
     std::string match = FindBestMatch(normalized);
     if (!match.empty())
     {
-        std::string matchedPath = AssetPath("assets/creatures/" + match + ".jpeg");
+        std::string matchNoSpaces = match;
+        matchNoSpaces.erase(std::remove(matchNoSpaces.begin(), matchNoSpaces.end(), ' '), matchNoSpaces.end());
+
+        std::string matchedPath = AssetPath("assets/creatures/" + matchNoSpaces + ".jpeg");
+        if (FileExists(matchedPath.c_str()))
+            return tm.Load(matchedPath);
+
+        matchedPath = AssetPath("assets/creatures/" + matchNoSpaces + ".png");
+        if (FileExists(matchedPath.c_str()))
+            return tm.Load(matchedPath);
+
+        matchedPath = AssetPath("assets/creatures/" + match + ".jpeg");
         if (FileExists(matchedPath.c_str()))
             return tm.Load(matchedPath);
 

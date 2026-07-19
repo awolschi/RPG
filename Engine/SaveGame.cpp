@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "../Skills/CommonSkills/CommonAttack.hpp"
 #include "../Items/Consumable.hpp"
+#include "../Items/Resources/Resources.hpp"
 
 SaveGameManager::SaveGameManager()
 {
@@ -25,7 +26,7 @@ std::string SaveGameManager::SlotPath(int slot) const
     return saveDirectory + "slot" + std::to_string(slot) + ".sav";
 }
 
-bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, int areaIndex, const ReligionSystem& religion, const AchievementSystem& achievements)
+bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, int areaIndex, const ReligionSystem& religion, const AchievementSystem& achievements, const ReputationSystem& reputation, const PetManager& pets)
 {
     if (!player) return false;
     if (slot < 1 || slot > SLOT_COUNT) return false;
@@ -71,6 +72,8 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
                 file << "|AC|" << ac->bonusHealth << "|" << ac->bonusMana << "|" << static_cast<int>(ac->element) << "|" << ac->elementDamage;
             else if (auto c = std::dynamic_pointer_cast<Consumable>(item))
                 file << "|C|" << c->healAmount << "|" << c->manaAmount;
+            else if (auto r = std::dynamic_pointer_cast<Resource>(item))
+                file << "|R|" << r->tier << "|" << static_cast<int>(r->quality) << "|" << r->healAmount << "|" << r->manaAmount;
             file << "\n";
         }
 
@@ -164,6 +167,12 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
         // Achievements
         file << achievements.Serialize() << "\n";
 
+        // Faction Reputation (v4+)
+        file << reputation.Serialize() << "\n";
+
+        // Pet system (v5+)
+        file << pets.Serialize() << "\n";
+
         file.close();
         return true;
     }
@@ -174,7 +183,7 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
     }
 }
 
-std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, ReligionSystem& outReligion, AchievementSystem& outAchievements)
+std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, ReligionSystem& outReligion, AchievementSystem& outAchievements, ReputationSystem& outReputation, PetManager& outPets)
 {
     if (slot < 1 || slot > SLOT_COUNT) return nullptr;
 
@@ -191,9 +200,11 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
         std::string firstLine;
         std::streampos firstLinePos = file.tellg();
         std::getline(file, firstLine);
-        if (firstLine.substr(0, 12) == "SAVE_VERSION ")
+        // "SAVE_VERSION " is 13 characters; the previous substr(0,12) check
+        // silently failed for every versioned save, corrupting the load.
+        if (firstLine.size() >= 13 && firstLine.compare(0, 13, "SAVE_VERSION ") == 0)
         {
-            saveVersion = std::stoi(firstLine.substr(12));
+            saveVersion = std::stoi(firstLine.substr(13));
         }
         else
         {
@@ -327,6 +338,36 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                     std::stoi(defStr), std::stoi(manaStr), std::stoi(arcStr), rarity);
                 oh->sellValue = sellVal;
                 item = oh;
+            }
+            else if (subType == "R")
+            {
+                std::string tierStr, qualStr, healStr, manaStr;
+                std::getline(ss, tierStr, '|');
+                std::getline(ss, qualStr, '|');
+                std::getline(ss, healStr, '|');
+                std::getline(ss, manaStr, '|');
+                int rTier = tierStr.empty() ? 1 : std::stoi(tierStr);
+                auto rQual = qualStr.empty() ? ResourceQuality::Normal
+                                             : static_cast<ResourceQuality>(std::stoi(qualStr));
+                int rHeal = healStr.empty() ? 0 : std::stoi(healStr);
+                int rMana = manaStr.empty() ? 0 : std::stoi(manaStr);
+                // Construct with Normal quality first to avoid the Resource
+                // constructor re-applying the quality multiplier to the
+                // already-multiplied saved values, then restore the real quality.
+                auto r = std::make_shared<Resource>(iname, rTier, sellVal, rHeal, rMana, ResourceQuality::Normal);
+                r->quality = rQual;
+                r->healAmount = rHeal;
+                r->manaAmount = rMana;
+                r->sellValue = sellVal;
+                item = r;
+            }
+            // Account for items saved without a subtype (old resources / quest
+            // items). Build a generic Resource so they aren't lost on load.
+            else if (static_cast<ItemType>(std::stoi(typeStr)) == ItemType::Resource)
+            {
+                auto r = std::make_shared<Resource>(iname, std::stoi(typeStr), sellVal);
+                r->sellValue = sellVal;
+                item = r;
             }
             if (item)
             {
@@ -608,6 +649,22 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 std::getline(file, achData);
                 outAchievements.Deserialize(achData);
             }
+
+            // Faction Reputation (v4+)
+            if (saveVersion >= 4)
+            {
+                std::string repData;
+                std::getline(file, repData);
+                outReputation.Deserialize(repData);
+            }
+
+            // Pet system (v5+)
+            if (saveVersion >= 5)
+            {
+                std::string petData;
+                std::getline(file, petData);
+                outPets.Deserialize(petData);
+            }
         }
 
         file.close();
@@ -642,15 +699,15 @@ SaveSlotInfo SaveGameManager::GetSlotInfo(int slot)
         // Skip version header if present
         std::string firstLine;
         std::getline(file, firstLine);
-        if (firstLine.substr(0, 12) != "SAVE_VERSION ")
-        {
-            // Old format: first line is player name
-            info.playerName = firstLine;
-        }
-        else
+        if (firstLine.size() >= 13 && firstLine.substr(0, 13) == "SAVE_VERSION ")
         {
             // New format: read player name from next line
             std::getline(file, info.playerName);
+        }
+        else
+        {
+            // Old format: first line is player name
+            info.playerName = firstLine;
         }
 
         int classInt;

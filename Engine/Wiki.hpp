@@ -18,6 +18,7 @@ enum class WikiTab
     Areas,
     Sets,
     Uniques,
+    Pets,
     COUNT
 };
 
@@ -30,6 +31,8 @@ public:
     void SetAreas(const std::vector<Area>& areaList);
     void MarkEnemyDefeated(const std::string& name);
     bool IsEnemyDefeated(const std::string& name) const;
+    void MarkPetObtained(const std::string& id);
+    bool IsPetObtained(const std::string& id) const;
 
 private:
     WikiTab currentTab;
@@ -44,11 +47,16 @@ private:
     int selectedEnemyIdx;  // index into filtered list, -1 = none
     bool showEnemyDetail;
 
+    // Pet detail view
+    int selectedPetIdx;
+    bool showPetDetail;
+
     // Keyboard navigation state
     int focusedEntry;      // which entry row is keyboard-focused (-1 = none)
     int wikiFocusPhase;    // 0=tab bar, 1=search, 2=entries, 3=page nav, 4=detail back
 
     std::set<std::string> defeatedEnemies;
+    std::set<std::string> obtainedPets;
 
     struct WikiEntry
     {
@@ -68,6 +76,7 @@ private:
     std::vector<WikiEntry> areaEntries;
     std::vector<WikiEntry> setEntries;
     std::vector<WikiEntry> uniqueEntries;
+    std::vector<WikiEntry> petEntries;
 
     void BuildEquipmentDatabase();
     void BuildSkillDatabase();
@@ -77,6 +86,7 @@ private:
     void BuildAreaDatabase();
     void BuildSetDatabase();
     void BuildUniqueDatabase();
+    void BuildPetDatabase();
 
     void DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, const std::string& title);
     void DrawTabBar(GRenderer& renderer);

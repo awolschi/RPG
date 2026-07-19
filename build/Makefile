@@ -582,6 +582,54 @@ Engine/Wiki.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Engine/Wiki.cpp.s
 .PHONY : Engine/Wiki.cpp.s
 
+Factions/FactionReputation.o: Factions/FactionReputation.cpp.o
+.PHONY : Factions/FactionReputation.o
+
+# target to build an object file
+Factions/FactionReputation.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Factions/FactionReputation.cpp.o
+.PHONY : Factions/FactionReputation.cpp.o
+
+Factions/FactionReputation.i: Factions/FactionReputation.cpp.i
+.PHONY : Factions/FactionReputation.i
+
+# target to preprocess a source file
+Factions/FactionReputation.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Factions/FactionReputation.cpp.i
+.PHONY : Factions/FactionReputation.cpp.i
+
+Factions/FactionReputation.s: Factions/FactionReputation.cpp.s
+.PHONY : Factions/FactionReputation.s
+
+# target to generate assembly for a file
+Factions/FactionReputation.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Factions/FactionReputation.cpp.s
+.PHONY : Factions/FactionReputation.cpp.s
+
+Factions/Pet.o: Factions/Pet.cpp.o
+.PHONY : Factions/Pet.o
+
+# target to build an object file
+Factions/Pet.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Factions/Pet.cpp.o
+.PHONY : Factions/Pet.cpp.o
+
+Factions/Pet.i: Factions/Pet.cpp.i
+.PHONY : Factions/Pet.i
+
+# target to preprocess a source file
+Factions/Pet.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Factions/Pet.cpp.i
+.PHONY : Factions/Pet.cpp.i
+
+Factions/Pet.s: Factions/Pet.cpp.s
+.PHONY : Factions/Pet.s
+
+# target to generate assembly for a file
+Factions/Pet.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Factions/Pet.cpp.s
+.PHONY : Factions/Pet.cpp.s
+
 Graphics/BattleLayout.o: Graphics/BattleLayout.cpp.o
 .PHONY : Graphics/BattleLayout.o
 
@@ -965,6 +1013,30 @@ Jobs/JobQuest.s: Jobs/JobQuest.cpp.s
 Jobs/JobQuest.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/JobQuest.cpp.s
 .PHONY : Jobs/JobQuest.cpp.s
+
+Jobs/JobSkillTree.o: Jobs/JobSkillTree.cpp.o
+.PHONY : Jobs/JobSkillTree.o
+
+# target to build an object file
+Jobs/JobSkillTree.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/JobSkillTree.cpp.o
+.PHONY : Jobs/JobSkillTree.cpp.o
+
+Jobs/JobSkillTree.i: Jobs/JobSkillTree.cpp.i
+.PHONY : Jobs/JobSkillTree.i
+
+# target to preprocess a source file
+Jobs/JobSkillTree.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/JobSkillTree.cpp.i
+.PHONY : Jobs/JobSkillTree.cpp.i
+
+Jobs/JobSkillTree.s: Jobs/JobSkillTree.cpp.s
+.PHONY : Jobs/JobSkillTree.s
+
+# target to generate assembly for a file
+Jobs/JobSkillTree.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/JobSkillTree.cpp.s
+.PHONY : Jobs/JobSkillTree.cpp.s
 
 Jobs/JobSpecialization.o: Jobs/JobSpecialization.cpp.o
 .PHONY : Jobs/JobSpecialization.o
@@ -1435,6 +1507,12 @@ help:
 	@echo "... Engine/Wiki.o"
 	@echo "... Engine/Wiki.i"
 	@echo "... Engine/Wiki.s"
+	@echo "... Factions/FactionReputation.o"
+	@echo "... Factions/FactionReputation.i"
+	@echo "... Factions/FactionReputation.s"
+	@echo "... Factions/Pet.o"
+	@echo "... Factions/Pet.i"
+	@echo "... Factions/Pet.s"
 	@echo "... Graphics/BattleLayout.o"
 	@echo "... Graphics/BattleLayout.i"
 	@echo "... Graphics/BattleLayout.s"
@@ -1483,6 +1561,9 @@ help:
 	@echo "... Jobs/JobQuest.o"
 	@echo "... Jobs/JobQuest.i"
 	@echo "... Jobs/JobQuest.s"
+	@echo "... Jobs/JobSkillTree.o"
+	@echo "... Jobs/JobSkillTree.i"
+	@echo "... Jobs/JobSkillTree.s"
 	@echo "... Jobs/JobSpecialization.o"
 	@echo "... Jobs/JobSpecialization.i"
 	@echo "... Jobs/JobSpecialization.s"

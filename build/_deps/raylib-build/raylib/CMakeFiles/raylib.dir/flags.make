@@ -6,5 +6,5 @@ C_DEFINES = -DGRAPHICS_API_OPENGL_33 -DPLATFORM_DESKTOP
 
 C_INCLUDES = -I/home/awolschi/Desktop/OwnProjects/RPG/build/_deps/raylib-src/src -isystem /home/awolschi/Desktop/OwnProjects/RPG/build/_deps/raylib-src/src/external/glfw/include
 
-C_FLAGS = -fno-strict-aliasing -Werror=implicit-function-declaration -Werror=pointer-arith  -std=gnu99
+C_FLAGS = -fno-strict-aliasing -Werror=implicit-function-declaration -Werror=pointer-arith  -g -std=gnu99
 

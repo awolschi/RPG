@@ -6,6 +6,7 @@
 #include "../Characters/Character.hpp"
 #include "../Characters/Monster.hpp"
 #include "../Engine/Game.hpp"
+#include "../Factions/Pet.hpp"
 #include <cmath>
 
 static void DrawCreatureFallback(GRenderer& renderer, const std::string& name, int x, int y, int size)
@@ -20,7 +21,9 @@ void BattleRenderer::DrawBattleScreen(GRenderer& renderer,
                                        CombatPhase phase,
                                        float enemyFlashTimer,
                                        bool isBoss,
-                                       const std::string& battleMessage)
+                                       const std::string& battleMessage,
+                                       const PetManager* petManager,
+                                       int playerLevel)
 {
     BattleLayout layout;
     layout.Calculate(GRenderer::W, GRenderer::H);
@@ -102,7 +105,7 @@ void BattleRenderer::DrawBattleScreen(GRenderer& renderer,
     int logX = 30;
     int logY = layout.messageY + 30;
     int logW = GRenderer::W - 60;
-    int logH = 120;
+    int logH = layout.abilityY - logY - 10;
 
     DrawRectangle(logX, logY, logW, logH, {10, 10, 15, 180});
     DrawRectangleLines(logX, logY, logW, logH, {80, 80, 100, 100});
@@ -132,6 +135,35 @@ void BattleRenderer::DrawBattleScreen(GRenderer& renderer,
                   player.GetCurrentHealth(), player.GetMaxHealth(),
                   player.GetCurrentMana(), player.GetMaxMana(),
                   layout.playerBarY);
+
+    // Show equipped pet info
+    if (petManager)
+    {
+        const Pet* pet = petManager->GetEquippedPet();
+        if (pet)
+        {
+            int petInfoY = layout.playerBarY + 48;
+            int petInfoX = 30;
+
+            Color elemCol = CQColors::TextDim;
+            switch (pet->element)
+            {
+                case ElementType::Fire:      elemCol = {255, 100, 50, 255}; break;
+                case ElementType::Ice:       elemCol = {100, 200, 255, 255}; break;
+                case ElementType::Lightning: elemCol = {255, 255, 100, 255}; break;
+                case ElementType::Arcane:    elemCol = {200, 120, 255, 255}; break;
+                case ElementType::Poison:    elemCol = {100, 220, 80, 255}; break;
+                case ElementType::Holy:      elemCol = {255, 240, 200, 255}; break;
+                default:                     elemCol = {200, 200, 200, 255}; break;
+            }
+
+            DrawText(pet->GetCurrentName().c_str(), petInfoX, petInfoY, 13, elemCol);
+
+            int petDmg = petManager->CalculatePetDamage(playerLevel);
+            std::string dmgText = "ATK:" + std::to_string(petDmg);
+            DrawText(dmgText.c_str(), petInfoX + 140, petInfoY, 12, CQColors::TextDim);
+        }
+    }
 
     if (phase == CombatPhase::PlayerTurn)
     {

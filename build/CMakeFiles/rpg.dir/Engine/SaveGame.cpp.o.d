@@ -186,11 +186,25 @@ CMakeFiles/rpg.dir/Engine/SaveGame.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/../Items/Resources/../Item.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/JobPerk.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/JobSpecialization.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/JobSkillTree.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/ResourceChain.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../World/Quests/Quest.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/Religion.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Quests/Quest.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Achievements/Achievement.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Factions/FactionReputation.hpp \
+ /usr/include/c++/10/functional /usr/include/c++/10/bits/std_function.h \
+ /usr/include/c++/10/unordered_map /usr/include/c++/10/bits/hashtable.h \
+ /usr/include/c++/10/bits/hashtable_policy.h /usr/include/c++/10/limits \
+ /usr/include/c++/10/bits/unordered_map.h \
+ /usr/include/c++/10/bits/stl_algo.h \
+ /usr/include/c++/10/bits/algorithmfwd.h \
+ /usr/include/c++/10/bits/stl_heap.h \
+ /usr/include/c++/10/bits/uniform_int_dist.h \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Factions/Pet.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Factions/../Skills/Skill.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Factions/../Characters/Character.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Factions/FactionReputation.hpp \
  /usr/include/c++/10/fstream /usr/include/c++/10/istream \
  /usr/include/c++/10/ios /usr/include/c++/10/bits/ios_base.h \
  /usr/include/c++/10/bits/locale_classes.h \
@@ -213,8 +227,8 @@ CMakeFiles/rpg.dir/Engine/SaveGame.cpp.o: \
  /usr/include/x86_64-linux-gnu/c++/10/bits/c++io.h \
  /usr/include/c++/10/bits/fstream.tcc /usr/include/c++/10/filesystem \
  /usr/include/c++/10/bits/fs_fwd.h /usr/include/c++/10/chrono \
- /usr/include/c++/10/ratio /usr/include/c++/10/limits \
- /usr/include/c++/10/ctime /usr/include/c++/10/bits/parse_numbers.h \
+ /usr/include/c++/10/ratio /usr/include/c++/10/ctime \
+ /usr/include/c++/10/bits/parse_numbers.h \
  /usr/include/c++/10/bits/fs_path.h /usr/include/c++/10/locale \
  /usr/include/c++/10/bits/locale_facets_nonio.h \
  /usr/include/x86_64-linux-gnu/c++/10/bits/time_members.h \
@@ -225,17 +239,10 @@ CMakeFiles/rpg.dir/Engine/SaveGame.cpp.o: \
  /usr/include/c++/10/bits/sstream.tcc /usr/include/c++/10/codecvt \
  /usr/include/c++/10/bits/fs_dir.h /usr/include/c++/10/bits/fs_ops.h \
  /usr/include/c++/10/iostream /usr/include/c++/10/algorithm \
- /usr/include/c++/10/bits/stl_algo.h \
- /usr/include/c++/10/bits/algorithmfwd.h \
- /usr/include/c++/10/bits/stl_heap.h \
- /usr/include/c++/10/bits/uniform_int_dist.h \
  /usr/include/c++/10/pstl/glue_algorithm_defs.h \
- /usr/include/c++/10/functional /usr/include/c++/10/bits/std_function.h \
- /usr/include/c++/10/unordered_map /usr/include/c++/10/bits/hashtable.h \
- /usr/include/c++/10/bits/hashtable_policy.h \
- /usr/include/c++/10/bits/unordered_map.h \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Skills/CommonSkills/CommonAttack.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Skills/CommonSkills/../Skill.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Consumable.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Item.hpp \
- /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/../Characters/Character.hpp
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/../Characters/Character.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Resources/Resources.hpp

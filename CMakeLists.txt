@@ -67,11 +67,16 @@ set(SOURCES
     Jobs/ResourceChain.cpp
     Jobs/JobQuest.cpp
     Jobs/JobSpecialization.cpp
+    Jobs/JobSkillTree.cpp
     Items/Resources/Resources.cpp
     Items/Crafting/Crafting.cpp
 
     # Achievements
     Achievements/Achievement.cpp
+
+    # Factions
+    Factions/FactionReputation.cpp
+    Factions/Pet.cpp
 
     # Graphics
     Graphics/GRenderer.cpp

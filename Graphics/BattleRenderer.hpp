@@ -9,6 +9,7 @@
 
 class Character;
 class Monster;
+class PetManager;
 enum class CombatPhase;
 
 namespace BattleRenderer
@@ -20,7 +21,9 @@ namespace BattleRenderer
                           CombatPhase phase,
                           float enemyFlashTimer,
                           bool isBoss,
-                          const std::string& battleMessage = "");
+                          const std::string& battleMessage = "",
+                          const PetManager* petManager = nullptr,
+                          int playerLevel = 1);
 
     void DrawAbilityButton(GRenderer& renderer,
                            const std::string& label,

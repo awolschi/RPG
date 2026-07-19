@@ -6,5 +6,5 @@ CXX_DEFINES = -DGRAPHICS_API_OPENGL_33 -DPLATFORM_DESKTOP
 
 CXX_INCLUDES = -I/home/awolschi/Desktop/OwnProjects/RPG -I/home/awolschi/Desktop/OwnProjects/RPG/build/_deps/raylib-src/src -I/home/awolschi/Desktop/OwnProjects/RPG/build/_deps/raylib-src/src/external/glfw/include
 
-CXX_FLAGS = -Wall -Wextra -Wpedantic -std=gnu++17
+CXX_FLAGS = -g -Wall -Wextra -Wpedantic -std=gnu++17
 

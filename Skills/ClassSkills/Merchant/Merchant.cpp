@@ -1,15 +1,21 @@
 #include "Merchant.hpp"
 #include "../../../Characters/Character.hpp"
+#include "../../../Characters/Player.hpp"
 
-ThrowCoin::ThrowCoin() : Skill("Throw Coin", 5, 1, 35, 1)
+ThrowCoin::ThrowCoin() : Skill("Throw Coin", 0, 1, 35, 1)
 {
-        description = "9 base + DEX/3 + weapon damage";
+        description = "9 base + DEX/3 + weapon damage (costs 5 gold)";
         InitializeUpgrades();
 }
 
 void ThrowCoin::Use(Character& caster, Character& target)
 {
     if (!IsReady()) return;
+
+    auto* player = dynamic_cast<Player*>(&caster);
+    if (!player || player->GetInventory().GetGold() < goldCost) return;
+    player->GetInventory().RemoveGold(goldCost);
+
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
@@ -117,7 +123,7 @@ void GoldenHurricane::Use(Character& caster, Character& target)
     ResetCooldown();
 }
 
-std::string ThrowCoin::GetDamageFormula() const { return "base/4 + DEX/3 + Weapon"; }
+std::string ThrowCoin::GetDamageFormula() const { return "base/4 + DEX/3 + Weapon (5 gold)"; }
 int ThrowCoin::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
     return ApplyDamageBonus((baseDamage / 4) + (stats.dexterity / 3) + weaponDamage + elementalBonus);

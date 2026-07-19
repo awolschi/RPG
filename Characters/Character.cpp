@@ -24,6 +24,10 @@ void Character::TakeDamage(int damage, ElementType element)
     int allResist = Passives::GetAllResistBonus(equipment);
     elemReduction += allResist;
 
+    // Pet defense bonus reduces incoming damage by a fractional amount
+    if (petBonusDefense > 0.0f)
+        damage = static_cast<int>(damage * (1.0f - std::min(petBonusDefense, 0.9f)));
+
     int mitigatedDamage = std::max(1, damage - totalDefense / 2 - elemReduction);
 
     // Damage reduction from passives

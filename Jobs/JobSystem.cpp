@@ -180,7 +180,7 @@ std::string JobSystem::SerializePerks() const
     std::ostringstream ss;
     for (const auto& job : jobs)
     {
-        ss << static_cast<int>(job.type) << ":" << job.jobPoints << ":";
+        ss << static_cast<int>(job.type) << ":" << job.jobPoints << ":" << job.skillPoints << ":";
         for (size_t i = 0; i < job.perks.size(); ++i)
         {
             if (i > 0) ss << ",";
@@ -207,11 +207,24 @@ void JobSystem::DeserializePerks(const std::string& data)
         if (colon2 == std::string::npos) continue;
         int points = std::stoi(jobStr.substr(colon1 + 1, colon2 - colon1 - 1));
 
-        std::string perksStr = jobStr.substr(colon2 + 1);
+        size_t colon3 = jobStr.find(':', colon2 + 1);
+        int skillPts = 0;
+        std::string perksStr;
+        if (colon3 != std::string::npos)
+        {
+            skillPts = std::stoi(jobStr.substr(colon2 + 1, colon3 - colon2 - 1));
+            perksStr = jobStr.substr(colon3 + 1);
+        }
+        else
+        {
+            perksStr = jobStr.substr(colon2 + 1);
+        }
+
         Job* job = FindJob(static_cast<JobType>(type));
         if (job)
         {
             job->jobPoints = points;
+            job->skillPoints = skillPts;
             std::istringstream ps(perksStr);
             std::string perkStr;
             int idx = 0;
@@ -222,6 +235,17 @@ void JobSystem::DeserializePerks(const std::string& data)
             }
         }
     }
+}
+
+std::string JobSystem::SerializeSkillTree() const
+{
+    return skillTree.Serialize();
+}
+
+void JobSystem::DeserializeSkillTree(const std::string& data)
+{
+    if (!data.empty())
+        skillTree.Deserialize(data);
 }
 
 Job* JobSystem::FindJob(JobType type)

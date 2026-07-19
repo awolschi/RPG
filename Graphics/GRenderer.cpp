@@ -336,6 +336,16 @@ bool GRenderer::Button(const std::string& text, int x, int y, int w, int h, int 
     bool pressed = hover && IsMouseButtonDown(MOUSE_LEFT_BUTTON);
     bool focused = (focusIndex >= 0 && focusIndex == currentFocus);
 
+    bool clicked = IsMouseClickedOn(x, y, w, h);
+
+    // Keyboard activation: Enter or Space on focused button
+    if (focused && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)))
+        clicked = true;
+
+    // Invisible button (empty text) — skip all rendering, only detect clicks
+    if (text.empty())
+        return clicked;
+
     Color bg;
     if (pressed)
         bg = CQColors::BtnActive;
@@ -343,12 +353,6 @@ bool GRenderer::Button(const std::string& text, int x, int y, int w, int h, int 
         bg = CQColors::BtnHover;
     else
         bg = CQColors::BtnBg;
-
-    bool clicked = IsMouseClickedOn(x, y, w, h);
-
-    // Keyboard activation: Enter or Space on focused button
-    if (focused && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE)))
-        clicked = true;
 
     // Button body
     DrawRect(x, y, w, h, bg);

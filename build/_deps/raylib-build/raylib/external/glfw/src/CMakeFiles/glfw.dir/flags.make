@@ -6,5 +6,5 @@ C_DEFINES = -D_DEFAULT_SOURCE -D_GLFW_X11
 
 C_INCLUDES = -I/home/awolschi/Desktop/OwnProjects/RPG/build/_deps/raylib-src/src/external/glfw/include -I/home/awolschi/Desktop/OwnProjects/RPG/build/_deps/raylib-src/src/external/glfw/src -I/home/awolschi/Desktop/OwnProjects/RPG/build/_deps/raylib-build/raylib/external/glfw/src
 
-C_FLAGS = -fno-strict-aliasing -Werror=implicit-function-declaration -Werror=pointer-arith  -fPIC -Wall -std=c99
+C_FLAGS = -fno-strict-aliasing -Werror=implicit-function-declaration -Werror=pointer-arith  -g -fPIC -Wall -std=c99
 

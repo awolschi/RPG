@@ -371,22 +371,22 @@
 ## 13. Job Reputation System
 
 ### 14.1 Reputation Factions
-- [ ] Each job has a reputation faction:
+- [x] Each job has a reputation faction:
   - Mining: Miners' Guild
   - Lumberjacking: Woodcutters' Union
   - Fishing: Fisher's Fellowship
   - Smithing: Artisan's Circle
 
 ### 14.2 Reputation Ranks
-- [ ] Stranger → Acquaintance → Friend → Ally → Champion → Legend
-- [ ] Higher ranks unlock better rewards
-- [ ] Reputation earned by working the job + completing quests
+- [x] Stranger → Acquaintance → Friend → Ally → Champion → Legend
+- [x] Higher ranks unlock better rewards
+- [x] Reputation earned by working the job + completing quests
 
 ### 14.3 Reputation Rewards
-- [ ] Rank 1 (Friend): Access to basic job shop
-- [ ] Rank 2 (Ally): Discount on job supplies
-- [ ] Rank 3 (Champion): Exclusive recipes
-- [ ] Rank 4 (Legend): Legendary tool quest
+- [x] Rank 1 (Friend): Access to basic job shop
+- [x] Rank 2 (Ally): Discount on job supplies
+- [x] Rank 3 (Champion): Exclusive recipes
+- [x] Rank 4 (Legend): Legendary tool quest
 
 ### 14.4 Reputation Decay
 - [ ] Reputation slowly decays if job not worked for many days

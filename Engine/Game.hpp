@@ -20,6 +20,8 @@
 #include "../Items/Crafting/Crafting.hpp"
 #include "../Jobs/JobQuest.hpp"
 #include "../Achievements/Achievement.hpp"
+#include "../Factions/FactionReputation.hpp"
+#include "../Factions/Pet.hpp"
 
 struct FloatingText
 {
@@ -59,6 +61,18 @@ struct AchievementNotification
         : name(n), description(d), life(dur), maxLife(dur) {}
 };
 
+struct QuestRewardNotification
+{
+    std::string questTitle;
+    int xpEarned;
+    int goldEarned;
+    float life;
+    float maxLife;
+
+    QuestRewardNotification(const std::string& title, int xp, int gold, float dur = 3.0f)
+        : questTitle(title), xpEarned(xp), goldEarned(gold), life(dur), maxLife(dur) {}
+};
+
 enum class GameState
 {
     MainMenu,
@@ -85,6 +99,8 @@ enum class GameState
     Wiki,
     NPCDialogue,
     Achievements,
+    Reputation,
+    Pets,
     Exit
 };
 
@@ -119,6 +135,8 @@ private:
     ReligionSystem religion;
     Wiki wiki;
     AchievementSystem achievementSystem;
+    ReputationSystem reputationSystem;
+    PetManager petManager;
     JobQuestSystem jobQuestSystem;
     std::vector<std::shared_ptr<Item>> shopItems;
 
@@ -127,6 +145,8 @@ private:
     std::vector<FloatingText> floatingTexts;
     std::vector<Particle> particles;
     std::vector<AchievementNotification> achNotifications;
+    std::vector<QuestRewardNotification> questRewardNotifications;
+    std::vector<PetNotification> petNotifications;
     double enemyActionTime;
 
     // Combat animation state
@@ -166,9 +186,35 @@ private:
 
     // Job perks state
     int selectedJobIdx;
+    int jobPerkPage = 0;
+    static constexpr int PERKS_PER_PAGE = 8;
+
+    // Reputation UI state
+    int selectedFactionIdx = -1;
+    int repQuestTab = 0;  // 0=Overview, 1=Repeatable Quests
+    int repQuestPage = 0;
+    static constexpr int REPEATABLE_QUESTS_PER_PAGE = 5;
 
     // Inventory UI state
     int inventoryTab;
+    int inventoryPage = 0;
+    static constexpr int INVENTORY_ITEMS_PER_PAGE = 18;
+
+    // Stats UI state (skill list pagination for high-level mages)
+    int skillStatsPage = 0;
+    static constexpr int SKILLS_PER_PAGE = 16;
+
+    // Shop UI state (sell-side pagination)
+    int shopSellPage = 0;
+    static constexpr int SHOP_SELL_PER_PAGE = 18;
+
+    // Achievements UI state
+    int achievementsPage = 0;
+    static constexpr int ACHIEVEMENTS_PER_PAGE = 12;
+
+    // Pet UI state
+    int petListPage = 0;
+    static constexpr int PETS_PER_PAGE = 9;
 
     // Main game states
     void StateMainMenu();
@@ -187,6 +233,8 @@ private:
     void StateQuestLog();
     void StateWiki();
     void StateAchievements();
+    void StateReputation();
+    void StatePets();
     void StateCombat();
     void StateDungeonSelect();
     void StateDungeonExplore();
@@ -213,6 +261,7 @@ private:
     void LoadGamePrompt();
     void SaveToSlot(int slot);
     void LoadFromSlot(int slot);
+    void ApplyPetPassivesToPlayer();
 
     // Drawing helpers
     void DrawTopBar();
@@ -223,6 +272,9 @@ private:
     void AddHealParticles(float x, float y);
     void AddCriticalParticles(float x, float y);
     void DrawAchievementNotifications();
+    void DrawQuestRewardNotifications();
+    void DrawReputationNotifications();
+    void DrawPetNotifications();
     void CheckAchievementNotifications();
     void DrawMessagePage(const std::string& title,
                          const std::vector<std::string>& lines,

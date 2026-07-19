@@ -55,6 +55,7 @@ public:
     int level;
     int experience;
     int jobPoints = 0;
+    int skillPoints = 0;
     int fatigue = 0;
     std::vector<JobPerk> perks;
     SpecializationType specialization = SpecializationType::None;

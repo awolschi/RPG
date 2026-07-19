@@ -25,6 +25,7 @@ void Job::GainXP(int xp)
         experience -= required;
         level++;
         jobPoints++;
+        skillPoints++;
         required = RequiredXP(level);
     }
     if (level >= MAX_JOB_LEVEL)

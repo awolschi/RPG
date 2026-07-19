@@ -44,7 +44,12 @@ Game::Game()
       skillOverviewPage(0),
       skillLoadoutPage(0),
       selectedJobIdx(-1),
+      jobPerkPage(0),
       inventoryTab(0),
+      inventoryPage(0),
+      skillStatsPage(0),
+      shopSellPage(0),
+      achievementsPage(0),
       enemyFlashTimer(0),
       previousState(GameState::MainMenu)
 {
@@ -332,6 +337,8 @@ void Game::Run()
             case GameState::Wiki:              StateWiki(); break;
             case GameState::NPCDialogue:        StateNPCDialogue(); break;
             case GameState::Achievements:       StateAchievements(); break;
+            case GameState::Reputation:         StateReputation(); break;
+            case GameState::Pets:              StatePets(); break;
             case GameState::Exit:              break;
             default:                           currentState = GameState::MainMenu;
         }
@@ -340,6 +347,11 @@ void Game::Run()
         DrawParticles();
         CheckAchievementNotifications();
         DrawAchievementNotifications();
+        DrawQuestRewardNotifications();
+        reputationSystem.UpdateNotifications(GetFrameTime());
+        DrawReputationNotifications();
+        petManager.UpdateNotifications(GetFrameTime());
+        DrawPetNotifications();
         achievementSystem.Tick(GetFrameTime());
         achievementSystem.CheckUnlockables();
 
@@ -512,6 +524,60 @@ void Game::DrawAchievementNotifications()
         DrawText("ACHIEVEMENT UNLOCKED", px + 24, py + 6, 12, goldText);
         DrawText(n.name.c_str(), px + 10, py + 22, 14, goldText);
         DrawText(n.description.c_str(), px + 10, py + 38, 11, whiteText);
+
+        yOffset += panelH + 6.0f;
+    }
+}
+
+void Game::DrawQuestRewardNotifications()
+{
+    float dt = GetFrameTime();
+    float yOffset = 60.0f;
+
+    for (int i = static_cast<int>(questRewardNotifications.size()) - 1; i >= 0; --i)
+    {
+        auto& n = questRewardNotifications[i];
+        n.life -= dt;
+
+        if (n.life <= 0.0f)
+        {
+            questRewardNotifications.erase(questRewardNotifications.begin() + i);
+            continue;
+        }
+
+        float alpha = 1.0f;
+        if (n.life < 0.5f)
+            alpha = n.life / 0.5f;
+
+        int panelW = 320;
+        int panelH = 60;
+        int px = GRenderer::W - panelW - 10;
+        int py = static_cast<int>(yOffset);
+
+        // Slide in from right
+        float slideProgress = 1.0f;
+        if (n.life > n.maxLife - 0.3f)
+            slideProgress = (n.maxLife - n.life) / 0.3f;
+        px = GRenderer::W - static_cast<int>((panelW + 10) * slideProgress);
+
+        Color bg = {20, 30, 20, static_cast<unsigned char>(220 * alpha)};
+        Color border = {100, 200, 100, static_cast<unsigned char>(255 * alpha)};
+        Color titleText = {100, 255, 100, static_cast<unsigned char>(255 * alpha)};
+        Color rewardText = {255, 215, 0, static_cast<unsigned char>(255 * alpha)};
+        Color dimText = {180, 180, 170, static_cast<unsigned char>(255 * alpha)};
+
+        DrawRectangle(px, py, panelW, panelH, bg);
+        DrawRectangleLines(px, py, panelW, panelH, border);
+
+        DrawText("QUEST COMPLETE", px + 10, py + 6, 12, titleText);
+        std::string titleLine = n.questTitle;
+        int maxTitleW = panelW - 20;
+        while (!titleLine.empty() && MeasureText(titleLine.c_str(), 14) > maxTitleW)
+            titleLine.pop_back();
+        DrawText(titleLine.c_str(), px + 10, py + 22, 14, titleText);
+
+        std::string rewardLine = "+" + std::to_string(n.xpEarned) + " XP   +" + std::to_string(n.goldEarned) + " Gold";
+        DrawText(rewardLine.c_str(), px + 10, py + 40, 13, rewardText);
 
         yOffset += panelH + 6.0f;
     }
@@ -748,7 +814,7 @@ void Game::StateExplore()
         "Explore Area", "Travel", "Quests",
         "Inventory", "Stats", "Jobs",
         "Skills", "Skill Upgrades", "Crafting", "Pray",
-        "Shop", "Rest at Inn", "Codex", "Achievements", "Save Game", "Main Menu"
+        "Shop", "Rest at Inn", "Codex", "Achievements", "Reputation", "Pets", "Save Game", "Main Menu"
     };
 
     int bx = GRenderer::W - 240;
@@ -767,8 +833,10 @@ void Game::StateExplore()
             }
             else if (i == 12) { currentState = GameState::Wiki; renderer.StartTransition(); }
             else if (i == 13) { currentState = GameState::Achievements; renderer.StartTransition(); }
-            else if (i == 14) currentState = GameState::SavePrompt;
-            else if (i == 15) {
+            else if (i == 14) { currentState = GameState::Reputation; renderer.StartTransition(); }
+            else if (i == 15) { currentState = GameState::Pets; petListPage = 0; renderer.StartTransition(); }
+            else if (i == 16) currentState = GameState::SavePrompt;
+            else if (i == 17) {
                 if (player->IsAlive()) currentState = GameState::MainMenu;
                 else { player.reset(); currentState = GameState::MainMenu; }
             }
@@ -896,7 +964,7 @@ void Game::StateDungeonExplore()
 
         if (needsLevel50 && player->GetLevel() < Character::MAX_LEVEL)
         {
-            renderer.DrawText("The Primordial One — Requires Level 50", 70, by, 22, CQColors::TextRed);
+            renderer.DrawText("The Primordial One - Requires Level 50", 70, by, 22, CQColors::TextRed);
             by += 30;
             renderer.DrawText("You are not yet strong enough to face this foe.", 70, by, 16, CQColors::TextDim);
         }
@@ -972,12 +1040,89 @@ void Game::StateDungeonComplete()
             Quest* q = qm.GetQuest(i);
             if (q && q->status == QuestStatus::Completed && !q->rewarded)
             {
-                player->GainXP(q->rewardXP);
+                int xpReward = q->rewardXP;
+                float achQuestXPBonus = achievementSystem.GetQuestXPBonusByTier();
+                if (achQuestXPBonus > 0.0f)
+                {
+                    int achBonus = static_cast<int>(xpReward * achQuestXPBonus);
+                    if (achBonus > 0)
+                        xpReward += achBonus;
+                }
+                player->GainXP(xpReward);
                 player->GetInventory().AddGold(q->rewardGold);
                 q->rewarded = true;
+
+                // Show quest reward notification
+                questRewardNotifications.emplace_back(q->title, xpReward, q->rewardGold);
+
+                // Reputation from quest completion
+                FactionID qFaction = reputationSystem.GetFactionByArea(currentAreaIndex);
+                reputationSystem.OnQuestCompleted(qFaction, 10 + q->rewardXP / 10);
+
+                // Check for Legend-rank faction pet
+                if (reputationSystem.GetRank(qFaction) == RepRank::Legend)
+                {
+                    std::string petID = petManager.GetFactionLegendPetID(qFaction);
+                    if (!petID.empty())
+                    {
+                        Pet* p = petManager.GetPet(petID);
+                        if (p && !p->obtained)
+                        {
+                            petManager.ObtainPet(petID); wiki.MarkPetObtained(petID);
+                            questRewardNotifications.emplace_back("Pet Unlocked: " + p->name, 0, 0);
+                            petManager.AddNotification(p->name, "Legend rank reward!");
+                        }
+                    }
+                }
+
+                // Track quest completion achievements
+                achievementSystem.UpdateProgress("quest_first");
+                achievementSystem.UpdateProgress("quest_5");
+                achievementSystem.UpdateProgress("quest_10");
+                achievementSystem.UpdateProgress("quest_25");
+                achievementSystem.UpdateProgress("quest_50");
+                achievementSystem.UpdateProgress("quest_100");
+                if (q->type == QuestType::Kill)
+                {
+                    achievementSystem.UpdateProgress("quest_kill_10");
+                    achievementSystem.UpdateProgress("quest_kill_25");
+                    achievementSystem.UpdateProgress("quest_kill_50");
+                }
+                else if (q->type == QuestType::Collect)
+                {
+                    achievementSystem.UpdateProgress("quest_gather_10");
+                    achievementSystem.UpdateProgress("quest_gather_25");
+                    achievementSystem.UpdateProgress("quest_gather_50");
+                }
+                else if (q->type == QuestType::Explore)
+                {
+                    achievementSystem.UpdateProgress("quest_explore_5");
+                    achievementSystem.UpdateProgress("quest_explore_10");
+                    achievementSystem.UpdateProgress("quest_explore_15");
+                }
             }
         }
         questsChecked = true;
+
+        // Dungeon completion reputation
+        FactionID dunFaction = reputationSystem.GetFactionByArea(currentAreaIndex);
+        reputationSystem.AddDungeonReputation(dunFaction, areas[currentAreaIndex].difficulty);
+
+        // Check for Legend-rank faction pet
+        if (reputationSystem.GetRank(dunFaction) == RepRank::Legend)
+        {
+            std::string petID = petManager.GetFactionLegendPetID(dunFaction);
+            if (!petID.empty())
+            {
+                Pet* p = petManager.GetPet(petID);
+                if (p && !p->obtained)
+                {
+                    petManager.ObtainPet(petID); wiki.MarkPetObtained(petID);
+                    questRewardNotifications.emplace_back("Pet Unlocked: " + p->name, 0, 0);
+                    petManager.AddNotification(p->name, "Legend rank reward!");
+                }
+            }
+        }
     }
 
     renderer.DrawPanel(200, 100, GRenderer::W - 400, 400, "Dungeon Complete!");
@@ -1177,6 +1322,7 @@ void Game::StateInventory()
         {
             inventoryTab = k;
             inventoryFocusRow = 0;
+            inventoryPage = 0;
             selectedItemIndex = -1;
             selectedItem = nullptr;
         }
@@ -1189,6 +1335,7 @@ void Game::StateInventory()
         else
             inventoryTab = (inventoryTab + 1) % tabCount;
         inventoryFocusRow = 0;
+        inventoryPage = 0;
         selectedItemIndex = -1;
         selectedItem = nullptr;
     }
@@ -1205,6 +1352,8 @@ void Game::StateInventory()
         if (renderer.Button(tabs[t].label, tx, y, tabBtnW, tabBtnH, t))
         {
             inventoryTab = t;
+            inventoryPage = 0;
+            inventoryFocusRow = 0;
             selectedItemIndex = -1;
             selectedItem = nullptr;
         }
@@ -1240,14 +1389,37 @@ void Game::StateInventory()
 
     int itemCount = static_cast<int>(filteredIndices.size());
 
-    // Arrow key navigation for item list
-    if (itemCount > 0 && inventoryFocusRow >= itemCount)
-        inventoryFocusRow = itemCount - 1;
-    if (inventoryFocusRow < 0 && itemCount > 0) inventoryFocusRow = 0;
+    // Page bounds for the item list — declared up here so the arrow-handler
+    // below can scroll across pages before the rendering loop runs.
+    const int itemsPerPage = INVENTORY_ITEMS_PER_PAGE;
+    int invMaxPage = (itemCount > itemsPerPage) ? ((itemCount - 1) / itemsPerPage) : 0;
+    if (inventoryPage < 0) inventoryPage = 0;
+    if (inventoryPage > invMaxPage) inventoryPage = invMaxPage;
+    int invStart = inventoryPage * itemsPerPage;
+    int invEnd = std::min(invStart + itemsPerPage, itemCount);
+
+    // Keep focus row clamped to a valid index inside the filtered list
+    if (itemCount > 0)
+    {
+        if (inventoryFocusRow < 0) inventoryFocusRow = invStart;
+        if (inventoryFocusRow >= itemCount) inventoryFocusRow = itemCount - 1;
+    }
+
+    // Arrow key navigation for item list — also scrolls the page when focus
+    // crosses the visible window.
     if (IsKeyPressed(KEY_DOWN) && inventoryFocusRow < itemCount - 1)
+    {
         inventoryFocusRow++;
+        if (inventoryFocusRow >= invEnd && inventoryPage < invMaxPage) inventoryPage++;
+    }
     if (IsKeyPressed(KEY_UP) && inventoryFocusRow > 0)
+    {
         inventoryFocusRow--;
+        if (inventoryFocusRow < invStart && inventoryPage > 0) inventoryPage--;
+    }
+    // Re-clamp page after potential auto-advance above
+    invStart = inventoryPage * itemsPerPage;
+    invEnd = std::min(invStart + itemsPerPage, itemCount);
     if (IsKeyPressed(KEY_ENTER) && itemCount > 0 && inventoryFocusRow < static_cast<int>(filteredIndices.size()))
     {
         size_t i = filteredIndices[inventoryFocusRow];
@@ -1277,15 +1449,23 @@ void Game::StateInventory()
         }
         if (inventoryFocusRow >= itemCount - 1 && inventoryFocusRow > 0)
             inventoryFocusRow--;
+        invMaxPage = (itemCount > itemsPerPage) ? ((itemCount - 1) / itemsPerPage) : 0;
+        if (inventoryPage > invMaxPage) inventoryPage = invMaxPage;
+    }
+
+    int visibleCount = invEnd - invStart;
+    // Keep focus row inside the current page while still indexing into filteredIndices
+    if (itemCount > 0)
+    {
+        if (inventoryFocusRow < invStart) inventoryFocusRow = invStart;
+        if (inventoryFocusRow >= invEnd) inventoryFocusRow = invEnd - 1;
     }
 
     // Pre-compute action button count per visible item for focus indexing
-    int maxVisibleItems = 15;
-    int visibleCount = std::min(itemCount, maxVisibleItems);
     std::vector<int> actionCountPerItem(visibleCount, 1); // every item has at least "D"
     for (int idx = 0; idx < visibleCount; ++idx)
     {
-        size_t i = filteredIndices[idx];
+        size_t i = filteredIndices[invStart + idx];
         auto item = inv.GetItem(i);
         if (!item) continue;
         if (item->type == ItemType::Weapon || item->type == ItemType::Armor || item->type == ItemType::Accessory)
@@ -1306,7 +1486,7 @@ void Game::StateInventory()
     }
     int totalActionButtons = 0;
     for (int c : actionCountPerItem) totalActionButtons += c;
-    keyboardNav.SetFocusCount(tabCount + totalActionButtons + 1); // tabs + actions + Back
+    keyboardNav.SetFocusCount(tabCount + totalActionButtons + 2 + 1); // tabs + actions + Prev/Next + Back
 
     renderer.DrawText("Items: " + std::to_string(itemCount), xLeft, y, 16, CQColors::TextDim);
     y += 26;
@@ -1315,7 +1495,6 @@ void Game::StateInventory()
     if (itemCount == 0)
     {
         renderer.DrawText("No items in this category.", xLeft, y, 18, CQColors::TextLight);
-        y += 24;
     }
     else
     {
@@ -1323,13 +1502,13 @@ void Game::StateInventory()
         int itemFocusIdx = tabCount; // action buttons start after tabs
         for (int idx = 0; idx < visibleCount; ++idx)
         {
-            size_t i = filteredIndices[idx];
+            size_t i = filteredIndices[invStart + idx];
             auto item = inv.GetItem(i);
             if (!item) continue;
             int iy = startY + idx * 30;
 
             // Highlight keyboard-focused item
-            if (idx == inventoryFocusRow)
+            if (idx == (inventoryFocusRow - invStart))
             {
                 renderer.DrawRect(xLeft - 4, iy - 4, 360, 26, Color{40, 40, 70, 100});
                 keyboardNav.DrawFocusRect(xLeft - 4, iy - 4, 360, 26, CQColors::TextDim);
@@ -1516,11 +1695,23 @@ void Game::StateInventory()
                 }
             }
         }
-        if (itemCount > maxVisibleItems)
+
+        // Page navigation footer (below item list)
+        int pageNavY = startY + visibleCount * 30 + 6;
+        if (invMaxPage > 0)
         {
-            int remaining = itemCount - maxVisibleItems;
-            renderer.DrawText("... and " + std::to_string(remaining) + " more items",
-                xLeft, startY + visibleCount * 30 + 4, 13, CQColors::TextDim);
+            if (renderer.Button("< Prev", xLeft, pageNavY, 88, 24, itemFocusIdx++) && inventoryPage > 0)
+            {
+                inventoryPage--;
+                inventoryFocusRow = inventoryPage * itemsPerPage;
+            }
+            if (renderer.Button("Next >", xLeft + 94, pageNavY, 88, 24, itemFocusIdx++) && inventoryPage < invMaxPage)
+            {
+                inventoryPage++;
+                inventoryFocusRow = inventoryPage * itemsPerPage;
+            }
+            renderer.DrawText("Page " + std::to_string(inventoryPage + 1) + " / " + std::to_string(invMaxPage + 1),
+                              xLeft + 188, pageNavY + 4, 12, CQColors::TextDim);
         }
     }
 
@@ -1905,7 +2096,14 @@ void Game::StateStats()
     y += 10;
     renderer.DrawText("Skills:", 70, y, 20, CQColors::TextGold);
     y += 28;
-    for (size_t i = 0; i < player->GetSkills().GetSkillCount(); ++i)
+    const int skillCount = static_cast<int>(player->GetSkills().GetSkillCount());
+    int skillMaxPage = (skillCount > SKILLS_PER_PAGE) ? ((skillCount - 1) / SKILLS_PER_PAGE) : 0;
+    if (skillStatsPage < 0) skillStatsPage = 0;
+    if (skillStatsPage > skillMaxPage) skillStatsPage = skillMaxPage;
+    int skillStart = skillStatsPage * SKILLS_PER_PAGE;
+    int skillEnd = std::min(skillStart + SKILLS_PER_PAGE, skillCount);
+    int skillFocusIdx = 0;
+    for (int i = skillStart; i < skillEnd; ++i)
     {
         auto sk = player->GetSkills().GetSkill(i);
         if (!sk) continue;
@@ -1919,7 +2117,15 @@ void Game::StateStats()
             80, y, 15, CQColors::TextLight);
         y += 22;
     }
-    if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 80, 120, 40, 0))
+    if (skillMaxPage > 0)
+    {
+        int navY = GRenderer::H - 130;
+        if (renderer.Button("< Prev", 70, navY, 100, 32, skillFocusIdx++) && skillStatsPage > 0) skillStatsPage--;
+        if (renderer.Button("Next >", 180, navY, 100, 32, skillFocusIdx++) && skillStatsPage < skillMaxPage) skillStatsPage++;
+        renderer.DrawText("Page " + std::to_string(skillStatsPage + 1) + " / " + std::to_string(skillMaxPage + 1),
+                          290, navY + 6, 13, CQColors::TextDim);
+    }
+    if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 80, 120, 40, skillFocusIdx))
         currentState = GameState::Exploring;
 }
 
@@ -2166,7 +2372,10 @@ void Game::StateJobPerks()
             renderer.DrawRect(70, y, 600, 32, cardBg);
 
             if (renderer.Button(label, 70, y, 600, 32, i))
+            {
                 selectedJobIdx = i;
+                jobPerkPage = 0;
+            }
             y += 40;
         }
 
@@ -2189,20 +2398,28 @@ void Game::StateJobPerks()
     renderer.DrawText("Job Level: " + std::to_string(job.level) + "  |  Click a perk to unlock", 70, y + 18, 14, CQColors::TextDim);
     y += 40;
 
-    // Count unlockable perks for focus count
+    // Count unlockable perks on the current page for focus count
+    const int totalPerks = static_cast<int>(job.perks.size());
+    int perkMaxPage = (totalPerks > PERKS_PER_PAGE) ? ((totalPerks - 1) / PERKS_PER_PAGE) : 0;
+    if (jobPerkPage < 0) jobPerkPage = 0;
+    if (jobPerkPage > perkMaxPage) jobPerkPage = perkMaxPage;
+    int perkStart = jobPerkPage * PERKS_PER_PAGE;
+    int perkEnd = std::min(perkStart + PERKS_PER_PAGE, totalPerks);
+
     int unlockCount = 0;
-    for (size_t u = 0; u < job.perks.size(); ++u)
-        if (job.CanUnlockPerk(static_cast<int>(u)))
+    for (int u = perkStart; u < perkEnd; ++u)
+        if (job.CanUnlockPerk(u))
             unlockCount++;
-    int detailFocusCount = unlockCount + 2; // unlock buttons + Back to Jobs + Back
+    int navExtra = (perkMaxPage > 0) ? 2 : 0;
+    int detailFocusCount = unlockCount + navExtra + 2; // unlock + Prev/Next + Back-to-Jobs + Back
     keyboardNav.SetFocusCount(detailFocusCount);
     int detailFocusIdx = 0;
 
-    for (size_t u = 0; u < job.perks.size(); ++u)
+    for (int u = perkStart; u < perkEnd; ++u)
     {
         const auto& perk = job.perks[u];
 
-        // Branch separator
+        // Branch separator (only when this page actually shows index 3)
         if (u == 3)
         {
             y += 8;
@@ -2217,7 +2434,7 @@ void Game::StateJobPerks()
             status = "[UNLOCKED]";
             statusColor = CQColors::TextGreen;
         }
-        else if (job.CanUnlockPerk(static_cast<int>(u)))
+        else if (job.CanUnlockPerk(u))
         {
             status = "[UNLOCK]";
             statusColor = CQColors::TextGold;
@@ -2233,10 +2450,10 @@ void Game::StateJobPerks()
         renderer.DrawText(perk.description, 110, y, 13, CQColors::TextDim);
         y += 20;
 
-        if (!perk.unlocked && job.CanUnlockPerk(static_cast<int>(u)))
+        if (!perk.unlocked && job.CanUnlockPerk(u))
         {
             if (renderer.Button("Unlock (1 PT)", 110, y, 160, 26, detailFocusIdx++))
-                job.UnlockPerk(static_cast<int>(u));
+                job.UnlockPerk(u);
             y += 30;
         }
         else
@@ -2246,15 +2463,27 @@ void Game::StateJobPerks()
         y += 4;
     }
 
+    // Page nav footer (above the back buttons)
+    if (perkMaxPage > 0)
+    {
+        int navY = GRenderer::H - 154;
+        if (renderer.Button("< Prev", 70, navY, 100, 30, detailFocusIdx++) && jobPerkPage > 0) jobPerkPage--;
+        if (renderer.Button("Next >", 180, navY, 100, 30, detailFocusIdx++) && jobPerkPage < perkMaxPage) jobPerkPage++;
+        renderer.DrawText("Page " + std::to_string(jobPerkPage + 1) + " / " + std::to_string(perkMaxPage + 1),
+                          290, navY + 6, 13, CQColors::TextDim);
+    }
+
     if (renderer.Button("Back to Jobs", 70, GRenderer::H - 100, 160, 36, detailFocusIdx++))
     {
         selectedJobIdx = -1;
+        jobPerkPage = 0;
         return;
     }
 
     if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 100, 120, 36, detailFocusIdx++))
     {
         selectedJobIdx = -1;
+        jobPerkPage = 0;
         currentState = GameState::Jobs;
     }
 }
@@ -2787,10 +3016,14 @@ void Game::StateShop()
     y += 30;
 
     // Shop items (left side)
-    renderer.DrawText("— For Sale —", xLeft, y, 16, CQColors::TextDim);
+    renderer.DrawText("- For Sale -", xLeft, y, 16, CQColors::TextDim);
     y += 24;
     int shopBuyCount = static_cast<int>(shopItems.size());
-    int shopSellCount = inv.GetItemCount();
+    int shopSellTotal = static_cast<int>(inv.GetItemCount());
+    int shopSellVisible = std::min(SHOP_SELL_PER_PAGE, shopSellTotal);
+    int shopSellMaxPage = (shopSellTotal > SHOP_SELL_PER_PAGE) ? ((shopSellTotal - 1) / SHOP_SELL_PER_PAGE) : 0;
+    int shopSellNav = (shopSellMaxPage > 0) ? 2 : 0;
+    int shopSellCount = shopSellVisible + shopSellNav;
     keyboardNav.SetFocusCount(shopBuyCount + shopSellCount + 1); // +1 for Leave
     int shopFocusIdx = 0;
     for (size_t i = 0; i < shopItems.size(); ++i)
@@ -2840,14 +3073,18 @@ void Game::StateShop()
                 auto bought = item->Clone();
                 bought->count = 1;
                 if (inv.AddItem(bought))
+                {
                     inv.RemoveGold(price);
+                    achievementSystem.UpdateProgress("social_shop_50");
+                    achievementSystem.UpdateProgress("social_shop_200");
+                }
             }
         }
     }
 
     // Player inventory (right side) — sell mode
     y = 100;
-    renderer.DrawText("— Your Items —", xRight, y, 16, CQColors::TextDim);
+    renderer.DrawText("- Your Items -", xRight, y, 16, CQColors::TextDim);
     y += 24;
     if (inv.GetItemCount() == 0)
     {
@@ -2855,11 +3092,18 @@ void Game::StateShop()
     }
     else
     {
-        for (size_t i = 0; i < inv.GetItemCount(); ++i)
+        const int sellTotal = static_cast<int>(inv.GetItemCount());
+        int sellMaxPage = (sellTotal > SHOP_SELL_PER_PAGE) ? ((sellTotal - 1) / SHOP_SELL_PER_PAGE) : 0;
+        if (shopSellPage < 0) shopSellPage = 0;
+        if (shopSellPage > sellMaxPage) shopSellPage = sellMaxPage;
+        int sellStart = shopSellPage * SHOP_SELL_PER_PAGE;
+        int sellEnd = std::min(sellStart + SHOP_SELL_PER_PAGE, sellTotal);
+        for (int idx = sellStart; idx < sellEnd; ++idx)
         {
+            size_t i = static_cast<size_t>(idx);
             auto item = inv.GetItem(i);
             if (!item) continue;
-            int iy = y + static_cast<int>(i) * 30;
+            int iy = y + (idx - sellStart) * 30;
             std::string line = item->name;
             if (item->count > 1) line += " x" + std::to_string(item->count);
             line += "  [" + std::to_string(item->sellValue) + "g]";
@@ -2872,7 +3116,24 @@ void Game::StateShop()
             {
                 inv.AddGold(item->sellValue);
                 inv.RemoveOneItem(i);
+                achievementSystem.UpdateProgress("social_sell_100");
+                achievementSystem.UpdateProgress("social_sell_500");
+                achievementSystem.UpdateProgress("social_sell_1000");
+                // Re-clamp page in case list shrank below current page
+                int newTotal = static_cast<int>(inv.GetItemCount());
+                int newMaxPage = (newTotal > SHOP_SELL_PER_PAGE) ? ((newTotal - 1) / SHOP_SELL_PER_PAGE) : 0;
+                if (shopSellPage > newMaxPage) shopSellPage = newMaxPage;
             }
+        }
+
+        // Sell-side page nav (below item list)
+        if (sellMaxPage > 0)
+        {
+            int navY = y + (sellEnd - sellStart) * 30 + 4;
+            if (renderer.Button("< Prev", xRight, navY, 88, 22, shopFocusIdx++) && shopSellPage > 0) shopSellPage--;
+            if (renderer.Button("Next >", xRight + 94, navY, 88, 22, shopFocusIdx++) && shopSellPage < sellMaxPage) shopSellPage++;
+            renderer.DrawText("Page " + std::to_string(shopSellPage + 1) + " / " + std::to_string(sellMaxPage + 1),
+                              xRight + 188, navY + 4, 12, CQColors::TextDim);
         }
     }
 
@@ -3040,6 +3301,9 @@ void Game::StateQuestLog()
                 player->GetInventory().AddGold(q->rewardGold);
                 q->rewarded = true;
 
+                // Show quest reward notification
+                questRewardNotifications.emplace_back(q->title, xpReward, q->rewardGold);
+
                 // Track quest completion achievements
                 achievementSystem.UpdateProgress("quest_first");
                 achievementSystem.UpdateProgress("quest_5");
@@ -3127,7 +3391,8 @@ void Game::StateCombat()
         isBoss = true;
 
     BattleRenderer::DrawBattleScreen(renderer, *currentEnemy, *player, combatLog,
-                                      combatPhase, enemyFlashTimer, isBoss);
+                                       combatPhase, enemyFlashTimer, isBoss, "",
+                                       &petManager, player->GetLevel());
 
     // Update flash timer after rendering
     if (enemyFlashTimer > 0)
@@ -3487,6 +3752,46 @@ void Game::DoPlayerAttack(CombatAction action, int skillIdx)
     }
     else
     {
+        // Pet auto-attack (if equipped and enemy alive)
+        const Pet* equippedPet = petManager.GetEquippedPet();
+        if (equippedPet)
+        {
+            int petDmgBefore = currentEnemy->GetCurrentHealth();
+            int petDamage = petManager.CalculatePetDamage(player->GetLevel());
+            currentEnemy->TakeDamage(petDamage, petManager.GetPetElement());
+            int petActualDmg = petDmgBefore - currentEnemy->GetCurrentHealth();
+            std::string petMsg = petManager.ExecutePetAttack(player->GetLevel(), currentEnemy->GetName());
+            AddCombatLog(petMsg);
+            if (petActualDmg > 0)
+            {
+                AddFloatingText("-" + std::to_string(petActualDmg), 680.0f, 170.0f, PURPLE, 16);
+                AddParticleBurst(680.0f, 180.0f, PURPLE, 5);
+            }
+
+            // Pet special ability proc
+            PetAbilityResult abilityResult = petManager.TryProcPetAbility(player->GetLevel());
+            if (abilityResult.procced && currentEnemy->IsAlive())
+            {
+                currentEnemy->ApplyEffect(abilityResult.effect, abilityResult.duration,
+                                          abilityResult.potency, abilityResult.abilityName);
+                AddCombatLog(abilityResult.message);
+                AddFloatingText(abilityResult.abilityName, 680.0f, 150.0f, RED, 14);
+                AddParticleBurst(680.0f, 160.0f, RED, 8);
+            }
+
+            if (!currentEnemy->IsAlive())
+            {
+                AddCombatLog(currentEnemy->GetName() + " has been defeated by your pet!");
+                AddFloatingText("DEFEATED!", 680.0f, 110.0f, GOLD, 28);
+                AddParticleBurst(680.0f, 140.0f, GOLD, 20);
+                auto mon = std::dynamic_pointer_cast<Monster>(currentEnemy);
+                if (mon)
+                    ProcessVictory(mon);
+                combatPhase = CombatPhase::Victory;
+                return;
+            }
+        }
+
         combatPhase = CombatPhase::EnemyTurn;
         enemyActionTime = renderer.GetTime();
     }
@@ -3537,6 +3842,44 @@ void Game::DoPlayerUseItem(int inventoryIndex)
     }
     else
     {
+        // Pet auto-attack after item use
+        const Pet* equippedPet = petManager.GetEquippedPet();
+        if (equippedPet)
+        {
+            int petDmgBefore = currentEnemy->GetCurrentHealth();
+            int petDamage = petManager.CalculatePetDamage(player->GetLevel());
+            currentEnemy->TakeDamage(petDamage, petManager.GetPetElement());
+            int petActualDmg = petDmgBefore - currentEnemy->GetCurrentHealth();
+            std::string petMsg = petManager.ExecutePetAttack(player->GetLevel(), currentEnemy->GetName());
+            AddCombatLog(petMsg);
+            if (petActualDmg > 0)
+            {
+                AddFloatingText("-" + std::to_string(petActualDmg), 680.0f, 170.0f, PURPLE, 16);
+                AddParticleBurst(680.0f, 180.0f, PURPLE, 5);
+            }
+
+            // Pet special ability proc
+            PetAbilityResult abilityResult = petManager.TryProcPetAbility(player->GetLevel());
+            if (abilityResult.procced && currentEnemy->IsAlive())
+            {
+                currentEnemy->ApplyEffect(abilityResult.effect, abilityResult.duration,
+                                          abilityResult.potency, abilityResult.abilityName);
+                AddCombatLog(abilityResult.message);
+                AddFloatingText(abilityResult.abilityName, 680.0f, 150.0f, RED, 14);
+                AddParticleBurst(680.0f, 160.0f, RED, 8);
+            }
+
+            if (!currentEnemy->IsAlive())
+            {
+                AddCombatLog(currentEnemy->GetName() + " has been defeated by your pet!");
+                auto mon = std::dynamic_pointer_cast<Monster>(currentEnemy);
+                if (mon)
+                    ProcessVictory(mon);
+                combatPhase = CombatPhase::Victory;
+                return;
+            }
+        }
+
         combatPhase = CombatPhase::EnemyTurn;
         enemyActionTime = renderer.GetTime();
     }
@@ -3564,6 +3907,54 @@ void Game::DoPlayerGodAbility(int abilityIndex)
     {
         AddFloatingText("+" + std::to_string(playerHeal), 340.0f, 130.0f, GREEN, 18);
         AddHealParticles(340.0f, 140.0f);
+    }
+
+    if (!currentEnemy->IsAlive())
+    {
+        AddCombatLog(currentEnemy->GetName() + " has been defeated!");
+        auto mon = std::dynamic_pointer_cast<Monster>(currentEnemy);
+        if (mon)
+            ProcessVictory(mon);
+        combatPhase = CombatPhase::Victory;
+        return;
+    }
+
+    // Pet auto-attack after god ability
+    const Pet* equippedPet = petManager.GetEquippedPet();
+    if (equippedPet)
+    {
+        int petDmgBefore = currentEnemy->GetCurrentHealth();
+        int petDamage = petManager.CalculatePetDamage(player->GetLevel());
+        currentEnemy->TakeDamage(petDamage, petManager.GetPetElement());
+        int petActualDmg = petDmgBefore - currentEnemy->GetCurrentHealth();
+        std::string petMsg = petManager.ExecutePetAttack(player->GetLevel(), currentEnemy->GetName());
+        AddCombatLog(petMsg);
+        if (petActualDmg > 0)
+        {
+            AddFloatingText("-" + std::to_string(petActualDmg), 680.0f, 170.0f, PURPLE, 16);
+            AddParticleBurst(680.0f, 180.0f, PURPLE, 5);
+        }
+
+        // Pet special ability proc
+        PetAbilityResult abilityResult = petManager.TryProcPetAbility(player->GetLevel());
+        if (abilityResult.procced && currentEnemy->IsAlive())
+        {
+            currentEnemy->ApplyEffect(abilityResult.effect, abilityResult.duration,
+                                      abilityResult.potency, abilityResult.abilityName);
+            AddCombatLog(abilityResult.message);
+            AddFloatingText(abilityResult.abilityName, 680.0f, 150.0f, RED, 14);
+            AddParticleBurst(680.0f, 160.0f, RED, 8);
+        }
+
+        if (!currentEnemy->IsAlive())
+        {
+            AddCombatLog(currentEnemy->GetName() + " has been defeated by your pet!");
+            auto mon = std::dynamic_pointer_cast<Monster>(currentEnemy);
+            if (mon)
+                ProcessVictory(mon);
+            combatPhase = CombatPhase::Victory;
+            return;
+        }
     }
 
     combatPhase = CombatPhase::EnemyTurn;
@@ -3675,7 +4066,17 @@ void Game::DoEnemyTurn()
     if (enemyHeal > 0)
         AddFloatingText("+" + std::to_string(enemyHeal), 680.0f, 150.0f, GREEN, 14);
 
-    if (!player->IsAlive())
+    if (!currentEnemy->IsAlive())
+    {
+        AddCombatLog(currentEnemy->GetName() + " has been defeated by poison!");
+        AddFloatingText("DEFEATED!", 680.0f, 110.0f, GOLD, 28);
+        AddParticleBurst(680.0f, 140.0f, GOLD, 20);
+        auto mon = std::dynamic_pointer_cast<Monster>(currentEnemy);
+        if (mon)
+            ProcessVictory(mon);
+        combatPhase = CombatPhase::Victory;
+    }
+    else if (!player->IsAlive())
     { AddCombatLog("You have been defeated..."); combatPhase = CombatPhase::Defeat; }
     else
         combatPhase = CombatPhase::PlayerTurn;
@@ -3749,10 +4150,81 @@ void Game::ProcessVictory(std::shared_ptr<Monster> enemy)
         }
     }
 
+    // Pet passive bonuses
+    {
+        float petXpBonus = petManager.GetXPBonus();
+        if (petXpBonus > 0.0f)
+        {
+            int petBonus = static_cast<int>(xp * petXpBonus);
+            if (petBonus > 0)
+            {
+                xp += petBonus;
+                AddCombatLog("[Pet] XP Bonus: +" + std::to_string(petBonus) + " XP!");
+            }
+        }
+        float petGoldBonus = petManager.GetGoldFind();
+        if (petGoldBonus > 0.0f)
+        {
+            int petGBonus = static_cast<int>(gold * petGoldBonus);
+            if (petGBonus > 0)
+            {
+                gold += petGBonus;
+                AddCombatLog("[Pet] Gold Find: +" + std::to_string(petGBonus) + " gold!");
+            }
+        }
+    }
+
     int prevLevel = player->GetLevel();
     player->GainXP(xp);
     player->GetInventory().AddGold(gold);
     AddCombatLog("Gained " + std::to_string(xp) + " XP and " + std::to_string(gold) + " gold!");
+
+    // Pet XP — pets receive 50% of the player's XP reward
+    {
+        int petXp = xp / 2;
+        if (petXp > 0)
+        {
+            petManager.GainPetXP(petXp);
+            if (petManager.HasEvolved())
+            {
+                Pet* eqPet = petManager.GetEquippedPet();
+                if (eqPet)
+                {
+                    std::string evoMsg = "*** PET EVOLUTION! " + eqPet->GetCurrentName()
+                                       + " has " + eqPet->GetEvolutionLabel() + "! ***";
+                    AddCombatLog(evoMsg);
+                    petManager.AddNotification(eqPet->GetCurrentName(),
+                        eqPet->GetEvolutionLabel() + "! New ability: " + eqPet->GetAbilityName() + "!");
+                }
+                petManager.ClearEvolveFlag();
+            }
+            if (petManager.HasLeveledUp())
+            {
+                Pet* eqPet = petManager.GetEquippedPet();
+                if (eqPet)
+                {
+                    AddCombatLog("*** PET LEVEL UP! " + eqPet->GetCurrentName() + " is now level "
+                                 + std::to_string(eqPet->level) + "! ***");
+                    petManager.AddNotification(eqPet->GetCurrentName(),
+                        "Level up! Now level " + std::to_string(eqPet->level) + "!");
+                }
+                petManager.ClearLevelUpFlag();
+            }
+            // Pet passives scale with level/evolution — refresh them on the player
+            ApplyPetPassivesToPlayer();
+        }
+    }
+
+    // Pet heal on kill
+    int petHealOnKill = petManager.GetHealOnKill();
+    if (petHealOnKill > 0)
+    {
+        int hpBefore = player->GetCurrentHealth();
+        player->RestoreHealth(petHealOnKill);
+        int healed = player->GetCurrentHealth() - hpBefore;
+        if (healed > 0)
+            AddCombatLog("[Pet] Healed " + std::to_string(healed) + " HP on kill!");
+    }
 
     if (player->GetLevel() > prevLevel)
     {
@@ -3781,6 +4253,31 @@ void Game::ProcessVictory(std::shared_ptr<Monster> enemy)
 
     player->GetQuestManager().UpdateKillQuests(enemy->GetName());
     player->GetQuestManager().UpdateGatherQuests(player->GetInventory());
+
+    // Reputation gains from kills
+    FactionID killFaction = reputationSystem.GetFactionByArea(currentAreaIndex);
+    reputationSystem.AddKillReputation(killFaction, enemy->IsBoss());
+    reputationSystem.UpdateRepeatableQuestProgress(enemy->GetName());
+
+    // Check for Legend-rank faction pets
+    for (int fi = 0; fi < reputationSystem.GetFactionCount(); ++fi)
+    {
+        auto fID = static_cast<FactionID>(fi);
+        if (reputationSystem.GetRank(fID) == RepRank::Legend)
+        {
+            std::string petID = petManager.GetFactionLegendPetID(fID);
+            if (!petID.empty())
+            {
+                Pet* p = petManager.GetPet(petID);
+                if (p && !p->obtained)
+                {
+                    petManager.ObtainPet(petID); wiki.MarkPetObtained(petID);
+                    AddCombatLog("*** FACTION PET UNLOCKED *** " + p->name + " joins your side!");
+                    petManager.AddNotification(p->name, "Legend rank reward!");
+                }
+            }
+        }
+    }
 
     wiki.MarkEnemyDefeated(enemy->GetName());
 
@@ -3855,6 +4352,22 @@ void Game::ProcessVictory(std::shared_ptr<Monster> enemy)
                 drop->count = qty;
                 player->GetInventory().AddItem(drop);
                 AddCombatLog("Special Drop: " + sd.itemName + " x" + std::to_string(qty));
+            }
+        }
+
+        // Boss pet drop
+        if (enemy->IsBoss())
+        {
+            std::string droppedPetID = petManager.RollBossDropPet(player->GetLevel(), enemy->GetName());
+            if (!droppedPetID.empty())
+            {
+                petManager.ObtainPet(droppedPetID); wiki.MarkPetObtained(droppedPetID);
+                const Pet* dropped = petManager.GetPet(droppedPetID);
+                if (dropped)
+                {
+                    AddCombatLog("*** PET DROP *** " + dropped->name + " joins your side!");
+                    petManager.AddNotification(dropped->name, "New companion obtained!");
+                }
             }
         }
     }
@@ -3957,7 +4470,7 @@ void Game::SaveGamePrompt()
                 case CharacterClass::Archer:   cn = "Archer";   break;
                 case CharacterClass::Merchant: cn = "Merchant"; break;
             }
-            renderer.DrawText(slots[i].playerName + " — Lv." + std::to_string(slots[i].level) + " " + cn,
+            renderer.DrawText(slots[i].playerName + " - Lv." + std::to_string(slots[i].level) + " " + cn,
                               215, sy + 30, 14, CQColors::TextLight);
         }
         else
@@ -4004,7 +4517,7 @@ void Game::LoadGamePrompt()
                 case CharacterClass::Archer:   cn = "Archer";   break;
                 case CharacterClass::Merchant: cn = "Merchant"; break;
             }
-            renderer.DrawText(slots[i].playerName + " — Lv." + std::to_string(slots[i].level) + " " + cn,
+            renderer.DrawText(slots[i].playerName + " - Lv." + std::to_string(slots[i].level) + " " + cn,
                               215, sy + 30, 14, CQColors::TextLight);
             if ((hover && renderer.IsMouseClickedOn(200, sy, GRenderer::W - 400, 60))
                 || (focused && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE))))
@@ -4026,7 +4539,7 @@ void Game::LoadGamePrompt()
 void Game::SaveToSlot(int slot)
 {
     if (!player) { currentState = GameState::Exploring; return; }
-    if (saveManager.SaveGame(player, slot, currentAreaIndex, religion, achievementSystem))
+    if (saveManager.SaveGame(player, slot, currentAreaIndex, religion, achievementSystem, reputationSystem, petManager))
         renderer.DrawCenteredText("Game saved to Slot " + std::to_string(slot) + "!", 350, 24, CQColors::TextGreen);
     currentState = GameState::Exploring;
 }
@@ -4034,7 +4547,7 @@ void Game::SaveToSlot(int slot)
 void Game::LoadFromSlot(int slot)
 {
     static bool init = true;
-    auto loaded = saveManager.LoadGame(slot, currentAreaIndex, religion, achievementSystem);
+    auto loaded = saveManager.LoadGame(slot, currentAreaIndex, religion, achievementSystem, reputationSystem, petManager);
     if (loaded)
     {
         player = loaded;
@@ -4043,7 +4556,36 @@ void Game::LoadFromSlot(int slot)
         ClearLog();
         init = true;
         currentState = GameState::Exploring;
+        ApplyPetPassivesToPlayer();
+        for (const auto& p : petManager.GetPets())
+            if (p.obtained) wiki.MarkPetObtained(p.id);
     }
+}
+
+void Game::ApplyPetPassivesToPlayer()
+{
+    if (!player) return;
+    // Cursor max-HP upward if the pet bonus increased so the player benefits
+    // immediately (otherwise they'd have to heal up to the new max).
+    int oldMaxHP = player->GetMaxHealth();
+    int oldMaxMP = player->GetMaxMana();
+
+    player->SetPetBonuses(
+        petManager.GetHealthBonus(),
+        petManager.GetManaBonus(),
+        petManager.GetDamageBonus(),
+        petManager.GetDefenseBonus(),
+        petManager.GetCritChance(),
+        petManager.GetCritDamage());
+
+    int newMaxHP = player->GetMaxHealth();
+    int newMaxMP = player->GetMaxMana();
+    if (newMaxHP > oldMaxHP)
+        player->SetCurrentHealth(player->GetCurrentHealth() + (newMaxHP - oldMaxHP));
+    if (newMaxMP > oldMaxMP)
+        player->SetCurrentMana(player->GetCurrentMana() + (newMaxMP - oldMaxMP));
+    if (player->GetCurrentHealth() > newMaxHP) player->SetCurrentHealth(newMaxHP);
+    if (player->GetCurrentMana() > newMaxMP)   player->SetCurrentMana(newMaxMP);
 }
 
 // ============================================================
@@ -4140,9 +4682,66 @@ void Game::StateNPCDialogue()
         {
             if (renderer.Button("Claim: " + quest->title, 130, y, 320, 36, focusIdx))
             {
-                player->GainXP(quest->rewardXP);
+                int xpReward = quest->rewardXP;
+                float achQuestXPBonus = achievementSystem.GetQuestXPBonusByTier();
+                if (achQuestXPBonus > 0.0f)
+                {
+                    int achBonus = static_cast<int>(xpReward * achQuestXPBonus);
+                    if (achBonus > 0)
+                        xpReward += achBonus;
+                }
+                player->GainXP(xpReward);
                 player->GetInventory().AddGold(quest->rewardGold);
                 quest->rewarded = true;
+
+                // Show quest reward notification
+                questRewardNotifications.emplace_back(quest->title, xpReward, quest->rewardGold);
+
+                // Reputation from quest completion
+                FactionID qFaction = reputationSystem.GetFactionByArea(currentAreaIndex);
+                reputationSystem.OnQuestCompleted(qFaction, 10 + quest->rewardXP / 10);
+
+                // Check for Legend-rank faction pet
+                if (reputationSystem.GetRank(qFaction) == RepRank::Legend)
+                {
+                    std::string petID = petManager.GetFactionLegendPetID(qFaction);
+                    if (!petID.empty())
+                    {
+                        Pet* p = petManager.GetPet(petID);
+                        if (p && !p->obtained)
+                        {
+                            petManager.ObtainPet(petID); wiki.MarkPetObtained(petID);
+                            questRewardNotifications.emplace_back("Pet Unlocked: " + p->name, 0, 0);
+                            petManager.AddNotification(p->name, "Legend rank reward!");
+                        }
+                    }
+                }
+
+                // Track quest completion achievements
+                achievementSystem.UpdateProgress("quest_first");
+                achievementSystem.UpdateProgress("quest_5");
+                achievementSystem.UpdateProgress("quest_10");
+                achievementSystem.UpdateProgress("quest_25");
+                achievementSystem.UpdateProgress("quest_50");
+                achievementSystem.UpdateProgress("quest_100");
+                if (quest->type == QuestType::Kill)
+                {
+                    achievementSystem.UpdateProgress("quest_kill_10");
+                    achievementSystem.UpdateProgress("quest_kill_25");
+                    achievementSystem.UpdateProgress("quest_kill_50");
+                }
+                else if (quest->type == QuestType::Collect)
+                {
+                    achievementSystem.UpdateProgress("quest_gather_10");
+                    achievementSystem.UpdateProgress("quest_gather_25");
+                    achievementSystem.UpdateProgress("quest_gather_50");
+                }
+                else if (quest->type == QuestType::Explore)
+                {
+                    achievementSystem.UpdateProgress("quest_explore_5");
+                    achievementSystem.UpdateProgress("quest_explore_10");
+                    achievementSystem.UpdateProgress("quest_explore_15");
+                }
             }
             y += 46;
             focusIdx++;
@@ -4204,26 +4803,35 @@ void Game::StateAchievements()
         if (renderer.Button(categoryNames[i], tabX, y, 80, 28, focusIdx))
         {
             selectedCategory = (i == 0) ? -1 : static_cast<int>(categoryValues[i]);
+            achievementsPage = 0;
         }
         tabX += 88;
     }
     y += 40;
 
-    // Achievement list
+    // Achievement list — pre-filter by category, then paginate the filtered set
     std::vector<AchievementProgress> allProgress = achievementSystem.GetAllProgress();
-    int displayCount = 0;
-    int maxDisplay = 12;
-
+    std::vector<const AchievementProgress*> filtered;
     for (const auto& prog : allProgress)
     {
-        if (displayCount >= maxDisplay) break;
-
         const AchievementDefinition* def = achievementSystem.GetDefinition(prog.achievementId);
         if (!def) continue;
-
-        // Filter by category
         if (selectedCategory != -1 && static_cast<int>(def->category) != selectedCategory)
             continue;
+        filtered.push_back(&prog);
+    }
+    int achTotal = static_cast<int>(filtered.size());
+    int achMaxPage = (achTotal > ACHIEVEMENTS_PER_PAGE) ? ((achTotal - 1) / ACHIEVEMENTS_PER_PAGE) : 0;
+    if (achievementsPage < 0) achievementsPage = 0;
+    if (achievementsPage > achMaxPage) achievementsPage = achMaxPage;
+    int achStart = achievementsPage * ACHIEVEMENTS_PER_PAGE;
+    int achEnd = std::min(achStart + ACHIEVEMENTS_PER_PAGE, achTotal);
+
+    for (int ai = achStart; ai < achEnd; ++ai)
+    {
+        const auto& prog = *filtered[ai];
+        const AchievementDefinition* def = achievementSystem.GetDefinition(prog.achievementId);
+        if (!def) continue;
 
         // Draw achievement box
         Color bgColor = prog.unlocked ? CQColors::BgPanel : CQColors::BgDark;
@@ -4283,7 +4891,17 @@ void Game::StateAchievements()
         }
 
         y += 46;
-        displayCount++;
+    }
+
+    // Achievement page nav footer
+    if (achMaxPage > 0)
+    {
+        int navY = y + 4;
+        if (renderer.Button("< Prev", 130, navY, 100, 28, focusIdx++) && achievementsPage > 0) achievementsPage--;
+        if (renderer.Button("Next >", 240, navY, 100, 28, focusIdx++) && achievementsPage < achMaxPage) achievementsPage++;
+        renderer.DrawText("Page " + std::to_string(achievementsPage + 1) + " / " + std::to_string(achMaxPage + 1),
+                          350, navY + 6, 13, CQColors::TextDim);
+        y = navY + 36;
     }
 
     // Summary at bottom
@@ -4356,6 +4974,565 @@ void Game::StateAchievements()
     // Back button
     y = GRenderer::H - 60;
     if (renderer.Button("Back", 130, y, 120, 36, focusIdx))
+    {
+        currentState = GameState::Exploring;
+        renderer.StartTransition();
+    }
+}
+
+// ============================================================
+//  REPUTATION SYSTEM
+// ============================================================
+
+void Game::DrawReputationNotifications()
+{
+    float dt = GetFrameTime();
+    float yOffset = 60.0f;
+
+    for (int i = static_cast<int>(reputationSystem.notifications.size()) - 1; i >= 0; --i)
+    {
+        auto& n = reputationSystem.notifications[i];
+        if (n.life <= 0.0f) continue;
+
+        float alpha = 1.0f;
+        if (n.life < 0.5f) alpha = n.life / 0.5f;
+
+        int panelW = 280;
+        int panelH = 48;
+        int px = GRenderer::W - panelW - 10;
+        int py = static_cast<int>(yOffset);
+
+        float slideProgress = 1.0f;
+        if (n.life > n.maxLife - 0.3f)
+            slideProgress = (n.maxLife - n.life) / 0.3f;
+        px = GRenderer::W - static_cast<int>((panelW + 10) * slideProgress);
+
+        Color bg = {20, 25, 40, static_cast<unsigned char>(220 * alpha)};
+        Color border = {80, 140, 220, static_cast<unsigned char>(255 * alpha)};
+        Color repColor = {100, 200, 255, static_cast<unsigned char>(255 * alpha)};
+        Color srcColor = {180, 180, 170, static_cast<unsigned char>(255 * alpha)};
+
+        DrawRectangle(px, py, panelW, panelH, bg);
+        DrawRectangleLines(px, py, panelW, panelH, border);
+
+        const auto& fData = reputationSystem.GetFactionData(n.faction);
+        std::string repLine = "+" + std::to_string(n.amount) + " " + fData.name + " Rep";
+        DrawText(repLine.c_str(), px + 10, py + 6, 13, repColor);
+        DrawText(n.source.c_str(), px + 10, py + 26, 11, srcColor);
+
+        yOffset += panelH + 4.0f;
+    }
+}
+
+void Game::StateReputation()
+{
+    if (!player) { currentState = GameState::Exploring; return; }
+    keyboardNav.Update();
+    renderer.SetCurrentFocus(keyboardNav.GetFocus());
+
+    // Faction selection list
+    if (selectedFactionIdx < 0)
+    {
+        renderer.DrawPanel(50, 60, GRenderer::W - 100, GRenderer::H - 120, "Faction Reputation");
+        int y = 110;
+
+        renderer.DrawText("Total Reputation Earned: " + std::to_string(reputationSystem.GetTotalReputationEarned()),
+                          70, y, 14, CQColors::TextGold);
+        y += 24;
+
+        // Faction colors
+        Color factionColors[] = {
+            {200, 180, 100, 255},  // Guardians - gold
+            {60, 160, 60, 255},    // Shadow Wardens - green
+            {60, 120, 200, 255},   // Tide Callers - blue
+            {200, 80, 40, 255},    // Dragon Scholars - red
+            {160, 120, 200, 255},  // Highland Clans - purple
+            {100, 60, 140, 255},   // Void Seekers - deep purple
+            {220, 200, 100, 255},  // Celestial Order - bright gold
+            {80, 40, 120, 255},    // Void Exarchs - dark purple
+            {40, 160, 200, 255},   // Arcane Conclave - cyan
+            {100, 200, 160, 255},  // Chronos Wardens - teal
+        };
+
+        int focusCount = reputationSystem.GetFactionCount() + 1;
+        keyboardNav.SetFocusCount(focusCount);
+
+        for (int i = 0; i < reputationSystem.GetFactionCount(); ++i)
+        {
+            auto fid = static_cast<FactionID>(i);
+            const auto& fData = reputationSystem.GetFactionData(fid);
+            Color col = factionColors[i % 10];
+
+            // Faction card
+            Color cardBg = {25, 25, 35, 255};
+            renderer.DrawRect(70, y, GRenderer::W - 160, 50, cardBg);
+            renderer.DrawRectLines(70, y, GRenderer::W - 160, 50, col);
+
+            // Faction name and rank
+            std::string header = fData.name + "  [" + reputationSystem.GetRankName(fData.rank) + "]";
+            renderer.DrawText(header, 80, y + 4, 16, col);
+
+            // Rep bar
+            int barX = 80;
+            int barY = y + 24;
+            int barW = 350;
+            int barH = 14;
+            renderer.DrawRect(barX, barY, barW, barH, Color{20, 20, 25, 255});
+
+            RepRank currentRank = fData.rank;
+            int currentRep = fData.reputation;
+            int nextThreshold = reputationSystem.GetRankThreshold(currentRank);
+            if (currentRank != RepRank::Legend)
+            {
+                int nextRankThreshold = reputationSystem.GetRankThreshold(
+                    static_cast<RepRank>(static_cast<int>(currentRank) + 1));
+                float progress = 0.0f;
+                if (nextRankThreshold > nextThreshold)
+                    progress = static_cast<float>(currentRep - nextThreshold)
+                             / static_cast<float>(nextRankThreshold - nextThreshold);
+                int fillW = static_cast<int>(barW * std::min(progress, 1.0f));
+                if (fillW > 0)
+                    renderer.DrawRect(barX + 1, barY + 1, fillW - 1, barH - 1, col);
+
+                std::string repText = std::to_string(currentRep) + " / " + std::to_string(nextRankThreshold);
+                int textW = MeasureText(repText.c_str(), 11);
+                renderer.DrawText(repText, barX + (barW - textW) / 2, barY + 1, 11, CQColors::TextLight);
+            }
+            else
+            {
+                renderer.DrawRect(barX + 1, barY + 1, barW - 1, barH - 1, col);
+                int textW = MeasureText("MAX", 11);
+                renderer.DrawText("MAX", barX + (barW - textW) / 2, barY + 1, 11, CQColors::TextLight);
+            }
+
+            // Next rank hint
+            if (currentRank != RepRank::Legend)
+            {
+                int toNext = reputationSystem.GetRepToNextRank(fid);
+                renderer.DrawText("Next rank in " + std::to_string(toNext) + " rep",
+                                  barX + barW + 10, barY + 1, 11, CQColors::TextDim);
+            }
+
+            // Area name
+            renderer.DrawText(fData.areaName, GRenderer::W - 180, y + 4, 12, CQColors::TextDim);
+
+            if (renderer.Button("", 70, y, GRenderer::W - 160, 50, i))
+            {
+                selectedFactionIdx = i;
+                repQuestPage = 0;
+            }
+
+            y += 58;
+        }
+
+        if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 80, 120, 40, reputationSystem.GetFactionCount()))
+        {
+            currentState = GameState::Exploring;
+            renderer.StartTransition();
+        }
+        return;
+    }
+
+    // Faction detail view
+    auto fid = static_cast<FactionID>(selectedFactionIdx);
+    const auto& fData = reputationSystem.GetFactionData(fid);
+
+    Color factionColors[] = {
+        {200, 180, 100, 255}, {60, 160, 60, 255}, {60, 120, 200, 255}, {200, 80, 40, 255},
+        {160, 120, 200, 255}, {100, 60, 140, 255}, {220, 200, 100, 255}, {80, 40, 120, 255},
+        {40, 160, 200, 255}, {100, 200, 160, 255},
+    };
+    Color col = factionColors[selectedFactionIdx % 10];
+
+    std::string title = fData.name + " — " + reputationSystem.GetRankName(fData.rank);
+    renderer.DrawPanel(50, 60, GRenderer::W - 100, GRenderer::H - 120, title);
+
+    int y = 110;
+    renderer.DrawText(fData.description, 70, y, 13, CQColors::TextDim);
+    y += 20;
+    renderer.DrawText("Area: " + fData.areaName + "  |  Reputation: " + std::to_string(fData.reputation),
+                      70, y, 14, col);
+    y += 24;
+
+    // Tabs: Overview | Repeatable Quests
+    int tabFocusBase = 0;
+    if (renderer.Button("Overview", 70, y, 160, 28, tabFocusBase))
+    {
+        repQuestTab = 0;
+        repQuestPage = 0;
+    }
+    if (renderer.Button("Repeatable Quests", 240, y, 200, 28, tabFocusBase + 1))
+    {
+        repQuestTab = 1;
+        repQuestPage = 0;
+    }
+    y += 38;
+
+    int focusIdx = 2;
+
+    if (repQuestTab == 0)
+    {
+        // Rewards overview
+        renderer.DrawText("Rewards by Rank:", 70, y, 16, CQColors::TextGold);
+        y += 22;
+
+        for (const auto& reward : fData.rewards)
+        {
+            bool unlocked = static_cast<int>(fData.rank) >= static_cast<int>(reward.requiredRank);
+            Color statusCol = unlocked ? CQColors::TextGreen : CQColors::TextDim;
+            std::string status = unlocked ? "[UNLOCKED]" : "[LOCKED]";
+
+            renderer.DrawText(status + "  " + reputationSystem.GetRankName(reward.requiredRank) + ": " + reward.name,
+                              90, y, 14, statusCol);
+            y += 18;
+            renderer.DrawText(reward.description, 110, y, 12, CQColors::TextDim);
+            y += 20;
+        }
+
+        // Shop discount
+        float discount = reputationSystem.GetShopDiscount(fid);
+        float xpBonus = reputationSystem.GetXPBonus(fid);
+        float combatBonus = reputationSystem.GetCombatStatBonus(fid);
+
+        y += 8;
+        renderer.DrawText("Active Bonuses:", 70, y, 14, CQColors::TextGold);
+        y += 20;
+        if (discount > 0.0f)
+            renderer.DrawText("Shop Discount: " + std::to_string(static_cast<int>(discount * 100)) + "%",
+                              90, y, 13, CQColors::TextGreen);
+        else
+            renderer.DrawText("Shop Discount: None", 90, y, 13, CQColors::TextDim);
+        y += 18;
+        if (xpBonus > 0.0f)
+            renderer.DrawText("XP Bonus: " + std::to_string(static_cast<int>(xpBonus * 100)) + "%",
+                              90, y, 13, CQColors::TextGreen);
+        else
+            renderer.DrawText("XP Bonus: None", 90, y, 13, CQColors::TextDim);
+        y += 18;
+        if (combatBonus > 0.0f)
+            renderer.DrawText("Combat Stats: +" + std::to_string(static_cast<int>(combatBonus * 100)) + "%",
+                              90, y, 13, CQColors::TextGreen);
+        else
+            renderer.DrawText("Combat Stats: None", 90, y, 13, CQColors::TextDim);
+    }
+    else
+    {
+        // Repeatable quests
+        const auto& quests = reputationSystem.GetRepeatableQuests(fid);
+        renderer.DrawText("Complete quests to earn reputation and rewards!", 70, y, 13, CQColors::TextDim);
+        y += 22;
+
+        int totalQuests = static_cast<int>(quests.size());
+        int totalPages = (totalQuests + REPEATABLE_QUESTS_PER_PAGE - 1) / REPEATABLE_QUESTS_PER_PAGE;
+        if (totalPages < 1) totalPages = 1;
+        if (repQuestPage >= totalPages) repQuestPage = totalPages - 1;
+        if (repQuestPage < 0) repQuestPage = 0;
+
+        int startIdx = repQuestPage * REPEATABLE_QUESTS_PER_PAGE;
+        int endIdx = std::min(startIdx + REPEATABLE_QUESTS_PER_PAGE, totalQuests);
+
+        for (int i = startIdx; i < endIdx; ++i)
+        {
+            const auto& q = quests[i];
+            bool canAccept = !q.active && !q.completed && static_cast<int>(fData.rank) >= q.requiredRank;
+            bool isActive = q.active && !q.completed;
+            bool isDone = q.completed;
+
+            Color qCol = isDone ? CQColors::TextGreen : (isActive ? CQColors::TextGold : CQColors::TextLight);
+            std::string status = isDone ? "[COMPLETE]" : (isActive ? "[IN PROGRESS]" : "");
+            std::string rankReq = " (Requires " + reputationSystem.GetRankName(static_cast<RepRank>(q.requiredRank)) + ")";
+
+            renderer.DrawText(status + " " + q.title + rankReq, 90, y, 14, qCol);
+            y += 18;
+            renderer.DrawText(q.description, 110, y, 12, CQColors::TextDim);
+            y += 16;
+            renderer.DrawText("Reward: " + std::to_string(q.reputationReward) + " Rep, "
+                              + std::to_string(q.goldReward) + " Gold, "
+                              + std::to_string(q.xpReward) + " XP",
+                              110, y, 12, CQColors::TextGold);
+            y += 16;
+
+            if (isActive)
+            {
+                std::string progText = "Progress: " + std::to_string(q.currentCount) + "/" + std::to_string(q.targetCount);
+                renderer.DrawText(progText, 110, y, 13, CQColors::TextGold);
+                y += 18;
+            }
+
+            if (canAccept && renderer.Button("Accept##rq" + std::to_string(i), 110, y, 120, 24, focusIdx++))
+            {
+                reputationSystem.AcceptRepeatableQuest(fid, i);
+            }
+            else if (isDone && renderer.Button("Claim##rq" + std::to_string(i), 110, y, 120, 24, focusIdx++))
+            {
+                int repReward = q.reputationReward;
+                int goldReward = q.goldReward;
+                int xpReward = q.xpReward;
+
+                reputationSystem.ClaimRepeatableQuestReward(fid, i);
+                player->GainXP(xpReward);
+                player->GetInventory().AddGold(goldReward);
+
+                questRewardNotifications.emplace_back(q.title, xpReward, goldReward);
+
+                // Check for Legend-rank faction pet
+                if (reputationSystem.GetRank(fid) == RepRank::Legend)
+                {
+                    std::string petID = petManager.GetFactionLegendPetID(fid);
+                    if (!petID.empty())
+                    {
+                        Pet* p = petManager.GetPet(petID);
+                        if (p && !p->obtained)
+                        {
+                            petManager.ObtainPet(petID); wiki.MarkPetObtained(petID);
+                            questRewardNotifications.emplace_back("Pet Unlocked: " + p->name, 0, 0);
+                            petManager.AddNotification(p->name, "Legend rank reward!");
+                        }
+                    }
+                }
+            }
+            y += 32;
+        }
+
+        // Pagination controls
+        if (totalPages > 1)
+        {
+            y += 4;
+            if (renderer.Button("< Prev", 90, y, 100, 28, focusIdx++))
+            {
+                if (repQuestPage > 0) repQuestPage--;
+            }
+            std::string pageText = "Page " + std::to_string(repQuestPage + 1) + " / " + std::to_string(totalPages);
+            renderer.DrawText(pageText, GRenderer::W / 2 - 60, y + 6, 14, CQColors::TextGold);
+            if (renderer.Button("Next >", 90 + 100 + 200, y, 100, 28, focusIdx++))
+            {
+                if (repQuestPage < totalPages - 1) repQuestPage++;
+            }
+            y += 36;
+        }
+    }
+
+    keyboardNav.SetFocusCount(focusIdx + 1);
+    if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 80, 120, 40, focusIdx))
+    {
+        selectedFactionIdx = -1;
+        repQuestTab = 0;
+        repQuestPage = 0;
+    }
+}
+
+// ============================================================
+//  PET NOTIFICATIONS
+// ============================================================
+
+void Game::DrawPetNotifications()
+{
+    float yOffset = 100.0f;
+    for (size_t i = 0; i < petManager.notifications.size(); ++i)
+    {
+        auto& n = petManager.notifications[i];
+        if (n.life <= 0.0f) continue;
+
+        float alpha = 1.0f;
+        if (n.life < 0.5f) alpha = n.life / 0.5f;
+
+        int panelW = 280;
+        int panelH = 48;
+        int px = GRenderer::W - panelW - 10;
+        int py = static_cast<int>(yOffset);
+
+        float slideProgress = 1.0f;
+        if (n.life > n.maxLife - 0.3f)
+            slideProgress = (n.maxLife - n.life) / 0.3f;
+        px = GRenderer::W - static_cast<int>((panelW + 10) * slideProgress);
+
+        Color bg = {25, 15, 35, static_cast<unsigned char>(220 * alpha)};
+        Color border = {180, 100, 220, static_cast<unsigned char>(255 * alpha)};
+        Color nameColor = {200, 160, 255, static_cast<unsigned char>(255 * alpha)};
+        Color msgColor = {180, 180, 170, static_cast<unsigned char>(255 * alpha)};
+
+        DrawRectangle(px, py, panelW, panelH, bg);
+        DrawRectangleLines(px, py, panelW, panelH, border);
+
+        DrawText(n.petName.c_str(), px + 10, py + 6, 13, nameColor);
+        DrawText(n.message.c_str(), px + 10, py + 26, 11, msgColor);
+
+        yOffset += panelH + 4.0f;
+    }
+}
+
+// ============================================================
+//  PET STATE
+// ============================================================
+
+void Game::StatePets()
+{
+    if (!player) { currentState = GameState::Exploring; return; }
+    keyboardNav.Update();
+    renderer.SetCurrentFocus(keyboardNav.GetFocus());
+
+    renderer.DrawPanel(50, 60, GRenderer::W - 100, GRenderer::H - 120, "Pet Gallery");
+    int y = 110;
+
+    // Collection summary
+    const auto& allPets = petManager.GetPets();
+    int ownedCount = 0, evolvedCount = 0, ascendedCount = 0;
+    for (const auto& p : allPets)
+    {
+        if (p.obtained) ownedCount++;
+        if (p.obtained && p.evolutionTier >= 1) evolvedCount++;
+        if (p.obtained && p.evolutionTier >= 2) ascendedCount++;
+    }
+
+    renderer.DrawText("Obtained: " + std::to_string(ownedCount) + " / " + std::to_string(allPets.size())
+                      + "   Evolved: " + std::to_string(evolvedCount)
+                      + "   Ascended: " + std::to_string(ascendedCount),
+                      70, y, 13, CQColors::TextDim);
+    y += 20;
+
+    // Equipped pet summary
+    const Pet* equipped = petManager.GetEquippedPet();
+    if (equipped)
+    {
+        renderer.DrawText("Equipped: " + equipped->GetCurrentName()
+                          + "  Lv:" + std::to_string(equipped->level)
+                          + "  [" + equipped->GetEvolutionLabel() + "]",
+                          70, y, 14, CQColors::TextGold);
+        y += 18;
+    }
+    else
+    {
+        renderer.DrawText("No pet equipped", 70, y, 14, CQColors::TextDim);
+        y += 18;
+    }
+    y += 4;
+
+    // Pet list — paginated (fights off-screen overflow for 20 pets)
+    const int totalPets = static_cast<int>(allPets.size());
+    int petMaxPage = (totalPets > PETS_PER_PAGE) ? ((totalPets - 1) / PETS_PER_PAGE) : 0;
+    if (petListPage < 0) petListPage = 0;
+    if (petListPage > petMaxPage) petListPage = petMaxPage;
+    int petStart = petListPage * PETS_PER_PAGE;
+    int petEnd = std::min(petStart + PETS_PER_PAGE, totalPets);
+
+    int focusIdx = 0;
+    for (int pi = petStart; pi < petEnd; ++pi)
+    {
+        const auto& p = allPets[pi];
+        Color elemCol = CQColors::TextLight;
+        switch (p.element)
+        {
+            case ElementType::Fire:      elemCol = {255, 100, 50, 255}; break;
+            case ElementType::Ice:       elemCol = {100, 200, 255, 255}; break;
+            case ElementType::Lightning: elemCol = {255, 255, 100, 255}; break;
+            case ElementType::Arcane:    elemCol = {200, 120, 255, 255}; break;
+            case ElementType::Poison:    elemCol = {100, 220, 80, 255}; break;
+            case ElementType::Holy:      elemCol = {255, 240, 200, 255}; break;
+            default:                     elemCol = {200, 200, 200, 255}; break;
+        }
+
+        bool isEquipped = p.equipped;
+        Color cardBg = isEquipped ? Color{40, 30, 60, 255}
+                      : p.obtained ? Color{25, 25, 35, 255}
+                      : Color{18, 18, 22, 255};
+        renderer.DrawRect(70, y, GRenderer::W - 160, 48, cardBg);
+
+        // Border color: gold if equipped, element color if obtained, dim if unobtained
+        Color borderCol = isEquipped ? CQColors::Gold
+                        : p.obtained ? elemCol
+                        : Color{60, 60, 70, 255};
+        if (p.obtained && p.evolutionTier == 1)
+            borderCol = {100, 255, 180, 255};  // green glow for evolved
+        else if (p.obtained && p.evolutionTier == 2)
+            borderCol = {255, 215, 0, 255};    // gold glow for ascended
+        renderer.DrawRectLines(70, y, GRenderer::W - 160, 48, borderCol);
+
+        if (p.obtained)
+        {
+            // Show full info
+            std::string nameStr = p.GetCurrentName();
+            if (isEquipped) nameStr += " [EQUIPPED]";
+            if (p.evolutionTier > 0)
+                nameStr += "  (" + p.GetEvolutionLabel() + ")";
+            renderer.DrawText(nameStr, 80, y + 3, 14, elemCol);
+
+            std::string statsLine = std::string(ElementName(p.element))
+                                  + "  ATK:" + std::to_string(p.GetScaledAttack())
+                                  + "  Lv:" + std::to_string(p.level)
+                                  + " / " + std::to_string(Pet::MAX_PET_LEVEL);
+            renderer.DrawText(statsLine, 80, y + 18, 11, CQColors::TextDim);
+
+            // XP bar
+            if (p.level < Pet::MAX_PET_LEVEL)
+            {
+                int reqXP = Pet::CalculateRequiredXP(p.level);
+                float progress = static_cast<float>(p.experience) / static_cast<float>(reqXP);
+                int barX = 80;
+                int barW = 150;
+                int barH = 8;
+                renderer.DrawRect(barX, y + 32, barW, barH, Color{20, 20, 25, 255});
+                int fillW = static_cast<int>(barW * std::min(progress, 1.0f));
+                if (fillW > 0)
+                    renderer.DrawRect(barX + 1, y + 33, fillW - 1, barH - 1, CQColors::TextGold);
+            }
+
+            // Ability info
+            if (p.evolutionTier > 0 && p.specialAbility != EffectType::None)
+            {
+                renderer.DrawText(p.GetAbilityName(), 340, y + 18, 11, CQColors::TextGreen);
+            }
+
+            // Source
+            std::string sourceLabel = (p.source == PetSource::FactionLegend) ? "Faction" : "Boss";
+            renderer.DrawText(sourceLabel, GRenderer::W - 250, y + 3, 10, CQColors::TextDim);
+
+            // Equip/Unequip button
+            if (!isEquipped)
+            {
+                if (renderer.Button("Equip##pet" + p.id, GRenderer::W - 160, y + 10, 80, 28, focusIdx++))
+                {
+                    petManager.EquipPet(p.id);
+                    ApplyPetPassivesToPlayer();
+                }
+            }
+            else
+            {
+                if (renderer.Button("Unequip##pet" + p.id, GRenderer::W - 160, y + 10, 80, 28, focusIdx++))
+                {
+                    petManager.UnequipAll();
+                    ApplyPetPassivesToPlayer();
+                }
+            }
+        }
+        else
+        {
+            // Unobtained — show silhouette
+            renderer.DrawText("???", 80, y + 3, 14, Color{80, 80, 90, 255});
+            std::string hint = std::string(ElementName(p.element));
+            if (p.source == PetSource::FactionLegend)
+                hint += "  (Faction Legend reward)";
+            else
+                hint += "  (Boss drop: " + p.bossName + ")";
+            renderer.DrawText(hint, 80, y + 18, 11, Color{60, 60, 70, 255});
+        }
+
+        y += 56;
+    }
+
+    // Page navigation footer
+    int navY = GRenderer::H - 130;
+    if (petMaxPage > 0)
+    {
+        if (renderer.Button("< Prev", 70, navY, 100, 32, focusIdx++))
+            if (petListPage > 0) petListPage--;
+        if (renderer.Button("Next >", 180, navY, 100, 32, focusIdx++))
+            if (petListPage < petMaxPage) petListPage++;
+        renderer.DrawText("Page " + std::to_string(petListPage + 1) + " / " + std::to_string(petMaxPage + 1),
+                          290, navY + 6, 13, CQColors::TextDim);
+    }
+
+    keyboardNav.SetFocusCount(focusIdx + 1);
+    if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 80, 120, 40, focusIdx))
     {
         currentState = GameState::Exploring;
         renderer.StartTransition();

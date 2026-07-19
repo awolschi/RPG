@@ -37,8 +37,8 @@ public:
     const Stats& GetStats() const { return stats; }
     int GetCurrentHealth() const { return currentHealth; }
     int GetCurrentMana() const { return currentMana; }
-    int GetMaxHealth() const { return stats.health + equipment.GetHealthBonus(); }
-    int GetMaxMana() const { return stats.mana + equipment.GetManaBonus(); }
+    int GetMaxHealth() const { return stats.health + equipment.GetHealthBonus() + petBonusHP; }
+    int GetMaxMana() const { return stats.mana + equipment.GetManaBonus() + petBonusMP; }
     int GetLevel() const { return level; }
     int GetExperience() const { return experience; }
     bool IsAlive() const { return currentHealth > 0; }
@@ -65,6 +65,23 @@ public:
     void SetCurrentMana(int mana);
     void SetLevel(int lvl);
     void SetExperience(int xp);
+
+    // Pet passive bonuses (set by the Game when pets are equipped / leveled)
+    void SetPetBonuses(int hp, int mp, float dmg, float def, float crit, float critDmg)
+    {
+        petBonusHP = hp;
+        petBonusMP = mp;
+        petBonusDamage = dmg;
+        petBonusDefense = def;
+        petBonusCritChance = crit;
+        petBonusCritDamage = critDmg;
+    }
+    int  GetPetBonusHP() const { return petBonusHP; }
+    int  GetPetBonusMP() const { return petBonusMP; }
+    float GetPetBonusDamage() const { return petBonusDamage; }
+    float GetPetBonusDefense() const { return petBonusDefense; }
+    float GetPetBonusCritChance() const { return petBonusCritChance; }
+    float GetPetBonusCritDamage() const { return petBonusCritDamage; }
 
     // Status effects
     void ApplyEffect(EffectType type, int duration, int potency = 0, const std::string& source = "");
@@ -98,6 +115,14 @@ protected:
     int attackBonus;
     int level;
     int experience;
+
+    // Pet passive bonuses (applied externally by the Game)
+    int petBonusHP = 0;
+    int petBonusMP = 0;
+    float petBonusDamage = 0.0f;
+    float petBonusDefense = 0.0f;
+    float petBonusCritChance = 0.0f;
+    float petBonusCritDamage = 0.0f;
 
     SkillSet skills;
     Equipment equipment;

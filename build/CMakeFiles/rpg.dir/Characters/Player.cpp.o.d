@@ -185,6 +185,7 @@ CMakeFiles/rpg.dir/Characters/Player.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Characters/../Jobs/../Items/Resources/../Item.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Characters/../Jobs/JobPerk.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Characters/../Jobs/JobSpecialization.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Characters/../Jobs/JobSkillTree.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Characters/../Jobs/ResourceChain.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Characters/../World/Quests/Quest.hpp \
  /usr/include/c++/10/iostream /usr/include/c++/10/ostream \

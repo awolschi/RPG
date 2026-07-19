@@ -3,7 +3,7 @@
 void BattleLayout::Calculate(int screenW, int screenH)
 {
     photoY = 0;
-    photoH = static_cast<int>(screenH * 0.60f);
+    photoH = static_cast<int>(screenH * 0.50f);
 
     creatureW = static_cast<int>(screenW * 0.40f);
     creatureH = creatureW;
@@ -15,9 +15,9 @@ void BattleLayout::Calculate(int screenW, int screenH)
     hpTextY = nameY + 28;
     messageY = hpTextY + 22;
 
-    int totalAbilityW = 4 * abilitySize + 3 * abilitySpacing;
-    int abilityStartX = (screenW - totalAbilityW) / 2;
-    abilityY = uiY + 70;
-
     playerBarY = screenH - 50;
+    abilityY = playerBarY - abilitySize - 15;
+
+    int totalAbilityW = 5 * abilitySize + 4 * abilitySpacing;
+    int abilityStartX = (screenW - totalAbilityW) / 2;
 }

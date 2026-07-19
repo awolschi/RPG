@@ -609,27 +609,64 @@ void AchievementSystem::Deserialize(const std::string& data)
     progress.clear();
     if (data.empty()) return;
 
-    std::istringstream ss(data);
-    size_t count;
-    ss >> count;
+    // Format: "N|id1,v1,u1,n1|id2,v2,u2,n2|... <flags>"
+    // The entries are NOT whitespace-separated, so using operator>> would
+    // swallow every entry as a single token. We split on '|'
+    // explicitly: the first segment is N (count), subsequent segments are
+    // id,v,u,n tuples, and the final segment after a space is the flags.
 
-    for (size_t i = 0; i < count; ++i)
+    size_t barPos = data.find('|');
+    if (barPos == std::string::npos)
     {
-        std::string token;
-        ss >> token;
-        if (token.empty() || token[0] != '|') continue;
-        token = token.substr(1);
+        // Only a count (or empty) — nothing to restore
+        return;
+    }
+    size_t count = 0;
+    try { count = static_cast<size_t>(std::stoi(data.substr(0, barPos))); }
+    catch (...) { return; }
 
-        size_t comma1 = token.find(',');
-        size_t comma2 = token.find(',', comma1 + 1);
-        size_t comma3 = token.find(',', comma2 + 1);
+    size_t pos = barPos;
+    for (size_t i = 0; i < count && pos != std::string::npos; ++i)
+    {
+        size_t next = data.find('|', pos + 1);
+        std::string entry = (next == std::string::npos)
+            ? data.substr(pos + 1)
+            : data.substr(pos + 1, next - pos - 1);
 
-        if (comma1 == std::string::npos) continue;
+        // The final segment (after the space before flags) is "0000" —
+        // detect via the leading space and bail.
+        size_t comma1 = entry.find(',');
+        if (comma1 == std::string::npos)
+        {
+            // This is the flags segment. Parse it.
+            if (entry.size() >= 4)
+            {
+                newGamePlus = (entry[0] == '1');
+                bossRush    = (entry[1] == '1');
+                masterClass = (entry[2] == '1');
+                devCommentary = (entry[3] == '1');
+            }
+            break;
+        }
 
-        std::string id = token.substr(0, comma1);
-        int value = std::stoi(token.substr(comma1 + 1, comma2 - comma1 - 1));
-        bool unlocked = (token.substr(comma2 + 1, comma3 - comma2 - 1) == "1");
-        bool notified = (comma3 != std::string::npos && token.substr(comma3 + 1) == "1");
+        std::string id = entry.substr(0, comma1);
+        size_t comma2 = entry.find(',', comma1 + 1);
+        size_t comma3 = entry.find(',', comma2 + 1);
+        if (comma2 == std::string::npos) { pos = next; continue; }
+
+        int value = 0;
+        try { value = std::stoi(entry.substr(comma1 + 1, comma2 - comma1 - 1)); }
+        catch (...) {}
+
+        bool unlocked = false;
+        if (comma3 != std::string::npos)
+            unlocked = (entry.substr(comma2 + 1, comma3 - comma2 - 1) == "1");
+
+        bool notified = false;
+        if (comma3 != std::string::npos && comma3 + 1 < entry.size())
+            notified = (entry.substr(comma3 + 1) == "1");
+        else if (comma3 == std::string::npos)
+            unlocked = (entry.substr(comma2 + 1) == "1");
 
         AchievementProgress p;
         p.achievementId = id;
@@ -637,16 +674,24 @@ void AchievementSystem::Deserialize(const std::string& data)
         p.unlocked = unlocked;
         p.notified = notified;
         progress[id] = p;
+
+        pos = next;
     }
 
-    // Load unlockable flags if present
-    std::string flags;
-    if (ss >> flags && flags.size() >= 4)
+    // Flags may also appear after a space in the data (older save format had
+    // flags trailing without their own '|'). Look for the trailing 4-char flag
+    // pattern after the first space following the last parsed bar.
+    size_t spacePos = data.find(' ', barPos);
+    if (spacePos != std::string::npos && spacePos + 1 < data.size())
     {
-        newGamePlus = (flags[0] == '1');
-        bossRush = (flags[1] == '1');
-        masterClass = (flags[2] == '1');
-        devCommentary = (flags[3] == '1');
+        std::string flags = data.substr(spacePos + 1);
+        if (flags.size() >= 4)
+        {
+            newGamePlus = (flags[0] == '1');
+            bossRush    = (flags[1] == '1');
+            masterClass = (flags[2] == '1');
+            devCommentary = (flags[3] == '1');
+        }
     }
 }
 

@@ -10,6 +10,7 @@
 Wiki::Wiki()
     : currentTab(WikiTab::Equipment), page(0), maxPage(0), areas(nullptr),
       selectedEnemyIdx(-1), showEnemyDetail(false),
+      selectedPetIdx(-1), showPetDetail(false),
       focusedEntry(-1), wikiFocusPhase(0)
 {
     searchBuf[0] = '\0';
@@ -21,6 +22,7 @@ Wiki::Wiki()
     BuildAreaDatabase();
     BuildSetDatabase();
     BuildUniqueDatabase();
+    BuildPetDatabase();
 }
 
 void Wiki::SetAreas(const std::vector<Area>& areaList)
@@ -37,6 +39,16 @@ void Wiki::MarkEnemyDefeated(const std::string& name)
 bool Wiki::IsEnemyDefeated(const std::string& name) const
 {
     return defeatedEnemies.find(name) != defeatedEnemies.end();
+}
+
+void Wiki::MarkPetObtained(const std::string& id)
+{
+    obtainedPets.insert(id);
+}
+
+bool Wiki::IsPetObtained(const std::string& id) const
+{
+    return obtainedPets.find(id) != obtainedPets.end();
 }
 
 // ============================================================
@@ -761,6 +773,46 @@ void Wiki::BuildAreaDatabase()
 }
 
 // ============================================================
+//  PET DATABASE
+// ============================================================
+
+void Wiki::BuildPetDatabase()
+{
+    petEntries.clear();
+
+    struct PetInfo { std::string id; std::string name; std::string element; std::string source; std::string desc; int baseAtk; };
+    std::vector<PetInfo> allPets = {
+        {"ember_sentinel",    "Ember Sentinel",    "Fire",      "Faction: Guardians of Felrona",    "A living flame that burns with the loyalty of Felrona's defenders.", 18},
+        {"frost_wisp",       "Frost Wisp",        "Ice",       "Faction: Shadow Wardens",           "A crystalline spirit from the deepest winter of the Dark Woods.", 15},
+        {"storm_tide",       "Storm Tide",        "Lightning", "Faction: Tide Callers",             "A crackling energy from the heart of a coastal tempest.", 16},
+        {"arcane_drake",     "Arcane Drake",      "Arcane",    "Faction: Dragon Scholars",          "A hatchling infused with the forbidden knowledge of dragon scholars.", 17},
+        {"venom_shard",      "Venom Shard",       "Poison",    "Faction: Highland Clans",           "A toxic fragment of the highland serpent, pulsing with deadly energy.", 20},
+        {"inferno_guardian", "Inferno Guardian",  "Fire",      "Faction: Void Seekers",             "A being of pure flame that feeds on the void's corruption.", 22},
+        {"celestial_spark",  "Celestial Spark",   "Holy",      "Faction: Celestial Order",          "A fragment of celestial light that restores vigor to the worthy.", 14},
+        {"void_mote",        "Void Mote",         "Arcane",    "Faction: Void Exarchs",             "A sliver of the void itself, bent to serve the light.", 24},
+        {"mana_weaver",      "Mana Weaver",       "Arcane",    "Faction: Arcane Conclave",          "A sentient thread of raw mana, weaving power from nothing.", 16},
+        {"chrono_spark",     "Chrono Spark",      "Lightning", "Faction: Chronos Wardens",          "A spark frozen in a single moment, crackling with temporal energy.", 20},
+        {"goblin_familiar",  "Goblin Familiar",   "Physical",  "Boss: Farm Overseer",               "A mischievous goblin spirit that aids its master.", 10},
+        {"treant_sapling",   "Treant Sapling",    "Ice",       "Boss: Treant King",                 "A living sapling with the ancient wisdom of the forest.", 12},
+        {"kraken_ink",       "Kraken Ink",        "Poison",    "Boss: Kraken",                      "A vial of ink from the depths, shimmering with oceanic power.", 14},
+        {"dragon_whelp",     "Dragon Whelp",      "Fire",      "Boss: Elder Dragon",                "A tiny dragon that yearns to breathe fire.", 18},
+        {"warlord_banner",   "Warlord Banner",    "Physical",  "Boss: Aran Warlord",                "The tattered banner of a fallen warlord, still radiating authority.", 20},
+        {"void_shard",       "Void Shard",        "Arcane",    "Boss: Void Lord",                   "A fragment of pure void, cold to the touch and humming with power.", 22},
+        {"seraph_feather",   "Seraph Feather",    "Holy",      "Boss: Seraphim Council",            "A radiant feather from a celestial being.", 16},
+        {"primordial_heart", "Primordial Heart",  "Fire",      "Boss: Primordial One",              "The still-beating heart of a primordial entity.", 28},
+        {"construct_core",   "Construct Core",    "Arcane",    "Boss: Arcane Construct",            "The arcane core of an ancient construct, pulsing with raw magic.", 20},
+        {"chrono_fragment",  "Chrono Fragment",   "Lightning", "Boss: Chronos",                     "A shard of crystallized time, moments frozen in amber.", 24},
+    };
+
+    for (const auto& p : allPets)
+    {
+        std::string info = "ATK: " + std::to_string(p.baseAtk) + "  |  Element: " + p.element;
+        info += "  |  Evolves at Lv.15, Ascends at Lv.30";
+        petEntries.push_back({p.name, p.element, info, p.source, 2, p.desc});
+    }
+}
+
+// ============================================================
 //  DRAW
 // ============================================================
 
@@ -790,8 +842,22 @@ void Wiki::Draw(GRenderer& renderer)
             case WikiTab::Areas:     DrawTabPage(renderer, areaEntries, "Areas"); break;
             case WikiTab::Sets:      DrawTabPage(renderer, setEntries, "Set Bonuses"); break;
             case WikiTab::Uniques:   DrawTabPage(renderer, uniqueEntries, "Unique Items"); break;
+            case WikiTab::Pets:      DrawTabPage(renderer, petEntries, "Pets"); break;
             default: break;
         }
+        return;
+    }
+
+    // Handle pet detail popup keyboard input
+    if (showPetDetail)
+    {
+        if (IsKeyPressed(KEY_ESCAPE) || IsKeyPressed(KEY_ENTER))
+        {
+            showPetDetail = false;
+            selectedPetIdx = -1;
+        }
+        DrawTabBar(renderer);
+        DrawTabPage(renderer, petEntries, "Pets");
         return;
     }
 
@@ -845,13 +911,14 @@ void Wiki::Draw(GRenderer& renderer)
         case WikiTab::Areas:     DrawTabPage(renderer, areaEntries, "Areas"); break;
         case WikiTab::Sets:      DrawTabPage(renderer, setEntries, "Set Bonuses"); break;
         case WikiTab::Uniques:   DrawTabPage(renderer, uniqueEntries, "Unique Items"); break;
+        case WikiTab::Pets:      DrawTabPage(renderer, petEntries, "Pets"); break;
         default: break;
     }
 }
 
 void Wiki::DrawTabBar(GRenderer& renderer)
 {
-    const char* tabNames[] = { "Equipment", "Skills", "Enemies", "Resources", "Crafting", "Areas", "Sets", "Uniques" };
+    const char* tabNames[] = { "Equipment", "Skills", "Enemies", "Resources", "Crafting", "Areas", "Sets", "Uniques", "Pets" };
     int tabCount = static_cast<int>(WikiTab::COUNT);
     int tabW = 90;
     int startX = renderer.CenterX(tabCount * tabW);
@@ -1122,6 +1189,12 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
             renderer.DrawText("Stats / Passives", colX[2], y, 14, headerColor);
             renderer.DrawText("Source / Set", colX[3], y, 14, headerColor);
             break;
+        case WikiTab::Pets:
+            renderer.DrawText("Pet", colX[0], y, 14, headerColor);
+            renderer.DrawText("Element", colX[1], y, 14, headerColor);
+            renderer.DrawText("Info", colX[2], y, 14, headerColor);
+            renderer.DrawText("Source", colX[3], y, 14, headerColor);
+            break;
         default: break;
     }
 
@@ -1146,8 +1219,8 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
         if (isFocused)
             renderer.DrawRect(38, y - 1, GRenderer::W - 76, lineH + 1, CQColors::BtnHover);
 
-        // Make enemy entries clickable
-        bool isClickable = (currentTab == WikiTab::Enemies);
+        // Make enemy and pet entries clickable
+        bool isClickable = (currentTab == WikiTab::Enemies || currentTab == WikiTab::Pets);
         bool isRowHover = isClickable && renderer.IsMouseInRect(38, y - 1, GRenderer::W - 76, lineH + 1);
         if (isRowHover)
             renderer.DrawRect(38, y - 1, GRenderer::W - 76, lineH + 1, CQColors::BtnHover);
@@ -1176,6 +1249,26 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
             }
         }
 
+        // Pet obtained/undiscovered visual treatment
+        if (currentTab == WikiTab::Pets)
+        {
+            bool obtained = IsPetObtained(e.name);
+            if (obtained)
+            {
+                namePrefix = "";
+                textColor.r = std::min(255, static_cast<int>(textColor.r * 1.15f));
+                textColor.g = std::min(255, static_cast<int>(textColor.g * 1.15f));
+                textColor.b = std::min(255, static_cast<int>(textColor.b * 1.15f));
+            }
+            else
+            {
+                namePrefix = "??? ";
+                textColor.r = static_cast<unsigned char>(textColor.r * 0.5f);
+                textColor.g = static_cast<unsigned char>(textColor.g * 0.5f);
+                textColor.b = static_cast<unsigned char>(textColor.b * 0.5f);
+            }
+        }
+
         // Draw name (truncate if needed)
         std::string name = namePrefix + e.name;
         int maxNameW = colW[0] - 5;
@@ -1199,12 +1292,20 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
         else if (!e.source.empty())
             renderer.DrawText(e.source, colX[3], y, 12, CQColors::TextDim);
 
-        // Handle click or Enter on enemy row
+        // Handle click or Enter on enemy/pet row
         if (isClickable && ((isRowHover && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
             || (isFocused && IsKeyPressed(KEY_ENTER))))
         {
-            selectedEnemyIdx = i;
-            showEnemyDetail = true;
+            if (currentTab == WikiTab::Enemies)
+            {
+                selectedEnemyIdx = i;
+                showEnemyDetail = true;
+            }
+            else if (currentTab == WikiTab::Pets)
+            {
+                selectedPetIdx = i;
+                showPetDetail = true;
+            }
         }
 
         y += lineH + rowLimit;
@@ -1316,7 +1417,7 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
         else if (nameLower.find("void") != std::string::npos || nameLower.find("cosmic") != std::string::npos
                  || nameLower.find("nether") != std::string::npos)
         {
-            renderer.DrawText("Arcane/void damage. High stats — bring your best gear.", dx + 10, dy, 13, CQColors::TextDim);
+            renderer.DrawText("Arcane/void damage. High stats - bring your best gear.", dx + 10, dy, 13, CQColors::TextDim);
             dy += 20;
             renderer.DrawText("UseDefend to mitigate heavy hits. Stack defensive passives.", dx + 10, dy, 13, CQColors::TextDim);
         }
@@ -1334,7 +1435,7 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
                  || nameLower.find("primordial") != std::string::npos || nameLower.find("construct") != std::string::npos
                  || nameLower.find("chronos") != std::string::npos)
         {
-            renderer.DrawText("BOSS — Powerful enemy with special abilities.", dx + 10, dy, 13, CQColors::TextRed);
+            renderer.DrawText("BOSS - Powerful enemy with special abilities.", dx + 10, dy, 13, CQColors::TextRed);
             dy += 20;
             renderer.DrawText("May heal or use devastating skills. Bring potions and best gear.", dx + 10, dy, 13, CQColors::TextDim);
         }

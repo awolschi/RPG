@@ -171,4 +171,23 @@ CMakeFiles/rpg.dir/Skills/ClassSkills/Merchant/Merchant.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Items/Equipment/../Item.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Items/Equipment/../../Skills/Skill.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Skills/Skills.hpp \
- /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Skills/Skill.hpp
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Skills/Skill.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/Player.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/Character.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Characters/Classes/Classes.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Characters/Classes/../Stats/Stats.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Characters/Classes/../../Items/Item.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Characters/Races/Races.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Characters/Races/../Stats/Stats.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Inventory/Inventory.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Inventory/../Items/Item.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Items/Item.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Jobs/JobSystem.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Jobs/Job.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Jobs/../Items/Resources/Resources.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Jobs/../Items/Resources/../Item.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Jobs/JobPerk.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Jobs/JobSpecialization.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Jobs/JobSkillTree.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Jobs/ResourceChain.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../World/Quests/Quest.hpp

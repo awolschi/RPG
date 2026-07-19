@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include "Job.hpp"
+#include "JobSkillTree.hpp"
 #include "ResourceChain.hpp"
 
 class Inventory;
@@ -64,9 +65,16 @@ public:
     std::string SerializePerks() const;
     void DeserializePerks(const std::string& data);
 
+    // Skill tree
+    JobSkillTree& GetSkillTree() { return skillTree; }
+    const JobSkillTree& GetSkillTree() const { return skillTree; }
+    std::string SerializeSkillTree() const;
+    void DeserializeSkillTree(const std::string& data);
+
 private:
     std::vector<Job> jobs;
     ResourceChainSystem resourceChain;
+    JobSkillTree skillTree;
     std::vector<JobSynergy> synergies;
     int totalHoursWorked = 0;
     Job* FindJob(JobType type);

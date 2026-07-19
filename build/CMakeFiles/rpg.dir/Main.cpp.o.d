@@ -187,25 +187,31 @@ CMakeFiles/rpg.dir/Main.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/../Items/Resources/../Item.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/JobPerk.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/JobSpecialization.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/JobSkillTree.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/ResourceChain.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../World/Quests/Quest.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/Religion.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Quests/Quest.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Achievements/Achievement.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Factions/FactionReputation.hpp \
+ /usr/include/c++/10/functional /usr/include/c++/10/bits/std_function.h \
+ /usr/include/c++/10/unordered_map /usr/include/c++/10/bits/hashtable.h \
+ /usr/include/c++/10/bits/hashtable_policy.h /usr/include/c++/10/limits \
+ /usr/include/c++/10/bits/unordered_map.h \
+ /usr/include/c++/10/bits/stl_algo.h \
+ /usr/include/c++/10/bits/algorithmfwd.h \
+ /usr/include/c++/10/bits/stl_heap.h \
+ /usr/include/c++/10/bits/uniform_int_dist.h \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Factions/Pet.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Factions/../Skills/Skill.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Factions/../Characters/Character.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Factions/FactionReputation.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/Wiki.hpp \
  /usr/include/c++/10/set /usr/include/c++/10/bits/stl_set.h \
  /usr/include/c++/10/bits/stl_multiset.h \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Graphics/GRenderer.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Graphics/TextureManager.hpp \
- /usr/include/c++/10/unordered_map /usr/include/c++/10/bits/hashtable.h \
- /usr/include/c++/10/bits/hashtable_policy.h /usr/include/c++/10/limits \
- /usr/include/c++/10/bits/unordered_map.h \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Areas/Area.hpp \
- /usr/include/c++/10/functional /usr/include/c++/10/bits/std_function.h \
- /usr/include/c++/10/bits/stl_algo.h \
- /usr/include/c++/10/bits/algorithmfwd.h \
- /usr/include/c++/10/bits/stl_heap.h \
- /usr/include/c++/10/bits/uniform_int_dist.h \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Areas/../../Characters/Monster.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Areas/../../Characters/Character.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Classes/Classes.hpp \

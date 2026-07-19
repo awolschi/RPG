@@ -1,7 +1,22 @@
 #include "Combat.hpp"
 #include "../Items/Passives.hpp"
+#include "../Characters/Character.hpp"
 #include <sstream>
 #include <cstdlib>
+
+namespace {
+    // Roll a critical hit using the attacker's pet bonus crit chance.
+    // Returns the crit damage multiplier (e.g. 1.0 normal, 1.5 crit w/ 50% bonus).
+    float PetCritMultiplier(const Character& attacker)
+    {
+        float chance = attacker.GetPetBonusCritChance();
+        if (chance <= 0.0f) return 1.0f;
+        int rolled = rand() % 1000;
+        if (rolled < static_cast<int>(chance * 1000.0f))
+            return 1.5f + attacker.GetPetBonusCritDamage();
+        return 1.0f;
+    }
+}
 
 bool CombatSystem::StartCombat(std::shared_ptr<Character> player,
                                std::shared_ptr<Character> enemy)
@@ -75,6 +90,22 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
                 {
                     int bonusDmg = baseDmg * physBoost / 100;
                     defender->TakeDamage(bonusDmg, ElementType::Physical);
+                }
+
+                // Pet damage bonus + crit roll (applied as bonus hit)
+                float petDmgPct = attacker->GetPetBonusDamage();
+                float critMult = PetCritMultiplier(*attacker);
+                int afterPhys = defender->GetCurrentHealth();
+                int dealtSoFar = hpBefore - afterPhys;
+                if (dealtSoFar > 0 && (petDmgPct > 0.0f || critMult > 1.0f))
+                {
+                    int bonusDmg = static_cast<int>(dealtSoFar * petDmgPct * critMult);
+                    if (bonusDmg > 0)
+                    {
+                        defender->TakeDamage(bonusDmg, ElementType::Physical);
+                        if (critMult > 1.0f)
+                            actionMsg += " (CRITICAL pet strike +" + std::to_string(bonusDmg) + ")";
+                    }
                 }
 
                 attacker->GetSkills().UpdateCooldowns();
@@ -163,6 +194,23 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
                 int bonusDmg = (-diff) * spellBoost / 100;
                 defender->TakeDamage(bonusDmg, effective);
                 actionMsg += " (+" + std::to_string(bonusDmg) + " spell boost)";
+            }
+
+            // Pet damage bonus + crit roll for damage-dealing skills
+            float petDmgPct = attacker->GetPetBonusDamage();
+            float critMult = PetCritMultiplier(*attacker);
+            if (diff < 0 && (petDmgPct > 0.0f || critMult > 1.0f))
+            {
+                int baseSkillDmg = -diff;
+                int bonusDmg = static_cast<int>(baseSkillDmg * petDmgPct * critMult);
+                if (bonusDmg > 0)
+                {
+                    defender->TakeDamage(bonusDmg, effective);
+                    if (critMult > 1.0f)
+                        actionMsg += " (CRITICAL pet +" + std::to_string(bonusDmg) + ")";
+                    else
+                        actionMsg += " (pet +" + std::to_string(bonusDmg) + ")";
+                }
             }
 
             // Lifesteal on skill

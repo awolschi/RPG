@@ -1,36 +1,167 @@
-SAVE_VERSION 3
-Kowalle4
+SAVE_VERSION 8
+Kowallenheine
 4
-2
-1 75
-110 110
-110 110 6 6 7 8 6 5
-0 49
-none
-none
-none
-none
-none
-none
-none
-none
-none
-none
-2
-Attack|1|19|0|25|0|6|0|0|0|0|0|0
-Throw Coin|1|14|0|35|0|6|0|0|0|0|0|0
-1
-Throw Coin
-4
-0 1 0 0 0
-0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-1 1 0 0 0
-0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-2 1 0 0 0
-0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-3 1 0 0 0
-0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0
+34 12747
+744 413
+506 308 39 74 71 74 37 39
+124 3531733
+27|5|Feather|1|5|R|1|0|0|0
+22|5|Slime Gel|1|5|R|1|0|0|0
+12|5|Rat Tail|1|5|R|1|0|0|0
+26|3|Refreshing Draft|2|10|C|33|23
+26|3|Mana Potion|2|10|C|0|58
+31|3|Minor Health Potion|1|10|C|35|0
+34|3|Health Potion|2|10|C|70|0
+24|3|Minor Mana Potion|1|10|C|0|24
+8|5|Bandit Mask|1|5|R|1|0|0|0
+20|5|Farm Key|3|15|R|3|0|0|0
+1|1|Straw-Filled Vest|5|10|A|0|1|15|1|2|3
+1|1|Scarecrow's Hood|5|10|A|0|0|12|1|1|5
+1|0|Rusty Spellgrimoire|5|10|W|35|30|0|0
+7|5|Ectoplasm|2|10|R|2|0|0|0
+8|5|Ancient Bark|2|10|R|2|0|0|0
+19|5|Wolf Pelt|2|10|R|2|0|0|0
+13|5|Treant Heart|4|20|R|4|0|0|0
+12|5|Spider Silk|2|10|R|2|0|0|0
+8|5|Elf Arrow|2|10|R|2|0|0|0
+19|5|Boar Tusk|2|10|R|2|0|0|0
+1|1|Hood of the Frozen Eye|4|100|A|0|0|18|1|2|8
+1|0|Overseer's Cleaver|5|10|W|55|5|0|0
+1|2|Ring of Mana|3|10|AC|0|42|0|0
+2|2|Circlet of Withered Dreams|4|100|AC|50|82|4|18
+1|2|Venom Band|3|10|AC|70|42|5|10
+1|1|Seedkeeper Boots|5|250|A|0|4|9|1|5|6
+6|5|Gryphon Plume|5|25|R|5|0|0|0
+16|5|Earth Essence|5|25|R|5|0|0|0
+8|5|Warrior Emblem|5|25|R|5|0|0|0
+7|5|Phantom Shard|5|25|R|5|0|0|0
+1|2|Pendant of Wisdom|3|10|AC|0|70|0|0
+12|5|Warlord Crest|7|35|R|7|0|0|0
+1|1|Crown of Thorns|5|10|A|0|0|18|1|1|8
+1|0|Living Root Bow|5|10|W|75|15|5|20
+1|2|Frost Pendant|2|10|AC|40|41|2|4
+31|5|Copper Ore|1|5|R|1|0|0|0
+30|5|Wood|1|4|R|1|0|0|0
+28|5|Raw Fish|1|6|R|1|0|20|0
+31|5|Simple Ingot|1|8|R|1|0|0|0
+1|5|Iron Ore|1|10|R|1|0|0|0
+1|5|Oak Wood|1|9|R|1|0|0|0
+4|5|Salmon|1|12|R|1|0|30|6
+1|2|Seal of Power|4|10|AC|80|60|0|0
+1|2|Ring of Mana|3|10|AC|0|58|0|0
+2|0|Shortbow|1|10|W|34|0|0|0
+1|0|Venomfang Dagger|2|10|W|82|18|5|23
+1|1|Scholar's Circlet|2|10|A|0|0|17|1|1|9
+1|0|Crystal Staff|2|10|W|80|25|2|28
+1|0|Holy Scepter|2|10|W|84|23|6|28
+1|0|Soul Reaper|3|10|W|98|18|5|23
+2|1|Leather Helmet|1|10|A|1|0|8|1|6|12
+1|0|Thunderstrike|3|10|W|99|34|3|29
+1|1|Dragon Helm|3|10|A|2|0|32|0
+1|2|Storm Amulet|3|10|AC|85|78|3|11
+1|0|Shadowfang|2|10|W|88|13|5|20
+1|1|Leather Pants|1|10|A|1|3|8|1|5|11
+1|0|Arcane Wand|2|10|W|78|30|2|19
+1|1|Elemental Robe|2|10|A|0|1|17|1|6|8
+1|1|Elemental Leggings|2|10|A|0|3|17|1|6|8
+1|0|Enchanted Blade|2|10|W|80|15|6|29
+1|0|Runed Greatsword|2|10|W|90|15|5|18
+1|1|Sandals of Transcendence|3|10|A|0|4|26|1|6|11
+1|0|Doomhammer|3|10|W|104|29|5|29
+1|1|Dragon Helm|3|10|A|1|0|32|1|5|17
+2|2|Ember Ring|3|10|AC|75|68|1|15
+1|1|Coin-Lord's Crown|5|10|A|0|0|20|6|1|5|2|5|3|5|4|5|5|5|6|5
+2|0|Training Staff|1|10|W|35|8|2|9
+1|1|Leggings of the Storm|4|100|A|0|3|23|1|3|11
+1|0|Thunderstrike|3|10|W|83|28|3|23
+1|1|Reinforced Helm|2|10|A|1|0|17|1|3|13
+1|0|Inferno Axe|2|10|W|88|15|1|29
+1|0|Thunder Bow|2|10|W|83|20|1|21
+1|0|Frostbite|3|10|W|81|33|2|23
+1|0|Fire Staff|2|10|W|85|20|1|24
+1|0|Spellbook|1|10|W|32|14|3|13
+1|1|Elemental Handwraps|2|10|A|0|2|17|1|1|8
+1|0|Thunderstrike Hammer|2|10|W|90|12|3|29
+1|0|Scepter of Stars|3|10|W|99|54|6|29
+1|1|Sandals of Transcendence|3|10|A|0|4|32|1|1|10
+1|1|Boots of Swiftness|3|10|A|1|4|26|0
+1|0|Doomhammer|3|10|W|88|23|5|23
+1|0|Dagger|1|10|W|31|0|0|0
+1|1|Leather Boots|1|10|A|1|4|8|0
+1|0|Soul Reaper|3|10|W|114|24|5|29
+1|1|Leggings of Eternity|3|10|A|0|3|32|1|6|17
+1|0|Wooden Staff|1|10|W|38|18|0|0
+1|1|Leather Pants|1|10|A|1|3|9|1|1|12
+1|0|Dagger|1|10|W|35|0|0|0
+2|0|Fire Staff|2|10|W|97|22|1|29
+1|1|Scholar's Circlet|2|10|A|0|0|19|1|3|13
+1|0|Scepter of Stars|3|10|W|91|51|6|26
+1|1|Gauntlets of Power|3|10|A|2|2|29|0
+1|0|Inferno Axe|2|10|W|100|17|1|30
+1|1|Reinforced Chest|2|10|A|1|1|19|0
+1|0|Soul Reaper|3|10|W|122|27|5|32
+1|1|Dragon Helm|3|10|A|1|0|35|1|2|19
+1|0|Shortbow|1|10|W|38|0|0|0
+1|1|Elemental Handwraps|2|10|A|0|2|19|1|6|9
+1|0|Doomhammer|3|10|W|96|26|5|26
+1|1|Leather Gloves|1|10|A|1|2|9|0
+2|1|Boots of Swiftness|3|10|A|1|4|29|0
+1|0|Training Staff|1|10|W|39|13|0|0
+1|0|Crystal Staff|2|10|W|92|27|1|19
+1|0|Staff of Ages|3|10|W|102|62|1|32
+1|1|Gauntlets of Power|3|10|A|2|2|35|1|5|16
+1|0|Spellbook|1|10|W|36|24|3|13
+1|1|Cloth Boots|1|10|A|0|4|9|0
+1|0|Apprentice Wand|1|10|W|37|16|0|0
+1|1|Reinforced Gloves|2|10|A|1|2|19|1|1|12
+1|1|Plate Armor|2|10|A|2|1|19|0
+1|0|Shadowfang|2|10|W|100|15|1|21
+2|0|Frost Staff|2|10|W|94|25|2|21
+2|0|Legendary Sword|2|10|W|92|17|2|20
+1|0|Scepter of Stars|3|10|W|107|57|6|32
+1|1|Boots of Swiftness|3|10|A|1|4|35|0
+1|2|Amulet of the Sage|3|10|AC|45|132|0|0
+1|0|Celestial Bow|3|10|W|94|46|6|26
+1|0|Runed Greatsword|2|10|W|102|17|6|30
+1|0|Voidreaver|3|10|W|117|47|4|32
+1|1|Crown of the Archmage|3|10|A|0|0|35|0
+2|0|Arcane Staff|3|10|W|81|51|4|26
+1|1|Reinforced Boots|2|10|A|1|4|19|1|2|11
+1|1|Elemental Robe|2|10|A|0|1|19|1|3|9
+1|0|Voidreaver|3|10|W|101|41|4|26
+1|0|Voidreaver|3|10|W|101|41|4|26
+1|0|Pitchfork of the Fields|5|10|W|50|0|0|0
+1|1|Warlord's Helm|5|10|A|2|0|30|1|3|10
+1|1|Merchant Prince's Vest|5|10|A|0|1|30|6|1|8|2|8|3|8|4|8|5|8|6|8
+1|1|Gloves of Arcane Weaving|4|10|A|0|2|18|1|4|8
+1|1|Rootwalker Leggings|5|10|A|0|3|12|1|2|5
+1|1|Seedkeeper Boots|5|10|A|0|4|9|1|5|6
+1|2|Ring of Living Wood|5|10|AC|50|25|0|0
+1|2|Gilded Signet|5|10|AC|80|40|4|10
+1|2|Amulet of Broken Chains|5|10|AC|60|40|0|0
+6
+Attack|5|287|0|42|4|6|0|0|0|0|0|0
+Appraise|1|0|0|0|0|6|0|0|0|0|0|0
+Haggle|1|2|0|0|0|6|0|0|0|0|0|0
+Bribery|1|0|0|60|0|6|0|0|0|0|0|0
+Invest|1|0|0|0|0|6|0|0|0|0|0|0
+Coin Storm|1|0|0|35|0|6|0|0|0|0|0|0
+4
+Appraise
+Haggle
+Bribery
+Invest
+4
+0 5 33 4 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+1 5 59 4 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+2 5 98 4 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+3 4 117 3 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+6
 0
 0
 0
@@ -67,4 +198,6 @@ Citadel Siege|2|Storm The Citadel and face the corrupted knights within.|The Cit
 Abyssal Victory|2|The Abyssal Depths test even the strongest. Survive and emerge triumphant.|Abyssal Depths|1|0|1500|750|0|0
 Heavenly Ascent|2|The Heavenly Ascent challenges body and spirit. Ascend to glory.|The Heavenly Ascent|1|0|3000|1500|0|0
 Void Conqueror|2|The Endless Void consumes all who enter. Be the one who conquers it.|The Endless Void|1|0|5000|2500|0|0
-9|combat_first_kill,1,1,1|combat_kills_10,2,0,0|combat_kills_100,2,0,0|combat_kills_1000,2,0,0|combat_kills_50,2,0,0|combat_kills_500,2,0,0|gold_1000,49,0,0|gold_10000,49,0,0|gold_100000,49,0,0 0000
+21|combat_boss_1,1,1,1|combat_boss_10,10,1,1|combat_boss_5,5,1,1|combat_first_kill,1,1,1|combat_kills_10,10,1,1|combat_kills_100,100,1,1|combat_kills_1000,386,0,0|combat_kills_50,50,1,1|combat_kills_500,386,0,0|explore_3_areas,3,1,1|explore_6_areas,6,1,1|explore_all_areas,7,0,0|gold_1000,1000,1,1|gold_10000,10000,1,1|gold_100000,100000,1,1|job_hours_100,100,1,1|job_hours_1000,120,0,0|job_hours_500,120,0,0|level_10,0,0,0|level_25,0,0,0|level_50,0,0,0 0000
+0:1516:5:1516;1:1716:5:1716;2:0:0:0;3:0:0:0;4:1539:5:1539;5:0:0:0;6:12:0:12;7:0:0:0;8:0:0:0;9:0:0:0;
+ember_sentinel:1:0:1:0:0;frost_wisp:1:0:1:0:0;storm_tide:0:0:1:0:0;arcane_drake:0:0:1:0:0;venom_shard:1:0:1:0:0;inferno_guardian:0:0:1:0:0;celestial_spark:0:0:1:0:0;void_mote:0:0:1:0:0;mana_weaver:0:0:1:0:0;chrono_spark:0:0:1:0:0;goblin_familiar:1:1:48:4054:2;treant_sapling:1:0:1:0:0;kraken_ink:0:0:1:0:0;dragon_whelp:0:0:1:0:0;warlord_banner:0:0:1:0:0;void_shard:0:0:1:0:0;seraph_feather:0:0:1:0:0;primordial_heart:0:0:1:0:0;construct_core:0:0:1:0:0;chrono_fragment:0:0:1:0:0;
