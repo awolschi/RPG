@@ -17,6 +17,11 @@ int Equipment::GetWeaponDamage() const
 {
     int dmg = 0;
     if (weapon) dmg += weapon->damage;
+    if (offhand)
+    {
+        if (auto w = std::dynamic_pointer_cast<Weapon>(offhand))
+            dmg += w->damage;
+    }
     return dmg;
 }
 

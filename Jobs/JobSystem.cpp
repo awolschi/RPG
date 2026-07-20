@@ -47,6 +47,37 @@ std::string JobSystem::WorkJob(JobType type, int hours, Inventory& inventory, Ac
     if (!job)
         return "Job not found!";
 
+    const WeatherEffect& weather = environment.GetEffect();
+    LocationUpgrades& locUpgrades = locationUpgrades;
+
+    float speedBonus = skillTree.GetSpeedBonus(type) + locUpgrades.GetTotalSpeedBonus();
+    float fatigueReduction = skillTree.GetFatigueReduction(type) + locUpgrades.GetTotalFatigueReduction();
+    float qualityBonus = skillTree.GetQualityBonus(type) + locUpgrades.GetTotalQualityBonus();
+    float rareFindBonus = skillTree.GetRareFindBonus(type) + locUpgrades.GetTotalRareFindBonus();
+    float doubleChanceBonus = skillTree.GetDoubleChanceBonus(type);
+    float xpBonusMult = skillTree.GetXPBonus(type) + locUpgrades.GetTotalXPBonus();
+    float sellValueBonus = skillTree.GetSellValueBonus(type);
+    bool hasAutoPickup = skillTree.HasAutoPickup(type);
+    bool hasPerfectQuality = skillTree.HasPerfectQuality(type);
+    bool hasLegendaryQuality = skillTree.HasLegendaryQuality(type);
+    bool hasUltraRare = skillTree.HasUltraRare(type);
+    bool hasMythical = skillTree.HasMythicalItems(type);
+
+    // Apply weather modifiers
+    speedBonus += (weather.speedMod - 1.0f);
+    fatigueReduction += (weather.fatigueMod - 1.0f);
+    qualityBonus += (weather.qualityMod - 1.0f);
+    rareFindBonus += (weather.rareFindMod - 1.0f);
+    float weatherXpMult = weather.xpMod;
+
+    // Speed bonus: reduce effective hours
+    int effectiveHours = hours;
+    if (speedBonus > 0.0f)
+    {
+        int saved = static_cast<int>(hours * speedBonus);
+        if (saved > 0) effectiveHours = std::max(1, hours - saved);
+    }
+
     std::string result = "You worked as a " + job->GetJobName() + " for " + std::to_string(hours) + " hours.\n";
 
     int collected = 0;
@@ -59,15 +90,35 @@ std::string JobSystem::WorkJob(JobType type, int hours, Inventory& inventory, Ac
     if (achSystem)
         achJobXPBonus = achSystem->GetJobXPBonusByTier();
 
-    for (int i = 0; i < hours; ++i)
+    for (int i = 0; i < effectiveHours; ++i)
     {
+        // Apply fatigue reduction
+        if (fatigueReduction > 0.0f)
+        {
+            int reduced = static_cast<int>(2 * fatigueReduction);
+            if (reduced > 0) job->ReduceFatigue(reduced);
+        }
+
         auto resource = job->CollectResource();
         if (resource && inventory.AddItem(resource))
         {
             collected++;
 
-            // Double chance roll (from perks)
-            int doubleChance = job->GetDoubleChance();
+            // Apply quality bonus from skill tree
+            if (qualityBonus > 0.0f && (rand() % 100) < static_cast<int>(qualityBonus * 100.0f))
+            {
+                resource->quality = static_cast<ResourceQuality>(
+                    std::min(static_cast<int>(resource->quality) + 1, static_cast<int>(ResourceQuality::Masterwork)));
+            }
+
+            // Apply sell value bonus from skill tree
+            if (sellValueBonus > 0.0f)
+            {
+                resource->sellValue = static_cast<int>(resource->sellValue * (1.0f + sellValueBonus));
+            }
+
+            // Double chance roll (from perks + skill tree)
+            int doubleChance = job->GetDoubleChance() + static_cast<int>(doubleChanceBonus * 100.0f);
             if (doubleChance > 0 && (rand() % 100) < doubleChance)
             {
                 auto bonus = job->CollectResource();
@@ -89,17 +140,52 @@ std::string JobSystem::WorkJob(JobType type, int hours, Inventory& inventory, Ac
                 }
             }
 
-            // Rare find roll
-            int rareChance = job->GetRareFindChance();
+            // Rare find roll (from perks + skill tree)
+            int rareChance = job->GetRareFindChance() + static_cast<int>(rareFindBonus * 100.0f);
             if (rareChance > 0 && (rand() % 100) < rareChance)
             {
-                // Create a rare variant worth 3x normal value
                 auto rare = std::make_shared<Resource>(
                     "Rare " + resource->name, resource->tier + 1,
                     resource->sellValue * 3);
                 if (inventory.AddItem(rare))
                 {
                     rares++;
+                }
+            }
+
+            // Legendary quality from skill tree
+            if (hasLegendaryQuality && (rand() % 100) < 5)
+            {
+                auto legendary = std::make_shared<Resource>(
+                    "Legendary " + resource->name, resource->tier + 2,
+                    resource->sellValue * 5);
+                if (inventory.AddItem(legendary))
+                {
+                    result += "Legendary " + resource->name + " discovered!\n";
+                }
+            }
+
+            // Ultra-rare from skill tree
+            if (hasUltraRare && (rand() % 100) < 3)
+            {
+                auto ultra = std::make_shared<Resource>(
+                    "Ultra-Rare " + resource->name, resource->tier + 3,
+                    resource->sellValue * 8);
+                if (inventory.AddItem(ultra))
+                {
+                    result += "Ultra-Rare " + resource->name + " discovered!\n";
+                }
+            }
+
+            // Mythical from skill tree
+            if (hasMythical && (rand() % 100) < 1)
+            {
+                auto myth = std::make_shared<Resource>(
+                    "Mythical " + resource->name, resource->tier + 4,
+                    resource->sellValue * 15);
+                if (inventory.AddItem(myth))
+                {
+                    result += "Mythical " + resource->name + " discovered!\n";
                 }
             }
         }
@@ -110,6 +196,20 @@ std::string JobSystem::WorkJob(JobType type, int hours, Inventory& inventory, Ac
         result += "Double bonuses: " + std::to_string(doubles) + " extra!\n";
     if (rares > 0)
         result += "Rare finds: " + std::to_string(rares) + "!\n";
+
+    // Apply XP bonus from skill tree + weather
+    float totalXpMult = xpBonusMult + (weatherXpMult - 1.0f);
+    if (totalXpMult > 0.0f && collected > 0)
+    {
+        int baseXPPerResource = 10 + job->level * 2;
+        int totalBaseXP = baseXPPerResource * collected;
+        int xpBonus = static_cast<int>(totalBaseXP * totalXpMult);
+        if (xpBonus > 0)
+        {
+            job->GainXP(xpBonus);
+            result += "[Bonus] XP Bonus: +" + std::to_string(xpBonus) + " XP!\n";
+        }
+    }
 
     // Apply achievement job XP bonus
     if (achJobXPBonus > 0.0f && collected > 0)

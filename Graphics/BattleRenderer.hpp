@@ -23,7 +23,12 @@ namespace BattleRenderer
                           bool isBoss,
                           const std::string& battleMessage = "",
                           const PetManager* petManager = nullptr,
-                          int playerLevel = 1);
+                          int playerLevel = 1,
+                          int playerXP = 0,
+                          int playerMaxXP = 0,
+                          int reputationValue = 0,
+                          int reputationMax = 0,
+                          const std::string& repLabel = "");
 
     void DrawAbilityButton(GRenderer& renderer,
                            const std::string& label,
@@ -35,7 +40,9 @@ namespace BattleRenderer
                        const std::string& name,
                        int currentHP, int maxHP,
                        int currentMP, int maxMP,
-                       int y);
+                       int y,
+                       int currentXP = 0,
+                       int maxXP = 0);
 }
 
 #endif

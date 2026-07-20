@@ -71,8 +71,8 @@ static std::shared_ptr<Item> CreateWeaponOfRarity(int rarity, int difficulty)
         case 1: return LootTable::CreateCommonWeapon(difficulty);
         case 2: return LootTable::CreateRareWeapon(difficulty);
         case 3: return LootTable::CreateBossWeapon(difficulty);
-        case 4: return LootTable::CreateBossWeapon(difficulty + 2);
-        case 5: return LootTable::CreateBossWeapon(difficulty + 4);
+        case 4: return LootTable::CreateEpicWeapon(difficulty);
+        case 5: return LootTable::CreateLegendaryWeapon(difficulty);
         default: return LootTable::CreateCommonWeapon(difficulty);
     }
 }
@@ -84,8 +84,8 @@ static std::shared_ptr<Item> CreateArmorOfRarity(int rarity, int difficulty)
         case 1: return LootTable::CreateCommonArmor(difficulty);
         case 2: return LootTable::CreateRareArmor(difficulty);
         case 3: return LootTable::CreateBossArmor(difficulty);
-        case 4: return LootTable::CreateBossArmor(difficulty + 2);
-        case 5: return LootTable::CreateBossArmor(difficulty + 4);
+        case 4: return LootTable::CreateEpicArmor(difficulty);
+        case 5: return LootTable::CreateLegendaryArmor(difficulty);
         default: return LootTable::CreateCommonArmor(difficulty);
     }
 }
@@ -157,7 +157,7 @@ std::vector<std::shared_ptr<Item>> LootTable::GenerateBossLoot(int difficulty, i
 
 std::shared_ptr<Item> LootTable::CreateCommonWeapon(int difficulty)
 {
-    int dmg = 12 + (difficulty * 4);
+    int dmg = 10 + (difficulty * 4);
     int mana = rand() % (difficulty * 2);
     ElementType elem = (rand() % 3 == 0) ? RandomElement() : ElementType::Physical;
     int elemDmg = (elem != ElementType::Physical) ? 2 + difficulty + rand() % (difficulty + 2) : 0;
@@ -177,7 +177,7 @@ std::shared_ptr<Item> LootTable::CreateCommonWeapon(int difficulty)
 
 std::shared_ptr<Item> LootTable::CreateCommonArmor(int difficulty)
 {
-    int def = 2 + difficulty;
+    int def = 1 + difficulty;
     ArmorType type = (rand() % 2 == 0) ? ArmorType::Leather : ArmorType::Cloth;
     ArmorPiece piece = static_cast<ArmorPiece>(rand() % 5);
     std::string name;
@@ -233,7 +233,7 @@ std::shared_ptr<Item> LootTable::CreateRareWeapon(int difficulty)
 
 std::shared_ptr<Item> LootTable::CreateRareArmor(int difficulty)
 {
-    int def = 5 + (difficulty * 2);
+    int def = 3 + (difficulty * 2);
     int roll = rand() % 5;
     ArmorType type;
     if (roll == 0) type = ArmorType::Plate;
@@ -301,10 +301,10 @@ std::shared_ptr<Item> LootTable::CreateRareArmor(int difficulty)
 
 std::shared_ptr<Item> LootTable::CreateBossWeapon(int difficulty)
 {
-    int dmg = 30 + (difficulty * 8);
+    int dmg = 20 + (difficulty * 16);
     int mana = 10 + (difficulty * 3);
     int rarity = 3;
-    int elemDmg = 5 + difficulty * 3;
+    int elemDmg = 5 + difficulty * 4;
     switch (rand() % 12)
     {
         case 0: return std::make_shared<Weapon>("Flamebrand", dmg, mana, rarity, ElementType::Fire, elemDmg, WeaponType::Sword);
@@ -325,7 +325,7 @@ std::shared_ptr<Item> LootTable::CreateBossWeapon(int difficulty)
 
 std::shared_ptr<Item> LootTable::CreateBossArmor(int difficulty)
 {
-    int def = 8 + (difficulty * 3);
+    int def = 6 + (difficulty * 3);
     int rarity = 3;
     int roll = rand() % 3;
     ArmorType type;
@@ -357,6 +357,159 @@ std::shared_ptr<Item> LootTable::CreateBossArmor(int difficulty)
         }
     }
     return std::make_shared<Armor>(name, type, piece, def, rarity, RandomElementalResist(difficulty));
+}
+
+// ---- Epic ----
+
+std::shared_ptr<Item> LootTable::CreateEpicWeapon(int difficulty)
+{
+    int dmg = 35 + (difficulty * 28);
+    int mana = 15 + (difficulty * 5);
+    int rarity = 4;
+    int elemDmg = 10 + difficulty * 6;
+    switch (rand() % 14)
+    {
+        case 0: return std::make_shared<Weapon>("Inferno Greatsword", dmg + 10, mana, rarity, ElementType::Fire, elemDmg, WeaponType::Sword);
+        case 1: return std::make_shared<Weapon>("Glacial Halberd", dmg + 8, mana + 10, rarity, ElementType::Ice, elemDmg, WeaponType::Sword);
+        case 2: return std::make_shared<Weapon>("Stormcaller's Hammer", dmg + 15, mana + 5, rarity, ElementType::Lightning, elemDmg, WeaponType::Hammer);
+        case 3: return std::make_shared<Weapon>("Plaguebringer's Scythe", dmg + 20, mana - 5, rarity, ElementType::Poison, elemDmg + 5, WeaponType::Axe);
+        case 4: return std::make_shared<Weapon>("Arcane Dominance Staff", dmg - 2, mana + 40, rarity, ElementType::Arcane, elemDmg, WeaponType::Staff);
+        case 5: return std::make_shared<Weapon>("Celestial Longbow", dmg + 12, mana + 20, rarity, ElementType::Holy, elemDmg, WeaponType::Bow);
+        case 6: return std::make_shared<Weapon>("Soulreaver", dmg + 25, mana - 10, rarity, ElementType::Fire, elemDmg + 3, WeaponType::Axe);
+        case 7: return std::make_shared<Weapon>("Eternal Frost Staff", dmg, mana + 35, rarity, ElementType::Ice, elemDmg + 2, WeaponType::Staff);
+        case 8: return std::make_shared<Weapon>("Thunderfury", dmg + 18, mana + 15, rarity, ElementType::Lightning, elemDmg, WeaponType::Sword);
+        case 9: return std::make_shared<Weapon>("Wand of Worlds", dmg - 5, mana + 50, rarity, ElementType::Arcane, elemDmg + 3, WeaponType::Wand);
+        case 10: return std::make_shared<Weapon>("Scepter of Dawn", dmg + 5, mana + 30, rarity, ElementType::Holy, elemDmg + 2, WeaponType::Scepter);
+        case 11: return std::make_shared<Weapon>("Venomstrike Dagger", dmg + 6, mana + 8, rarity, ElementType::Poison, elemDmg + 5, WeaponType::Dagger);
+        case 12: return std::make_shared<Weapon>("Tome of Arcane Secrets", dmg - 8, mana + 60, rarity, ElementType::Arcane, elemDmg, WeaponType::Wand);
+        default: return std::make_shared<Weapon>("Epic Weapon", dmg, mana, rarity, ElementType::Fire, elemDmg, WeaponType::Sword);
+    }
+}
+
+std::shared_ptr<Item> LootTable::CreateEpicArmor(int difficulty)
+{
+    int def = 8 + (difficulty * 4);
+    int rarity = 4;
+    int roll = rand() % 3;
+    ArmorType type;
+    if (roll == 0) type = ArmorType::Plate;
+    else if (roll == 1) type = ArmorType::Leather;
+    else type = ArmorType::Cloth;
+    ArmorPiece piece = static_cast<ArmorPiece>(rand() % 5);
+    std::string name;
+    auto resist = RandomElementalResist(difficulty);
+    resist[RandomElement()] += 3 + difficulty;
+
+    if (type == ArmorType::Cloth)
+    {
+        switch (piece)
+        {
+            case ArmorPiece::Helmet: name = "Crown of the Archmage"; break;
+            case ArmorPiece::Chest:  name = "Ethereal Mantle"; break;
+            case ArmorPiece::Gloves: name = "Hands of the Weave"; break;
+            case ArmorPiece::Pants:  name = "Leggings of Eternity"; break;
+            case ArmorPiece::Boots:  name = "Sandals of Transcendence"; break;
+        }
+    }
+    else if (type == ArmorType::Leather)
+    {
+        switch (piece)
+        {
+            case ArmorPiece::Helmet: name = "Shadow Stalker Hood"; break;
+            case ArmorPiece::Chest:  name = "Shadow Stalker Vest"; break;
+            case ArmorPiece::Gloves: name = "Shadow Stalker Grips"; break;
+            case ArmorPiece::Pants:  name = "Shadow Stalker Leggings"; break;
+            case ArmorPiece::Boots:  name = "Shadow Stalker Boots"; break;
+        }
+    }
+    else
+    {
+        switch (piece)
+        {
+            case ArmorPiece::Helmet: name = "Titan's Helm"; break;
+            case ArmorPiece::Chest:  name = "Titan's Plate"; break;
+            case ArmorPiece::Gloves: name = "Titan's Gauntlets"; break;
+            case ArmorPiece::Pants:  name = "Titan's Greaves"; break;
+            case ArmorPiece::Boots:  name = "Titan's Sabatons"; break;
+        }
+    }
+    return std::make_shared<Armor>(name, type, piece, def, rarity, resist);
+}
+
+// ---- Legendary ----
+
+std::shared_ptr<Item> LootTable::CreateLegendaryWeapon(int difficulty)
+{
+    int dmg = 55 + (difficulty * 40);
+    int mana = 25 + (difficulty * 8);
+    int rarity = 5;
+    int elemDmg = 15 + difficulty * 8;
+    switch (rand() % 12)
+    {
+        case 0: return std::make_shared<Weapon>("Worldsplitter", dmg + 20, mana + 10, rarity, ElementType::Fire, elemDmg + 5, WeaponType::Sword);
+        case 1: return std::make_shared<Weapon>("Frostmourne's Echo", dmg + 15, mana + 20, rarity, ElementType::Ice, elemDmg + 8, WeaponType::Sword);
+        case 2: return std::make_shared<Weapon>("Stormbringer", dmg + 25, mana + 15, rarity, ElementType::Lightning, elemDmg + 3, WeaponType::Hammer);
+        case 3: return std::make_shared<Weapon>("Pestilence", dmg + 30, mana, rarity, ElementType::Poison, elemDmg + 10, WeaponType::Axe);
+        case 4: return std::make_shared<Weapon>("Staff of Creation", dmg + 5, mana + 60, rarity, ElementType::Arcane, elemDmg + 5, WeaponType::Staff);
+        case 5: return std::make_shared<Weapon>("Dawnbreaker", dmg + 18, mana + 25, rarity, ElementType::Holy, elemDmg + 7, WeaponType::Bow);
+        case 6: return std::make_shared<Weapon>("Doomhammer's Legacy", dmg + 35, mana - 8, rarity, ElementType::Fire, elemDmg + 6, WeaponType::Hammer);
+        case 7: return std::make_shared<Weapon>("Scepter of the Ancients", dmg + 8, mana + 45, rarity, ElementType::Arcane, elemDmg + 4, WeaponType::Scepter);
+        case 8: return std::make_shared<Weapon>("Voidrender", dmg + 40, mana + 5, rarity, ElementType::Poison, elemDmg + 8, WeaponType::Axe);
+        case 9: return std::make_shared<Weapon>("Tome of Infinite Wisdom", dmg - 5, mana + 80, rarity, ElementType::Arcane, elemDmg + 3, WeaponType::Wand);
+        case 10: return std::make_shared<Weapon>("Frostfire Blade", dmg + 22, mana + 18, rarity, ElementType::Ice, elemDmg + 10, WeaponType::Sword);
+        case 11: return std::make_shared<Weapon>("Celestial Judgement", dmg + 28, mana + 30, rarity, ElementType::Holy, elemDmg + 6, WeaponType::Scepter);
+        default: return std::make_shared<Weapon>("Legendary Weapon", dmg, mana, rarity, ElementType::Physical, elemDmg, WeaponType::Sword);
+    }
+}
+
+std::shared_ptr<Item> LootTable::CreateLegendaryArmor(int difficulty)
+{
+    int def = 12 + (difficulty * 6);
+    int rarity = 5;
+    int roll = rand() % 3;
+    ArmorType type;
+    if (roll == 0) type = ArmorType::Plate;
+    else if (roll == 1) type = ArmorType::Leather;
+    else type = ArmorType::Cloth;
+    ArmorPiece piece = static_cast<ArmorPiece>(rand() % 5);
+    std::string name;
+    auto resist = RandomElementalResist(difficulty);
+    resist[RandomElement()] += 5 + difficulty * 2;
+
+    if (type == ArmorType::Cloth)
+    {
+        switch (piece)
+        {
+            case ArmorPiece::Helmet: name = "Crown of the God-King"; break;
+            case ArmorPiece::Chest:  name = "Mantle of the Cosmos"; break;
+            case ArmorPiece::Gloves: name = "Hands of Fate"; break;
+            case ArmorPiece::Pants:  name = "Legwraps of Infinity"; break;
+            case ArmorPiece::Boots:  name = "Treads of the Wind"; break;
+        }
+    }
+    else if (type == ArmorType::Leather)
+    {
+        switch (piece)
+        {
+            case ArmorPiece::Helmet: name = "Umbral Stalker Hood"; break;
+            case ArmorPiece::Chest:  name = "Umbral Stalker Vest"; break;
+            case ArmorPiece::Gloves: name = "Umbral Stalker Claws"; break;
+            case ArmorPiece::Pants:  name = "Umbral Stalker Legs"; break;
+            case ArmorPiece::Boots:  name = "Umbral Stalker Treads"; break;
+        }
+    }
+    else
+    {
+        switch (piece)
+        {
+            case ArmorPiece::Helmet: name = "Helm of the Worldbearer"; break;
+            case ArmorPiece::Chest:  name = "Chestplate of Eternity"; break;
+            case ArmorPiece::Gloves: name = "Gauntlets of the Colossus"; break;
+            case ArmorPiece::Pants:  name = "Legplates of the Guardian"; break;
+            case ArmorPiece::Boots:  name = "Sabatons of the Leviathan"; break;
+        }
+    }
+    return std::make_shared<Armor>(name, type, piece, def, rarity, resist);
 }
 
 std::shared_ptr<Item> LootTable::CreateAccessory(int difficulty)

@@ -102,6 +102,8 @@ public:
     std::string GetRankTitle(FactionID faction) const;
     int GetRepToNextRank(FactionID faction) const;
     int GetRankThreshold(RepRank rank) const;
+    int GetRepIntoCurrentRank(FactionID faction) const;  // rep earned since current rank
+    int GetRepForCurrentRankBracket(FactionID faction) const; // total rep needed in this bracket
     const FactionData& GetFactionData(FactionID faction) const;
     FactionData& GetFactionData(FactionID faction);
     int GetFactionCount() const { return static_cast<int>(FactionID::FactionCount); }

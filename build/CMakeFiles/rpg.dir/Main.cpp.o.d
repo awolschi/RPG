@@ -188,6 +188,8 @@ CMakeFiles/rpg.dir/Main.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/JobPerk.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/JobSpecialization.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/JobSkillTree.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/JobEnvironment.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/LocationUpgrades.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/ResourceChain.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../World/Quests/Quest.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/Religion.hpp \

@@ -451,6 +451,7 @@ void Player::CheckNewSkills()
             break;
 
         case CharacterClass::Merchant:
+            learned |= addIfMissing("Throw Coin", []{ return std::make_shared<ThrowCoin>(); });
             learned |= addIfMissing("Appraise", []{ return std::make_shared<Appraise>(); });
             learned |= addIfMissing("Haggle", []{ return std::make_shared<Haggle>(); });
             learned |= addIfMissing("Bribery", []{ return std::make_shared<Bribery>(); });

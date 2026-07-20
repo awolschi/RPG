@@ -187,6 +187,8 @@ CMakeFiles/rpg.dir/Engine/SaveGame.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/JobPerk.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/JobSpecialization.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/JobSkillTree.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/JobEnvironment.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/LocationUpgrades.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Jobs/ResourceChain.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../World/Quests/Quest.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/Religion.hpp \
@@ -205,6 +207,16 @@ CMakeFiles/rpg.dir/Engine/SaveGame.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Factions/../Skills/Skill.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Factions/../Characters/Character.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Factions/FactionReputation.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/Wiki.hpp \
+ /usr/include/c++/10/set /usr/include/c++/10/bits/stl_set.h \
+ /usr/include/c++/10/bits/stl_multiset.h \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Graphics/GRenderer.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/build/_deps/raylib-src/src/raylib.h \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Graphics/TextureManager.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Areas/Area.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Areas/../../Characters/Monster.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Areas/../../Characters/Character.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/Classes/Classes.hpp \
  /usr/include/c++/10/fstream /usr/include/c++/10/istream \
  /usr/include/c++/10/ios /usr/include/c++/10/bits/ios_base.h \
  /usr/include/c++/10/bits/locale_classes.h \

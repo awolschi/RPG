@@ -269,6 +269,9 @@
 10. [x] Add job quests (daily + mastery) — backend implemented, needs UI
 11. [ ] Add job storylines
 12. [ ] Add tool system
+13. [x] Add skill tree system (3 branches x 5 tiers, 4 jobs) — wired, UI, save/load
+14. [x] Add weather/environment system — effects collected
+15. [x] Add location upgrades — 7 types, 5 levels each
 
 ### Phase 4: Polish
 13. [x] Add job synergies — implemented in JobSystem
@@ -622,36 +625,22 @@
 ## 20. Job Skill Trees (Separate from Perks)
 
 ### 20.1 Skill Tree Structure
-- [ ] Each job has a skill tree (3 branches, 5 skills each)
-- [ ] Skills unlocked with Job Skill Points (earned at level up)
-- [ ] Skills provide passive bonuses to job performance
+- [x] Each job has a skill tree (3 branches, 5 skills each) — JobSkillTree.hpp/cpp
+- [x] Skills unlocked with Job Skill Points (earned at level up)
+- [x] Skills provide passive bonuses to job performance
+- [x] Skill tree UI integrated into Jobs screen (StateJobSkillTree)
+- [x] Skill tree bonuses wired into WorkJob (speed, quality, rare find, double, XP, sell value)
+- [x] Save/load support for skill tree data
 
 ### 20.2 Mining Skill Tree
-- **Branch 1: Efficiency**
-  - Level 1: Faster mining (10% speed)
-  - Level 2: Less fatigue (20% reduction)
-  - Level 3: Auto-pickup (no clicking needed)
-  - Level 4: Double yield (15% chance)
-  - Level 5: Triple yield (5% chance)
-
-- **Branch 2: Quality**
-  - Level 1: Better quality chance (10%)
-  - Level 2: Fine items more common
-  - Level 3: Masterwork chance (5%)
-  - Level 4: Perfect items (guaranteed quality)
-  - Level 5: Legendary quality (unique effect)
-
-- **Branch 3: Luck**
-  - Level 1: Rare finds +10%
-  - Level 2: Rare finds +20%
-  - Level 3: Rare finds +30%
-  - Level 4: Ultra-rare items
-  - Level 5: Mythical items
+- [x] **Branch 1: Efficiency** — speed, fatigue reduction, auto-pickup, double/triple yield
+- [x] **Branch 2: Quality** — quality chance, fine/masterwork/perfect/legendary quality up to Masterwork
+- [x] **Branch 3: Luck** — rare find %, ultra-rare/mythical items
 
 ### 20.3 Other Job Trees
-- [ ] Similar trees for Lumberjacking, Fishing, Smithing
-- [ ] Each branch focuses on different aspects
-- [ ] Can only fully master one branch per job
+- [x] Similar trees for Lumberjacking, Fishing, Smithing (Efficiency/Quality/Luck per job)
+- [x] Each branch focuses on different aspects
+- [ ] Can only fully master one branch per job (no restriction implemented)
 
 ---
 
@@ -665,18 +654,20 @@
   - Smithing: Ancient Forge
 
 ### 21.2 Environmental Effects
-- [ ] Weather affects job performance:
-  - Rain: -10% Mining, +20% Fishing
-  - Sunny: +10% all jobs
-  - Storm: -20% all jobs, +50% rare finds
-  - Night: +15% rare finds, +10% danger
+- [x] Weather system implemented (JobEnvironment.hpp/cpp):
+  - Clear, Rainy, Stormy, Windy, Foggy, Snowy, Scorching
+  - Each weather type modifies speed, quality, fatigue, rare finds, XP
+  - Weather changes every 1-3 days, rolled randomly
+  - Effects wired into WorkJob function
+  - `UpdateDaily()` call needed in game loop
 
 ### 21.3 Location Upgrades
-- [ ] Upgrade job locations for bonuses:
-  - Mining: Add mine carts (faster transport)
-  - Lumberjacking: Build sawmill (faster processing)
-  - Fishing: Build dock (better fish)
-  - Smithing: Upgrade forge (better quality)
+- [x] Location upgrade system (LocationUpgrades.hpp/cpp):
+  - 7 upgrade types: Tool Quality, Workspace, Storage, Lighting, Ventilation, Automation, Enchantment
+  - Each upgrade has 5 levels with increasing gold costs
+  - Bonuses: speed, quality, fatigue reduction, rare find, XP, storage
+  - Integrated into WorkJob via LocationUpgrades member in JobSystem
+  - UI integration pending
 
 ---
 
@@ -741,11 +732,12 @@
 
 ### 24.3 Nice-to-Have Features
 1. [ ] Job seasons/events
-2. [ ] Full skill trees
+2. [x] Full skill trees — implemented with 3 branches × 5 tiers per job
 3. [ ] Job collectibles
-4. [ ] Environmental effects
-5. [ ] Job tutorials
-6. [ ] Animated job screen
+4. [x] Environmental effects — JobEnvironment with 7 weather types
+5. [ ] Location upgrades — system done, needs UI
+6. [ ] Job tutorials
+7. [ ] Animated job screen
 
 ### 24.4 Future Expansion
 1. [ ] New job types (Herbalism, Alchemy, etc.)

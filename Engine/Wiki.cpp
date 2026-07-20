@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <sstream>
 #include <cstring>
+#include <map>
 
 Wiki::Wiki()
     : currentTab(WikiTab::Equipment), page(0), maxPage(0), areas(nullptr),
@@ -44,11 +45,80 @@ bool Wiki::IsEnemyDefeated(const std::string& name) const
 void Wiki::MarkPetObtained(const std::string& id)
 {
     obtainedPets.insert(id);
+    // Also map common ids to display names for the Wiki tab which looks up by name
+    static const std::map<std::string, std::string> idToName = {
+        {"ember_sentinel", "Ember Sentinel"}, {"frost_wisp", "Frost Wisp"},
+        {"storm_tide", "Storm Tide"}, {"arcane_drake", "Arcane Drake"},
+        {"venom_shard", "Venom Shard"}, {"inferno_guardian", "Inferno Guardian"},
+        {"celestial_spark", "Celestial Spark"}, {"void_mote", "Void Mote"},
+        {"mana_weaver", "Mana Weaver"}, {"chrono_spark", "Chrono Spark"},
+        {"goblin_familiar", "Goblin Familiar"}, {"treant_sapling", "Treant Sapling"},
+        {"kraken_ink", "Kraken Ink"}, {"dragon_whelp", "Dragon Whelp"},
+        {"warlord_banner", "Warlord Banner"}, {"void_shard", "Void Shard"},
+        {"seraph_feather", "Seraph Feather"}, {"primordial_heart", "Primordial Heart"},
+        {"construct_core", "Construct Core"}, {"chrono_fragment", "Chrono Fragment"}
+    };
+    auto it = idToName.find(id);
+    if (it != idToName.end())
+        obtainedPets.insert(it->second);
 }
 
 bool Wiki::IsPetObtained(const std::string& id) const
 {
     return obtainedPets.find(id) != obtainedPets.end();
+}
+
+void Wiki::MarkPetObtainedByName(const std::string& name)
+{
+    obtainedPets.insert(name);
+}
+
+void Wiki::MarkItemDiscovered(const std::string& name)
+{
+    if (!name.empty())
+        discoveredItems.insert(name);
+}
+
+bool Wiki::IsItemDiscovered(const std::string& name) const
+{
+    return discoveredItems.find(name) != discoveredItems.end();
+}
+
+std::string Wiki::Serialize() const
+{
+    std::ostringstream ss;
+    // Format: defeatedEnemies|obtainedPets|discoveredItems
+    // Each set is comma-separated, sets separated by ';'
+    bool first = true;
+    for (const auto& s : defeatedEnemies) { if (!first) ss << ","; ss << s; first = false; }
+    ss << ";";
+    first = true;
+    for (const auto& s : obtainedPets) { if (!first) ss << ","; ss << s; first = false; }
+    ss << ";";
+    first = true;
+    for (const auto& s : discoveredItems) { if (!first) ss << ","; ss << s; first = false; }
+    return ss.str();
+}
+
+void Wiki::Deserialize(const std::string& data)
+{
+    if (data.empty()) return;
+    std::istringstream ss(data);
+    std::string section;
+    int sectionIdx = 0;
+    while (std::getline(ss, section, ';'))
+    {
+        std::istringstream items(section);
+        std::string item;
+        while (std::getline(items, item, ','))
+        {
+            if (item.empty()) continue;
+            if (sectionIdx == 0) defeatedEnemies.insert(item);
+            else if (sectionIdx == 1) obtainedPets.insert(item);
+            else if (sectionIdx == 2) discoveredItems.insert(item);
+        }
+        sectionIdx++;
+    }
 }
 
 // ============================================================
@@ -1225,37 +1295,38 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
         if (isRowHover)
             renderer.DrawRect(38, y - 1, GRenderer::W - 76, lineH + 1, CQColors::BtnHover);
 
-        Color textColor = RarityColor(static_cast<Rarity>(e.rarity));
+Color textColor = RarityColor(static_cast<Rarity>(e.rarity));
 
-        // Enemy defeated/undiscovered visual treatment
+        // Determine discovery state for this entry
+        bool isDiscovered = true;
+        if (currentTab == WikiTab::Enemies)
+            isDiscovered = IsEnemyDefeated(e.name);
+        else if (currentTab == WikiTab::Pets)
+            isDiscovered = IsPetObtained(e.name);
+        else if (currentTab == WikiTab::Equipment || currentTab == WikiTab::Uniques ||
+                 currentTab == WikiTab::Resources || currentTab == WikiTab::Crafting)
+            isDiscovered = IsItemDiscovered(e.name);
+
         std::string namePrefix;
         if (currentTab == WikiTab::Enemies)
         {
-            bool defeated = IsEnemyDefeated(e.name);
-            if (defeated)
+            if (isDiscovered)
             {
                 namePrefix = "[DEFEATED] ";
-                // Slightly brighter variant
                 textColor.r = std::min(255, static_cast<int>(textColor.r * 1.15f));
                 textColor.g = std::min(255, static_cast<int>(textColor.g * 1.15f));
                 textColor.b = std::min(255, static_cast<int>(textColor.b * 1.15f));
             }
             else
             {
-                // Undiscovered: dim the text color
-                textColor.r = static_cast<unsigned char>(textColor.r * 0.6f);
-                textColor.g = static_cast<unsigned char>(textColor.g * 0.6f);
-                textColor.b = static_cast<unsigned char>(textColor.b * 0.6f);
+                namePrefix = "? ";
+                textColor = CQColors::TextDim;
             }
         }
-
-        // Pet obtained/undiscovered visual treatment
-        if (currentTab == WikiTab::Pets)
+        else if (currentTab == WikiTab::Pets)
         {
-            bool obtained = IsPetObtained(e.name);
-            if (obtained)
+            if (isDiscovered)
             {
-                namePrefix = "";
                 textColor.r = std::min(255, static_cast<int>(textColor.r * 1.15f));
                 textColor.g = std::min(255, static_cast<int>(textColor.g * 1.15f));
                 textColor.b = std::min(255, static_cast<int>(textColor.b * 1.15f));
@@ -1268,29 +1339,67 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
                 textColor.b = static_cast<unsigned char>(textColor.b * 0.5f);
             }
         }
+        else if (!isDiscovered)
+        {
+            namePrefix = "? ";
+            textColor = CQColors::TextDim;
+        }
 
-        // Draw name (truncate if needed)
-        std::string name = namePrefix + e.name;
+        // Draw name
+        std::string displayName = isDiscovered ? (namePrefix + e.name) : (namePrefix + "???");
         int maxNameW = colW[0] - 5;
-        while (!name.empty() && MeasureText(name.c_str(), 14) > maxNameW)
-            name.pop_back();
-        renderer.DrawText(name, colX[0], y, 14, textColor);
+        while (!displayName.empty() && MeasureText(displayName.c_str(), 14) > maxNameW)
+            displayName.pop_back();
+        renderer.DrawText(displayName, colX[0], y, 14, textColor);
 
-        // Draw category
-        renderer.DrawText(e.category, colX[1], y, 13, CQColors::TextDim);
+        // Draw category (area/type hint) - always shown to help discovery
+        std::string categoryText = isDiscovered ? e.category : std::string("???");
+        if (currentTab == WikiTab::Enemies && !isDiscovered)
+            categoryText = e.category; // Show area as a hint for undiscovered enemies
+        renderer.DrawText(categoryText, colX[1], y, 13, CQColors::TextDim);
 
-        // Draw info (truncate to column width)
-        std::string info = e.info;
+        // Draw info - only if discovered, otherwise show hint
+        std::string info;
+        if (isDiscovered)
+        {
+            info = e.info;
+        }
+        else
+        {
+            // Show a discovery hint from the source field
+            if (currentTab == WikiTab::Enemies)
+                info = "Defeat to reveal";
+            else if (currentTab == WikiTab::Pets)
+                info = "Obtain to reveal";
+            else
+                info = "Find to reveal";
+        }
         int maxInfoW = colW[2] - 5;
         while (!info.empty() && MeasureText(info.c_str(), 12) > maxInfoW)
             info.pop_back();
-        renderer.DrawText(info, colX[2], y, 12, CQColors::TextLight);
+        renderer.DrawText(info, colX[2], y, 12, isDiscovered ? CQColors::TextLight : CQColors::TextDim);
 
-        // Draw 4th column (source or lootInfo for enemies)
-        if (currentTab == WikiTab::Enemies && !e.lootInfo.empty())
-            renderer.DrawText(e.lootInfo, colX[3], y, 12, CQColors::TextDim);
-        else if (!e.source.empty())
-            renderer.DrawText(e.source, colX[3], y, 12, CQColors::TextDim);
+        // Draw source/hint column
+        if (isDiscovered)
+        {
+            if (currentTab == WikiTab::Enemies && !e.lootInfo.empty())
+                renderer.DrawText(e.lootInfo, colX[3], y, 12, CQColors::TextDim);
+            else if (!e.source.empty())
+                renderer.DrawText(e.source, colX[3], y, 12, CQColors::TextDim);
+        }
+        else
+        {
+            // Show hint about where to find it
+            std::string hint;
+            if (currentTab == WikiTab::Enemies)
+                hint = "Found in: " + e.category;
+            else if (!e.source.empty())
+                hint = e.source;
+            int maxHintW = colW[3] - 5;
+            while (!hint.empty() && MeasureText(hint.c_str(), 12) > maxHintW)
+                hint.pop_back();
+            renderer.DrawText(hint, colX[3], y, 12, CQColors::TextDim);
+        }
 
         // Handle click or Enter on enemy/pet row
         if (isClickable && ((isRowHover && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
@@ -1342,108 +1451,120 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
     if (showEnemyDetail && selectedEnemyIdx >= 0 && selectedEnemyIdx < static_cast<int>(filtered.size()))
     {
         const auto& e = filtered[selectedEnemyIdx];
+        bool defeated = IsEnemyDefeated(e.name);
 
         // Semi-transparent overlay
         renderer.DrawRect(0, 0, GRenderer::W, GRenderer::H, {0, 0, 0, 150});
 
-        // Detail panel
+        // Detail panel - hide name if undiscovered
+        std::string panelTitle = defeated ? (e.name + " — " + e.category) : ("??? — " + e.category);
         int px = 100, py = 60, pw = GRenderer::W - 200, ph = GRenderer::H - 120;
-        renderer.DrawPanel(px, py, pw, ph, e.name + " — " + e.category);
+        renderer.DrawPanel(px, py, pw, ph, panelTitle);
 
         int dy = py + 45;
         int dx = px + 20;
 
-        // Enemy portrait
-        DrawEnemyIcon(e.name, px + pw - 120, py + 10, 72);
-
-        // Stats breakdown
-        renderer.DrawText("Stats:", dx, dy, 18, CQColors::TextGold);
-        dy += 24;
-        renderer.DrawText(e.info, dx + 10, dy, 14, CQColors::TextLight);
-        dy += 30;
-
-        // Defeated status
-        if (IsEnemyDefeated(e.name))
+        if (defeated)
         {
+            // Enemy portrait
+            DrawEnemyIcon(e.name, px + pw - 120, py + 10, 72);
+
+            // Stats breakdown
+            renderer.DrawText("Stats:", dx, dy, 18, CQColors::TextGold);
+            dy += 24;
+            renderer.DrawText(e.info, dx + 10, dy, 14, CQColors::TextLight);
+            dy += 30;
+
+            // Defeated status
             renderer.DrawText("[DEFEATED]", dx, dy, 16, CQColors::TextGreen);
             dy += 24;
-        }
-        else
-        {
-            renderer.DrawText("[UNDISCOVERED]", dx, dy, 16, CQColors::TextDim);
-            dy += 24;
-        }
 
-        // Loot info
-        if (!e.lootInfo.empty())
-        {
-            renderer.DrawText("Loot:", dx, dy, 18, CQColors::TextGold);
+            // Loot info
+            if (!e.lootInfo.empty())
+            {
+                renderer.DrawText("Loot:", dx, dy, 18, CQColors::TextGold);
+                dy += 24;
+                renderer.DrawText(e.lootInfo, dx + 10, dy, 14, CQColors::TextLight);
+                dy += 30;
+            }
+
+            // Area info
+            renderer.DrawText("Found in:", dx, dy, 18, CQColors::TextGold);
             dy += 24;
-            renderer.DrawText(e.lootInfo, dx + 10, dy, 14, CQColors::TextLight);
+            renderer.DrawText(e.category + " (" + e.source + ")", dx + 10, dy, 14, CQColors::TextLight);
             dy += 30;
-        }
 
-        // Area info
-        renderer.DrawText("Found in:", dx, dy, 18, CQColors::TextGold);
-        dy += 24;
-        renderer.DrawText(e.category + " (" + e.source + ")", dx + 10, dy, 14, CQColors::TextLight);
-        dy += 30;
+            // Strategy hints based on enemy type
+            renderer.DrawText("Strategy:", dx, dy, 18, CQColors::TextGold);
+            dy += 24;
+            std::string nameLower = e.name;
+            for (auto& c : nameLower) c = std::tolower(c);
 
-        // Strategy hints based on enemy type
-        renderer.DrawText("Strategy:", dx, dy, 18, CQColors::TextGold);
-        dy += 24;
-        std::string nameLower = e.name;
-        for (auto& c : nameLower) c = std::tolower(c);
-
-        if (nameLower.find("mage") != std::string::npos || nameLower.find("lich") != std::string::npos
-            || nameLower.find("seraphim") != std::string::npos || nameLower.find("astral") != std::string::npos)
-        {
-            renderer.DrawText("High magic damage. Use magic resistance gear and close distance quickly.", dx + 10, dy, 13, CQColors::TextDim);
-            dy += 20;
-            renderer.DrawText("Weak to physical attacks. Bring potions to counter burst damage.", dx + 10, dy, 13, CQColors::TextDim);
-        }
-        else if (nameLower.find("golem") != std::string::npos || nameLower.find("elemental") != std::string::npos)
-        {
-            renderer.DrawText("High defense. Use armor-piercing skills and elemental weaknesses.", dx + 10, dy, 13, CQColors::TextDim);
-            dy += 20;
-            renderer.DrawText("Slow but powerful hits. Stay healed and chip away at HP.", dx + 10, dy, 13, CQColors::TextDim);
-        }
-        else if (nameLower.find("dragon") != std::string::npos || nameLower.find("drake") != std::string::npos)
-        {
-            renderer.DrawText("Fire-based attacks. Equip fire resistance gear.", dx + 10, dy, 13, CQColors::TextDim);
-            dy += 20;
-            renderer.DrawText("High HP and damage. UseDefend wisely and heal often.", dx + 10, dy, 13, CQColors::TextDim);
-        }
-        else if (nameLower.find("void") != std::string::npos || nameLower.find("cosmic") != std::string::npos
-                 || nameLower.find("nether") != std::string::npos)
-        {
-            renderer.DrawText("Arcane/void damage. High stats - bring your best gear.", dx + 10, dy, 13, CQColors::TextDim);
-            dy += 20;
-            renderer.DrawText("UseDefend to mitigate heavy hits. Stack defensive passives.", dx + 10, dy, 13, CQColors::TextDim);
-        }
-        else if (nameLower.find("slime") != std::string::npos || nameLower.find("rat") != std::string::npos
-                 || nameLower.find("chicken") != std::string::npos)
-        {
-            renderer.DrawText("Weak early-game enemy. Safe to fight at any level.", dx + 10, dy, 13, CQColors::TextDim);
-            dy += 20;
-            renderer.DrawText("Good for farming early resources and XP.", dx + 10, dy, 13, CQColors::TextDim);
-        }
-        else if (nameLower.find("boss") != std::string::npos || nameLower.find("overseer") != std::string::npos
-                 || nameLower.find("treant king") != std::string::npos || nameLower.find("kraken") != std::string::npos
-                 || nameLower.find("elder dragon") != std::string::npos || nameLower.find("warlord") != std::string::npos
-                 || nameLower.find("lord") != std::string::npos || nameLower.find("seraphim council") != std::string::npos
-                 || nameLower.find("primordial") != std::string::npos || nameLower.find("construct") != std::string::npos
-                 || nameLower.find("chronos") != std::string::npos)
-        {
-            renderer.DrawText("BOSS - Powerful enemy with special abilities.", dx + 10, dy, 13, CQColors::TextRed);
-            dy += 20;
-            renderer.DrawText("May heal or use devastating skills. Bring potions and best gear.", dx + 10, dy, 13, CQColors::TextDim);
+            if (nameLower.find("mage") != std::string::npos || nameLower.find("lich") != std::string::npos
+                || nameLower.find("seraphim") != std::string::npos || nameLower.find("astral") != std::string::npos)
+            {
+                renderer.DrawText("High magic damage. Use magic resistance gear and close distance quickly.", dx + 10, dy, 13, CQColors::TextDim);
+                dy += 20;
+                renderer.DrawText("Weak to physical attacks. Bring potions to counter burst damage.", dx + 10, dy, 13, CQColors::TextDim);
+            }
+            else if (nameLower.find("golem") != std::string::npos || nameLower.find("elemental") != std::string::npos)
+            {
+                renderer.DrawText("High defense. Use armor-piercing skills and elemental weaknesses.", dx + 10, dy, 13, CQColors::TextDim);
+                dy += 20;
+                renderer.DrawText("Slow but powerful hits. Stay healed and chip away at HP.", dx + 10, dy, 13, CQColors::TextDim);
+            }
+            else if (nameLower.find("dragon") != std::string::npos || nameLower.find("drake") != std::string::npos)
+            {
+                renderer.DrawText("Fire-based attacks. Equip fire resistance gear.", dx + 10, dy, 13, CQColors::TextDim);
+                dy += 20;
+                renderer.DrawText("High HP and damage. Use Defend wisely and heal often.", dx + 10, dy, 13, CQColors::TextDim);
+            }
+            else if (nameLower.find("void") != std::string::npos || nameLower.find("cosmic") != std::string::npos
+                     || nameLower.find("nether") != std::string::npos)
+            {
+                renderer.DrawText("Arcane/void damage. High stats - bring your best gear.", dx + 10, dy, 13, CQColors::TextDim);
+                dy += 20;
+                renderer.DrawText("Use Defend to mitigate heavy hits. Stack defensive passives.", dx + 10, dy, 13, CQColors::TextDim);
+            }
+            else if (nameLower.find("slime") != std::string::npos || nameLower.find("rat") != std::string::npos
+                     || nameLower.find("chicken") != std::string::npos)
+            {
+                renderer.DrawText("Weak early-game enemy. Safe to fight at any level.", dx + 10, dy, 13, CQColors::TextDim);
+                dy += 20;
+                renderer.DrawText("Good for farming early resources and XP.", dx + 10, dy, 13, CQColors::TextDim);
+            }
+            else if (nameLower.find("boss") != std::string::npos || nameLower.find("overseer") != std::string::npos
+                     || nameLower.find("treant king") != std::string::npos || nameLower.find("kraken") != std::string::npos
+                     || nameLower.find("elder dragon") != std::string::npos || nameLower.find("warlord") != std::string::npos
+                     || nameLower.find("lord") != std::string::npos || nameLower.find("seraphim council") != std::string::npos
+                     || nameLower.find("primordial") != std::string::npos || nameLower.find("construct") != std::string::npos
+                     || nameLower.find("chronos") != std::string::npos)
+            {
+                renderer.DrawText("BOSS - Powerful enemy with special abilities.", dx + 10, dy, 13, CQColors::TextRed);
+                dy += 20;
+                renderer.DrawText("May heal or use devastating skills. Bring potions and best gear.", dx + 10, dy, 13, CQColors::TextDim);
+            }
+            else
+            {
+                renderer.DrawText("Physical attacks. Stack defense and HP to survive.", dx + 10, dy, 13, CQColors::TextDim);
+                dy += 20;
+                renderer.DrawText("Use skills with elemental damage for bonus effectiveness.", dx + 10, dy, 13, CQColors::TextDim);
+            }
         }
         else
         {
-            renderer.DrawText("Physical attacks. Stack defense and HP to survive.", dx + 10, dy, 13, CQColors::TextDim);
-            dy += 20;
-            renderer.DrawText("Use skills with elemental damage for bonus effectiveness.", dx + 10, dy, 13, CQColors::TextDim);
+            // Undiscovered enemy - show hint only
+            renderer.DrawText("[UNDISCOVERED]", dx, dy, 16, CQColors::TextDim);
+            dy += 30;
+
+            renderer.DrawText("Hint:", dx, dy, 18, CQColors::TextGold);
+            dy += 24;
+            std::string hint = "This creature can be found in: " + e.category;
+            if (!e.source.empty())
+                hint += " (" + e.source + ")";
+            renderer.DrawText(hint, dx + 10, dy, 14, CQColors::TextLight);
+            dy += 30;
+            renderer.DrawText("Defeat this enemy to reveal its stats, loot, and strategy.", dx + 10, dy, 13, CQColors::TextDim);
         }
 
         // Back button

@@ -33,6 +33,13 @@ public:
     bool IsEnemyDefeated(const std::string& name) const;
     void MarkPetObtained(const std::string& id);
     bool IsPetObtained(const std::string& id) const;
+    void MarkPetObtainedByName(const std::string& name);
+    void MarkItemDiscovered(const std::string& name);
+    bool IsItemDiscovered(const std::string& name) const;
+
+    // Save / Load discovery state
+    std::string Serialize() const;
+    void Deserialize(const std::string& data);
 
 private:
     WikiTab currentTab;
@@ -56,7 +63,8 @@ private:
     int wikiFocusPhase;    // 0=tab bar, 1=search, 2=entries, 3=page nav, 4=detail back
 
     std::set<std::string> defeatedEnemies;
-    std::set<std::string> obtainedPets;
+    std::set<std::string> obtainedPets;       // keyed by pet display name
+    std::set<std::string> discoveredItems;   // keyed by item name
 
     struct WikiEntry
     {

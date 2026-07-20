@@ -6,6 +6,8 @@
 #include <string>
 #include "Job.hpp"
 #include "JobSkillTree.hpp"
+#include "JobEnvironment.hpp"
+#include "LocationUpgrades.hpp"
 #include "ResourceChain.hpp"
 
 class Inventory;
@@ -61,6 +63,14 @@ public:
     // Total hours tracking
     int GetTotalHoursWorked() const { return totalHoursWorked; }
 
+    // Weather / Environment
+    JobEnvironment& GetEnvironment() { return environment; }
+    const JobEnvironment& GetEnvironment() const { return environment; }
+
+    // Location upgrades
+    LocationUpgrades& GetLocationUpgrades() { return locationUpgrades; }
+    const LocationUpgrades& GetLocationUpgrades() const { return locationUpgrades; }
+
     // Save/load perk data
     std::string SerializePerks() const;
     void DeserializePerks(const std::string& data);
@@ -75,6 +85,8 @@ private:
     std::vector<Job> jobs;
     ResourceChainSystem resourceChain;
     JobSkillTree skillTree;
+    JobEnvironment environment;
+    LocationUpgrades locationUpgrades;
     std::vector<JobSynergy> synergies;
     int totalHoursWorked = 0;
     Job* FindJob(JobType type);

@@ -32,6 +32,8 @@ const Color ManaFg      = { 52, 152, 219, 255 };
 const Color ManaBg      = { 20, 50, 80, 255 };
 const Color XpFg        = { 241, 196, 15, 255 };
 const Color XpBg        = { 60, 50, 20, 255 };
+const Color RepFg       = { 155, 89, 182, 255 };
+const Color RepBg       = { 40, 25, 50, 255 };
 
 // Text
 const Color TextLight   = { 230, 220, 200, 255 };

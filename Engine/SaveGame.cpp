@@ -26,7 +26,7 @@ std::string SaveGameManager::SlotPath(int slot) const
     return saveDirectory + "slot" + std::to_string(slot) + ".sav";
 }
 
-bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, int areaIndex, const ReligionSystem& religion, const AchievementSystem& achievements, const ReputationSystem& reputation, const PetManager& pets)
+bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, int areaIndex, const ReligionSystem& religion, const AchievementSystem& achievements, const ReputationSystem& reputation, const PetManager& pets, const Wiki& wiki)
 {
     if (!player) return false;
     if (slot < 1 || slot > SLOT_COUNT) return false;
@@ -55,7 +55,8 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
         {
             auto item = inv.GetItem(i);
             if (!item) continue;
-            file << item->count << "|" << static_cast<int>(item->type) << "|" << item->name << "|" << item->rarity << "|" << item->sellValue;
+            file << item->count << "|" << static_cast<int>(item->type) << "|" << item->name << "|" << item->rarity << "|" << item->sellValue
+                 << "|" << item->setId << "|" << static_cast<int>(item->passive1) << "|" << static_cast<int>(item->passive2);
 
             if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
                 file << "|OH|" << oh->defense << "|" << oh->manaBonus << "|" << oh->arcaneDamage << "|" << static_cast<int>(oh->offhandType);
@@ -81,7 +82,8 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
         auto writeEquipSlot = [&](const std::shared_ptr<Item>& item) {
             if (!item) { file << "none\n"; return; }
             file << item->count << "|" << static_cast<int>(item->type) << "|" << item->name
-                 << "|" << item->rarity << "|" << item->sellValue;
+                 << "|" << item->rarity << "|" << item->sellValue
+                 << "|" << item->setId << "|" << static_cast<int>(item->passive1) << "|" << static_cast<int>(item->passive2);
             if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
                 file << "|OH|" << oh->defense << "|" << oh->manaBonus << "|" << oh->arcaneDamage << "|" << static_cast<int>(oh->offhandType);
             else if (auto w = std::dynamic_pointer_cast<Weapon>(item))
@@ -132,11 +134,14 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
         for (const auto& j : jobs)
         {
             file << static_cast<int>(j.type) << " " << j.level << " "
-                 << j.experience << " " << j.jobPoints << " "
+                 << j.experience << " " << j.jobPoints << " " << j.skillPoints << " "
                  << static_cast<int>(j.specialization) << "\n";
             for (size_t p = 0; p < j.perks.size(); ++p)
                 file << (j.perks[p].unlocked ? "1" : "0") << (p + 1 < j.perks.size() ? " " : "\n");
         }
+
+        // Job skill tree (v9+)
+        file << player->GetJobSystem().SerializeSkillTree() << "\n";
 
         // Area index
         file << areaIndex << "\n";
@@ -173,6 +178,9 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
         // Pet system (v5+)
         file << pets.Serialize() << "\n";
 
+        // Wiki discovery state (v10+)
+        file << wiki.Serialize() << "\n";
+
         file.close();
         return true;
     }
@@ -183,7 +191,7 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
     }
 }
 
-std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, ReligionSystem& outReligion, AchievementSystem& outAchievements, ReputationSystem& outReputation, PetManager& outPets)
+std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, ReligionSystem& outReligion, AchievementSystem& outAchievements, ReputationSystem& outReputation, PetManager& outPets, Wiki& outWiki)
 {
     if (slot < 1 || slot > SLOT_COUNT) return nullptr;
 
@@ -263,6 +271,20 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
             int itemCount = std::stoi(countStr);
             int rarity = std::stoi(rarityStr);
             int sellVal = std::stoi(sellStr);
+
+            int setId = -1;
+            ItemPassive passive1 = ItemPassive::None;
+            ItemPassive passive2 = ItemPassive::None;
+            if (saveVersion >= 9)
+            {
+                std::string sidStr, p1Str, p2Str;
+                std::getline(ss, sidStr, '|');
+                std::getline(ss, p1Str, '|');
+                std::getline(ss, p2Str, '|');
+                if (!sidStr.empty()) setId = std::stoi(sidStr);
+                if (!p1Str.empty()) passive1 = static_cast<ItemPassive>(std::stoi(p1Str));
+                if (!p2Str.empty()) passive2 = static_cast<ItemPassive>(std::stoi(p2Str));
+            }
 
             std::string subType;
             std::getline(ss, subType, '|');
@@ -373,6 +395,9 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
             {
                 item->sellValue = sellVal;
                 item->count = itemCount;
+                item->setId = setId;
+                item->passive1 = passive1;
+                item->passive2 = passive2;
                 player->GetInventory().AddItem(item);
             }
         }
@@ -393,6 +418,20 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
             int rarity = std::stoi(rarityStr);
             int sellVal = std::stoi(sellStr);
 
+            int setId = -1;
+            ItemPassive passive1 = ItemPassive::None;
+            ItemPassive passive2 = ItemPassive::None;
+            if (saveVersion >= 9)
+            {
+                std::string sidStr, p1Str, p2Str;
+                std::getline(ss, sidStr, '|');
+                std::getline(ss, p1Str, '|');
+                std::getline(ss, p2Str, '|');
+                if (!sidStr.empty()) setId = std::stoi(sidStr);
+                if (!p1Str.empty()) passive1 = static_cast<ItemPassive>(std::stoi(p1Str));
+                if (!p2Str.empty()) passive2 = static_cast<ItemPassive>(std::stoi(p2Str));
+            }
+
             std::string subType;
             std::getline(ss, subType, '|');
 
@@ -411,6 +450,7 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 }
                 auto w = std::make_shared<Weapon>(iname, std::stoi(dmgStr), std::stoi(manaStr), rarity, elem, elemDmg);
                 w->sellValue = sellVal;
+                w->setId = setId; w->passive1 = passive1; w->passive2 = passive2;
                 if (i == 0) player->GetEquipment().weapon = w;
                 else if (i == 1) player->GetEquipment().offhand = w;
             }
@@ -424,6 +464,7 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 auto oh = std::make_shared<Offhand>(iname, static_cast<OffhandType>(std::stoi(typeStr)),
                     std::stoi(defStr), std::stoi(manaStr), std::stoi(arcStr), rarity);
                 oh->sellValue = sellVal;
+                oh->setId = setId; oh->passive1 = passive1; oh->passive2 = passive2;
                 if (i == 1) player->GetEquipment().offhand = oh;
             }
             else if (subType == "A")
@@ -448,6 +489,7 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 auto a = std::make_shared<Armor>(iname, static_cast<ArmorType>(std::stoi(atStr)),
                                                  static_cast<ArmorPiece>(std::stoi(apStr)), std::stoi(defStr), rarity, elemResist);
                 a->sellValue = sellVal;
+                a->setId = setId; a->passive1 = passive1; a->passive2 = passive2;
                 if (i == 2) player->GetEquipment().helmet = a;
                 else if (i == 3) player->GetEquipment().chest = a;
                 else if (i == 4) player->GetEquipment().gloves = a;
@@ -469,6 +511,7 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 }
                 auto ac = std::make_shared<Accessory>(iname, std::stoi(bhStr), std::stoi(bmStr), rarity, elem, elemDmg);
                 ac->sellValue = sellVal;
+                ac->setId = setId; ac->passive1 = passive1; ac->passive2 = passive2;
                 if (i == 7) player->GetEquipment().ring1 = ac;
                 else if (i == 8) player->GetEquipment().ring2 = ac;
                 else if (i == 9) player->GetEquipment().amulet = ac;
@@ -566,11 +609,13 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
         auto& jobs = player->GetJobSystem().GetJobs();
         for (size_t i = 0; i < jobCount && i < jobs.size(); ++i)
         {
-            int jt, jl, je, jp;
-            file >> jt >> jl >> je >> jp;
+            int jt, jl, je, jp, jsp = 0;
+            file >> jt >> jl >> je >> jp >> jsp;
             jobs[i].level = jl;
             jobs[i].experience = je;
             jobs[i].jobPoints = jp;
+            if (saveVersion >= 9)
+                jobs[i].skillPoints = jsp;
 
             // Read specialization (v3+ saves have this field)
             if (saveVersion >= 3)
@@ -588,6 +633,15 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 jobs[i].perks[p].unlocked = (unlocked == 1);
             }
             file.ignore();
+        }
+
+        // Job skill tree (v9+)
+        if (saveVersion >= 9 && file.peek() != std::char_traits<char>::eof())
+        {
+            std::string stData;
+            std::getline(file, stData);
+            if (!stData.empty())
+                player->GetJobSystem().DeserializeSkillTree(stData);
         }
 
         // Extended save data (area, religion, quests) — only if present
@@ -664,6 +718,14 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 std::string petData;
                 std::getline(file, petData);
                 outPets.Deserialize(petData);
+            }
+
+            // Wiki discovery state (v10+)
+            if (saveVersion >= 10)
+            {
+                std::string wikiData;
+                std::getline(file, wikiData);
+                outWiki.Deserialize(wikiData);
             }
         }
 

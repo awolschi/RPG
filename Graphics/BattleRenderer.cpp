@@ -23,7 +23,12 @@ void BattleRenderer::DrawBattleScreen(GRenderer& renderer,
                                        bool isBoss,
                                        const std::string& battleMessage,
                                        const PetManager* petManager,
-                                       int playerLevel)
+                                       int playerLevel,
+                                       int playerXP,
+                                       int playerMaxXP,
+                                       int reputationValue,
+                                       int reputationMax,
+                                       const std::string& repLabel)
 {
     BattleLayout layout;
     layout.Calculate(GRenderer::W, GRenderer::H);
@@ -134,15 +139,17 @@ void BattleRenderer::DrawBattleScreen(GRenderer& renderer,
     DrawPlayerBar(renderer, player.GetName(),
                   player.GetCurrentHealth(), player.GetMaxHealth(),
                   player.GetCurrentMana(), player.GetMaxMana(),
-                  layout.playerBarY);
+                  layout.playerBarY,
+                  playerXP, playerMaxXP);
 
-    // Show equipped pet info
+    // Show equipped pet info (above player bar, left side)
+    int extraInfoY = layout.playerBarY - 8;
     if (petManager)
     {
         const Pet* pet = petManager->GetEquippedPet();
         if (pet)
         {
-            int petInfoY = layout.playerBarY + 48;
+            extraInfoY -= 30;
             int petInfoX = 30;
 
             Color elemCol = CQColors::TextDim;
@@ -157,12 +164,40 @@ void BattleRenderer::DrawBattleScreen(GRenderer& renderer,
                 default:                     elemCol = {200, 200, 200, 255}; break;
             }
 
-            DrawText(pet->GetCurrentName().c_str(), petInfoX, petInfoY, 13, elemCol);
+            DrawText(pet->GetCurrentName().c_str(), petInfoX, extraInfoY, 13, elemCol);
 
             int petDmg = petManager->CalculatePetDamage(playerLevel);
             std::string dmgText = "ATK:" + std::to_string(petDmg);
-            DrawText(dmgText.c_str(), petInfoX + 140, petInfoY, 12, CQColors::TextDim);
+            DrawText(dmgText.c_str(), petInfoX + 140, extraInfoY, 12, CQColors::TextDim);
+
+            // Pet XP bar
+            int petLvl = pet->level;
+            if (petLvl < Pet::MAX_PET_LEVEL)
+            {
+                int petXpBarX = petInfoX;
+                int petXpBarY = extraInfoY + 16;
+                int petXpBarW = 220;
+                int petXpCurrent = pet->experience;
+                int petXpMax = Pet::CalculateRequiredXP(petLvl);
+                if (petXpMax > 0)
+                    renderer.DrawBarLabeled(petXpCurrent, petXpMax, petXpBarX, petXpBarY, petXpBarW, 10,
+                                            CQColors::XpFg, CQColors::XpBg, "Lv." + std::to_string(petLvl));
+            }
+            else
+            {
+                DrawText(("Lv." + std::to_string(petLvl) + " MAX").c_str(), petInfoX, extraInfoY + 16, 10, CQColors::TextGold);
+            }
+            extraInfoY -= 30;
         }
+    }
+
+    // Faction reputation bar (above player bar, below pet info)
+    if (reputationMax > 0)
+    {
+        int repBarX = 30;
+        int repBarW = GRenderer::W - 60;
+        renderer.DrawBarLabeled(reputationValue, reputationMax, repBarX, extraInfoY, repBarW, 12,
+                                CQColors::RepFg, CQColors::RepBg, repLabel);
     }
 
     if (phase == CombatPhase::PlayerTurn)
@@ -229,11 +264,13 @@ void BattleRenderer::DrawPlayerBar(GRenderer& renderer,
                                     const std::string& name,
                                     int currentHP, int maxHP,
                                     int currentMP, int maxMP,
-                                    int y)
+                                    int y,
+                                    int currentXP,
+                                    int maxXP)
 {
     int barX = 30;
     int barW = GRenderer::W - 60;
-    int barH = 44;
+    int barH = 60;
 
     DrawRectangle(barX, y, barW, barH, {15, 15, 20, 240});
     DrawRectangleLines(barX, y, barW, barH, {60, 60, 80, 200});
@@ -242,11 +279,21 @@ void BattleRenderer::DrawPlayerBar(GRenderer& renderer,
 
     int hpBarX = barX + 10;
     int hpBarY = y + 24;
-    int hpBarW = 180;
-    renderer.DrawBarLabeled(currentHP, maxHP, hpBarX, hpBarY, hpBarW, 16,
+    int hpBarW = 160;
+    renderer.DrawBarLabeled(currentHP, maxHP, hpBarX, hpBarY, hpBarW, 14,
                             CQColors::HpFg, CQColors::HpBg, "HP");
 
-    int mpBarX = hpBarX + hpBarW + 20;
-    renderer.DrawBarLabeled(currentMP, maxMP, mpBarX, hpBarY, hpBarW, 16,
+    int mpBarX = hpBarX + hpBarW + 10;
+    renderer.DrawBarLabeled(currentMP, maxMP, mpBarX, hpBarY, hpBarW, 14,
                             CQColors::ManaFg, CQColors::ManaBg, "MP");
+
+    // XP bar
+    int xpBarX = barX + 10;
+    int xpBarY = y + 42;
+    int xpBarW = barW - 20;
+    if (maxXP > 0)
+        renderer.DrawBarLabeled(currentXP, maxXP, xpBarX, xpBarY, xpBarW, 12,
+                                CQColors::XpFg, CQColors::XpBg, "XP");
+    else
+        renderer.DrawText("MAX LEVEL", xpBarX, xpBarY, 12, CQColors::TextGold);
 }

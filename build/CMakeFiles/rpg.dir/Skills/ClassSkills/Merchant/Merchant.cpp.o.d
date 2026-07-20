@@ -189,5 +189,7 @@ CMakeFiles/rpg.dir/Skills/ClassSkills/Merchant/Merchant.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Jobs/JobPerk.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Jobs/JobSpecialization.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Jobs/JobSkillTree.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Jobs/JobEnvironment.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Jobs/LocationUpgrades.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../Jobs/ResourceChain.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Skills/ClassSkills/Merchant/../../../Characters/../World/Quests/Quest.hpp

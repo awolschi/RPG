@@ -300,6 +300,8 @@ void Game::Run()
                     currentState = GameState::Exploring;
                     break;
                 case GameState::JobPerks:
+                case GameState::JobSkillTree:
+                case GameState::JobUpgrades:
                     currentState = GameState::Jobs;
                     break;
                 case GameState::DungeonExplore:
@@ -334,6 +336,8 @@ void Game::Run()
             case GameState::SkillLoadout:      StateSkillLoadout(); break;
             case GameState::SkillUpgrade:      StateSkillUpgrade(); break;
             case GameState::JobPerks:          StateJobPerks(); break;
+            case GameState::JobSkillTree:      StateJobSkillTree(); break;
+            case GameState::JobUpgrades:       StateJobUpgrades(); break;
             case GameState::Wiki:              StateWiki(); break;
             case GameState::NPCDialogue:        StateNPCDialogue(); break;
             case GameState::Achievements:       StateAchievements(); break;
@@ -830,6 +834,8 @@ void Game::StateExplore()
                 player->RestoreHealth(player->GetMaxHealth());
                 player->RestoreMana(player->GetMaxMana());
                 player->ResetTempDefense();
+                // Advance day for weather and other daily effects
+                player->GetJobSystem().GetEnvironment().UpdateDaily();
             }
             else if (i == 12) { currentState = GameState::Wiki; renderer.StartTransition(); }
             else if (i == 13) { currentState = GameState::Achievements; renderer.StartTransition(); }
@@ -1125,13 +1131,14 @@ void Game::StateDungeonComplete()
         }
     }
 
+    keyboardNav.SetFocusCount(1);
     renderer.DrawPanel(200, 100, GRenderer::W - 400, 400, "Dungeon Complete!");
 
     renderer.DrawCenteredText(dungeon.name + " conquered!", 200, 28, CQColors::TextGold);
     renderer.DrawCenteredText("All enemies cleared. The dungeon is safe once more.",
                               250, 18, CQColors::TextLight);
 
-    if (renderer.Button("Return", renderer.CenterX(160), 420, 160, 44))
+    if (renderer.Button("Return", renderer.CenterX(160), 420, 160, 44, 0))
     {
         questsChecked = false;
         dungeonCompleted = false;
@@ -1500,41 +1507,89 @@ void Game::StateInventory()
     {
         int startY = y;
         int itemFocusIdx = tabCount; // action buttons start after tabs
+        const int rowH = 50;
+        const int cardW = 420;
         for (int idx = 0; idx < visibleCount; ++idx)
         {
             size_t i = filteredIndices[invStart + idx];
             auto item = inv.GetItem(i);
             if (!item) continue;
-            int iy = startY + idx * 30;
-
-            // Highlight keyboard-focused item
-            if (idx == (inventoryFocusRow - invStart))
-            {
-                renderer.DrawRect(xLeft - 4, iy - 4, 360, 26, Color{40, 40, 70, 100});
-                keyboardNav.DrawFocusRect(xLeft - 4, iy - 4, 360, 26, CQColors::TextDim);
-            }
+            int iy = startY + idx * rowH;
 
             // Check if this item is selected for comparison
             bool isSelected = (static_cast<int>(i) == selectedItemIndex && item == selectedItem);
+            Color rarityColor = RarityColor(static_cast<Rarity>(item->rarity));
+            Color cardBg = CQColors::BgDark;
+            cardBg.a = 200;
 
-            std::string line = item->name;
+            // Highlight keyboard-focused item
+            bool isFocused = (idx == (inventoryFocusRow - invStart));
+            if (isFocused)
+            {
+                renderer.DrawRect(xLeft - 4, iy - 4, cardW, rowH - 4, Color{40, 40, 70, 160});
+                keyboardNav.DrawFocusRect(xLeft - 4, iy - 4, cardW, rowH - 4, CQColors::TextDim);
+            }
+
+            // Card background
+            renderer.DrawRect(xLeft - 4, iy - 4, cardW, rowH - 4, cardBg);
+
+            // Rarity-colored left border bar (4px wide)
+            Color barColor = rarityColor;
+            barColor.a = 255;
+            renderer.DrawRect(xLeft - 4, iy - 4, 4, rowH - 4, barColor);
+
+            // Rarity glow effect for Epic/Legendary items
+            if (item->rarity >= static_cast<int>(Rarity::Epic))
+            {
+                unsigned char glowAlpha = static_cast<unsigned char>(
+                    40 + 30.0 * std::sin(renderer.GetTime() * 3.0));
+                Color glowColor = rarityColor;
+                glowColor.a = glowAlpha;
+                renderer.DrawRect(xLeft - 4, iy - 4, cardW, rowH - 4, glowColor);
+            }
+
+            // Card border (dim if normal, rarity-colored for rare+)
+            Color borderColor = (item->rarity >= static_cast<int>(Rarity::Rare)) ? rarityColor : CQColors::BorderLight;
+            borderColor.a = (item->rarity >= static_cast<int>(Rarity::Epic)) ? 200 : 120;
+            renderer.DrawRectLines(xLeft - 4, iy - 4, cardW, rowH - 4, borderColor, 1);
+
+            // Icon with rarity background
+            DrawItemIcon(item->name, item->rarity, xLeft + 8, iy, 28);
+
+            // Line 1: Name (rarity color, bold)
+            Color nameColor = isSelected ? CQColors::TextGold : rarityColor;
+            std::string name = item->name;
+            if (item->count > 1) name += " x" + std::to_string(item->count);
+            int maxNameW = cardW - 80;
+            while (!name.empty() && MeasureText(name.c_str(), 16) > maxNameW)
+                name.pop_back();
+            renderer.DrawText(name, xLeft + 44, iy + 2, 16, nameColor);
+
+            // Set name badge next to item name
             std::string setName = GetSetNameFromItem(item);
             if (!setName.empty())
-                line += " [" + setName + "]";
-            if (item->count > 1)
-                line += " x" + std::to_string(item->count);
+            {
+                int nameW = MeasureText(name.c_str(), 16);
+                std::string setBadge = "[" + setName + "]";
+                int badgeX = xLeft + 44 + nameW + 6;
+                renderer.DrawText(setBadge, badgeX, iy + 4, 11, CQColors::TextGreen);
+            }
+
+            // Line 2: Stats summary (dim)
+            std::string stats;
             if (auto w = std::dynamic_pointer_cast<Weapon>(item))
             {
-                line += " [" + std::string(WeaponTypeName(w->weaponType)) + "] DMG:" + std::to_string(w->damage);
+                stats = std::string(WeaponTypeName(w->weaponType)) + " | DMG:" + std::to_string(w->damage);
                 if (w->element != ElementType::Physical)
-                    line += " " + std::string(ElementName(w->element)) + ":" + std::to_string(w->elementDamage);
+                    stats += " | " + std::string(ElementName(w->element)) + ":" + std::to_string(w->elementDamage);
+                if (w->manaCost > 0) stats += " | MP:" + std::to_string(w->manaCost);
             }
             else if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
             {
-                line += " [" + std::string(OffhandTypeName(oh->offhandType)) + "]";
-                if (oh->defense > 0) line += " DEF:" + std::to_string(oh->defense);
-                if (oh->manaBonus > 0) line += " MP:" + std::to_string(oh->manaBonus);
-                if (oh->arcaneDamage > 0) line += " [Arcane:" + std::to_string(oh->arcaneDamage) + "]";
+                stats = std::string(OffhandTypeName(oh->offhandType));
+                if (oh->defense > 0) stats += " | DEF:" + std::to_string(oh->defense);
+                if (oh->manaBonus > 0) stats += " | MP:" + std::to_string(oh->manaBonus);
+                if (oh->arcaneDamage > 0) stats += " | Arcane:" + std::to_string(oh->arcaneDamage);
             }
             else if (auto a = std::dynamic_pointer_cast<Armor>(item))
             {
@@ -1546,35 +1601,47 @@ void Game::StateInventory()
                     case ArmorPiece::Pants:  pn = "Pants"; break;
                     case ArmorPiece::Boots:  pn = "Boots"; break;
                 }
-                line += " [" + pn + "] DEF:" + std::to_string(a->defense);
+                stats = pn + " | DEF:" + std::to_string(a->defense);
                 for (const auto& [elem, val] : a->elementalResist)
-                    line += " " + std::string(ElementName(elem)) + "Res:" + std::to_string(val);
+                    stats += " | " + std::string(ElementName(elem)) + " Res:" + std::to_string(val);
             }
             else if (auto ac = std::dynamic_pointer_cast<Accessory>(item))
-                line += " [Acc] HP:" + std::to_string(ac->bonusHealth)
-                    + " MP:" + std::to_string(ac->bonusMana);
-            else if (auto con = std::dynamic_pointer_cast<Consumable>(item))
-                line += " [" + con->GetDescription() + "]";
-            DrawItemIcon(item->name, item->rarity, xLeft, iy - 2, 20);
-
-            // Rarity glow effect for Epic/Legendary items
-            if (item->rarity >= static_cast<int>(Rarity::Epic))
             {
-                unsigned char glowAlpha = static_cast<unsigned char>(
-                    60 + 40.0 * std::sin(renderer.GetTime() * 3.0));
-                Color glowColor = RarityColor(static_cast<Rarity>(item->rarity));
-                glowColor.a = glowAlpha;
-                renderer.DrawRect(xLeft - 2, iy - 4, 24, 24, glowColor);
+                stats = "Accessory";
+                if (ac->bonusHealth > 0) stats += " | HP:" + std::to_string(ac->bonusHealth);
+                if (ac->bonusMana > 0) stats += " | MP:" + std::to_string(ac->bonusMana);
+                if (ac->element != ElementType::Physical)
+                    stats += " | " + std::string(ElementName(ac->element)) + ":" + std::to_string(ac->elementDamage);
+            }
+            else if (auto con = std::dynamic_pointer_cast<Consumable>(item))
+            {
+                stats = con->GetDescription();
+            }
+            else if (auto res = std::dynamic_pointer_cast<Resource>(item))
+            {
+                stats = "Resource";
+                if (res->healAmount > 0) stats += " | Heals:" + std::to_string(res->healAmount);
+                if (res->manaAmount > 0) stats += " | MP:" + std::to_string(res->manaAmount);
+                if (res->quality != ResourceQuality::Normal)
+                    stats += " | " + std::string(ResourceQualityName(res->quality));
+            }
+            int maxStatsW = cardW - 80;
+            while (!stats.empty() && MeasureText(stats.c_str(), 12) > maxStatsW)
+                stats.pop_back();
+            renderer.DrawText(stats, xLeft + 44, iy + 22, 12, CQColors::TextDim);
+
+            // Show passive text if any
+            std::string passiveText = GetPassiveText(item);
+            if (!passiveText.empty())
+            {
+                std::string pt = "Passive: " + passiveText;
+                while (!pt.empty() && MeasureText(pt.c_str(), 11) > maxStatsW)
+                    pt.pop_back();
+                renderer.DrawText(pt, xLeft + 44, iy + 36, 11, CQColors::TextGreen);
             }
 
-            Color textColor = isSelected ? CQColors::TextGold : RarityColor(static_cast<Rarity>(item->rarity));
-            int maxLineW = 240;
-            while (!line.empty() && MeasureText(line.c_str(), 14) > maxLineW)
-                line.pop_back();
-            renderer.DrawText(line, xLeft + 24, iy, 14, textColor);
-
             // Tooltip on hover over icon
-            if (renderer.IsMouseInRect(xLeft - 2, iy - 4, 24, 24))
+            if (renderer.IsMouseInRect(xLeft - 2, iy - 4, 36, rowH - 4))
             {
                 std::string tip = item->name;
                 tip += "\nRarity: " + std::string(RarityName(static_cast<Rarity>(item->rarity)));
@@ -1617,23 +1684,25 @@ void Game::StateInventory()
                 renderer.DrawTooltip(tip, static_cast<int>(GetMousePosition().x), static_cast<int>(GetMousePosition().y));
             }
 
-            // Action buttons
-            int btnX = xLeft + 300;
+            // Action buttons (right side of card)
+            int btnX = xLeft + cardW - 110;
+            int btnY = iy + 8;
             if (item->type == ItemType::Weapon || item->type == ItemType::Armor || item->type == ItemType::Accessory)
             {
                 bool canEquip = player->CanEquip(item);
                 if (canEquip)
                 {
-                    if (renderer.Button("Eq", btnX, iy, 34, 22, itemFocusIdx++))
+                    if (renderer.Button("Equip", btnX, btnY, 50, 22, itemFocusIdx++))
                         player->EquipItem(item);
                 }
                 else
                 {
-                    renderer.DrawText("Eq", btnX, iy, 12, CQColors::TextDim);
+                    Color c = CQColors::TextDim; c.a = 100;
+                    renderer.DrawText("Equip", btnX + 4, btnY + 4, 12, c);
                 }
-                btnX += 38;
+                btnX += 56;
                 // Compare button
-                if (renderer.Button("?", btnX, iy, 22, 22, itemFocusIdx++))
+                if (renderer.Button("?", btnX, btnY, 22, 22, itemFocusIdx++))
                 {
                     if (isSelected)
                     {
@@ -1651,7 +1720,7 @@ void Game::StateInventory()
             else if (item->type == ItemType::Consumable)
             {
                 auto con = std::dynamic_pointer_cast<Consumable>(item);
-                if (con && renderer.Button("Use", btnX, iy, 40, 22, itemFocusIdx++))
+                if (con && renderer.Button("Use", btnX, btnY, 50, 22, itemFocusIdx++))
                 {
                     con->Use(*player);
                     inv.RemoveOneItem(i);
@@ -1661,7 +1730,7 @@ void Game::StateInventory()
                         selectedItem = nullptr;
                     }
                 }
-                btnX += 44;
+                btnX += 56;
             }
             else if (item->type == ItemType::Resource)
             {
@@ -1669,10 +1738,8 @@ void Game::StateInventory()
                 auto res = std::dynamic_pointer_cast<Resource>(item);
                 if (res && res->healAmount > 0)
                 {
-                    if (renderer.Button("Eat", btnX, iy, 40, 22, itemFocusIdx++))
+                    if (renderer.Button("Eat", btnX, btnY, 50, 22, itemFocusIdx++))
                     {
-                        int hpBefore = player->GetCurrentHealth();
-                        int mpBefore = player->GetCurrentMana();
                         if (res->healAmount > 0) player->RestoreHealth(res->healAmount);
                         if (res->manaAmount > 0) player->RestoreMana(res->manaAmount);
                         inv.RemoveOneItem(i);
@@ -1682,10 +1749,11 @@ void Game::StateInventory()
                             selectedItem = nullptr;
                         }
                     }
-                    btnX += 44;
+                    btnX += 56;
                 }
             }
-            if (renderer.Button("D", btnX, iy, 28, 22, itemFocusIdx++))
+            // Drop button (always available)
+            if (renderer.Button("Drop", btnX, btnY, 38, 22, itemFocusIdx++))
             {
                 inv.RemoveOneItem(i);
                 if (selectedItemIndex == static_cast<int>(i))
@@ -1697,7 +1765,7 @@ void Game::StateInventory()
         }
 
         // Page navigation footer (below item list)
-        int pageNavY = startY + visibleCount * 30 + 6;
+        int pageNavY = startY + visibleCount * rowH + 6;
         if (invMaxPage > 0)
         {
             if (renderer.Button("< Prev", xLeft, pageNavY, 88, 24, itemFocusIdx++) && inventoryPage > 0)
@@ -2315,7 +2383,7 @@ void Game::StateJobs()
 
     // Quick work all button
     int wh = (player->GetCharacterClass() == CharacterClass::Merchant) ? 5 : 3;
-    keyboardNav.SetFocusCount(6); // 4 jobs + Perks + Back
+    keyboardNav.SetFocusCount(8); // 4 jobs + Perks + Skill Tree + Upgrades + Back
     if (renderer.Button("Work All Jobs (" + std::to_string(wh) + "h each)", 70, y, 300, 36, 4))
     {
         js.WorkJob(JobType::Mining, wh, player->GetInventory(), &achievementSystem);
@@ -2335,7 +2403,17 @@ void Game::StateJobs()
         selectedJobIdx = -1;
         currentState = GameState::JobPerks;
     }
-    if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 80, 120, 40, 5))
+    if (renderer.Button("Skill Tree", 290, y, 200, 36, 5))
+    {
+        skillTreeJobIdx = -1;
+        currentState = GameState::JobSkillTree;
+    }
+    if (renderer.Button("Upgrades", 510, y, 200, 36, 6))
+    {
+        upgradeJobIdx = -1;
+        currentState = GameState::JobUpgrades;
+    }
+    if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 80, 120, 40, 7))
         currentState = GameState::Exploring;
 }
 
@@ -2486,6 +2564,255 @@ void Game::StateJobPerks()
         jobPerkPage = 0;
         currentState = GameState::Jobs;
     }
+}
+
+void Game::StateJobSkillTree()
+{
+    if (!player) { currentState = GameState::Exploring; return; }
+    keyboardNav.Update();
+    renderer.SetCurrentFocus(keyboardNav.GetFocus());
+
+    auto& js = player->GetJobSystem();
+    auto& st = js.GetSkillTree();
+    JobType jobTypes[] = { JobType::Mining, JobType::Lumberjacking, JobType::Fishing, JobType::Smithing };
+    const char* jobNames[] = { "Mining", "Lumberjacking", "Fishing", "Smithing" };
+
+    // If no job selected, show job list
+    if (skillTreeJobIdx < 0)
+    {
+        renderer.DrawPanel(50, 60, GRenderer::W - 100, GRenderer::H - 120, "Skill Tree — Choose a Job");
+        int y = 110;
+        renderer.DrawText("Select a job to view its skill tree (3 branches x 5 tiers each):", 70, y, 16, CQColors::TextDim);
+        y += 30;
+
+        keyboardNav.SetFocusCount(5);
+        for (int i = 0; i < 4; ++i)
+        {
+            auto& job = js.GetJob(jobTypes[i]);
+            int unlocked = 0;
+            for (auto& s : st.GetSkills(jobTypes[i]))
+                if (s.unlocked) unlocked++;
+            std::string label = std::string(jobNames[i]) + "  Lv." + std::to_string(job.level)
+                + "  Pts:" + std::to_string(job.skillPoints)
+                + "  [" + std::to_string(unlocked) + "/15 skills]";
+
+            renderer.DrawRect(70, y, 600, 32, CQColors::SkillCardBg(player->GetCharacterClass()));
+            if (renderer.Button(label, 70, y, 600, 32, i))
+            {
+                skillTreeJobIdx = i;
+                skillTreePage = 0;
+            }
+            y += 40;
+        }
+        if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 80, 120, 40, 4))
+            currentState = GameState::Jobs;
+        return;
+    }
+
+    // Show skill tree for selected job
+    JobType currentJobType = jobTypes[skillTreeJobIdx];
+    auto& job = js.GetJob(currentJobType);
+    const auto& skills = st.GetSkills(currentJobType);
+
+    std::string title = std::string(jobNames[skillTreeJobIdx]) + " Skill Tree";
+    renderer.DrawPanel(50, 40, GRenderer::W - 100, GRenderer::H - 80, title);
+
+    int y = 85;
+    renderer.DrawText("Skill Points: " + std::to_string(job.skillPoints), 70, y, 18, CQColors::TextGold);
+    y += 10;
+    renderer.DrawText("Branches: Efficiency (speed/fatigue) | Quality (quality/rare) | Luck (rare/mythical)", 70, y + 18, 13, CQColors::TextDim);
+    y += 40;
+
+    // Pagination
+    int totalSkills = static_cast<int>(skills.size());
+    if (totalSkills <= 0) { skillTreeJobIdx = -1; return; }
+    int maxPage = (totalSkills - 1) / SKILL_TREE_PER_PAGE;
+    if (skillTreePage < 0) skillTreePage = 0;
+    if (skillTreePage > maxPage) skillTreePage = maxPage;
+    int startIdx = skillTreePage * SKILL_TREE_PER_PAGE;
+    int endIdx = std::min(startIdx + SKILL_TREE_PER_PAGE, totalSkills);
+
+    // Count unlockable on this page for focus
+    int unlockableCount = 0;
+    for (int si = startIdx; si < endIdx; ++si)
+        if (st.CanUnlockSkill(currentJobType, skills[si].branch, skills[si].tier, job.level, job.skillPoints))
+            unlockableCount++;
+    int navExtra = (maxPage > 0) ? 2 : 0;
+    int focusCount = unlockableCount + navExtra + 2;
+    keyboardNav.SetFocusCount(focusCount);
+    int focusIdx = 0;
+
+    const char* branchNames[] = { "Efficiency", "Quality", "Luck" };
+    Color branchColors[] = {
+        {100, 200, 100, 255},
+        {100, 150, 255, 255},
+        {255, 200, 100, 255}
+    };
+
+    for (int si = startIdx; si < endIdx; ++si)
+    {
+        const auto& sk = skills[si];
+
+        // Branch label
+        bool showBranchHeader = (si == startIdx || skills[si-1].branch != sk.branch);
+        if (showBranchHeader)
+        {
+            y += 4;
+            renderer.DrawText(("-- " + std::string(branchNames[static_cast<int>(sk.branch)]) + " --").c_str(),
+                              90, y, 14, branchColors[static_cast<int>(sk.branch)]);
+            y += 20;
+        }
+
+        std::string status;
+        Color statusColor;
+        if (sk.unlocked)
+        {
+            status = "[UNLOCKED]";
+            statusColor = CQColors::TextGreen;
+        }
+        else if (st.CanUnlockSkill(currentJobType, sk.branch, sk.tier, job.level, job.skillPoints))
+        {
+            status = "[UNLOCK]";
+            statusColor = CQColors::TextGold;
+        }
+        else
+        {
+            status = "[Lv." + std::to_string(sk.requiredLevel) + "]";
+            statusColor = CQColors::TextDim;
+        }
+
+        renderer.DrawText(status + "  " + sk.name + " (Tier " + std::to_string(sk.tier) + ")", 90, y, 15, statusColor);
+        y += 18;
+        renderer.DrawText(sk.description, 110, y, 12, CQColors::TextDim);
+        y += 16;
+
+        if (!sk.unlocked && st.CanUnlockSkill(currentJobType, sk.branch, sk.tier, job.level, job.skillPoints))
+        {
+            if (renderer.Button("Unlock (1 PT)", 110, y, 160, 24, focusIdx++))
+            {
+                int& sp = job.skillPoints;
+                st.UnlockSkill(currentJobType, sk.branch, sk.tier, sp);
+            }
+            y += 28;
+        }
+        else
+        {
+            y += 4;
+        }
+    }
+
+    // Page nav
+    if (maxPage > 0)
+    {
+        int navY = GRenderer::H - 110;
+        if (renderer.Button("< Prev", 70, navY, 100, 30, focusIdx++) && skillTreePage > 0) skillTreePage--;
+        if (renderer.Button("Next >", 180, navY, 100, 30, focusIdx++) && skillTreePage < maxPage) skillTreePage++;
+        renderer.DrawText("Page " + std::to_string(skillTreePage + 1) + " / " + std::to_string(maxPage + 1),
+                          290, navY + 6, 13, CQColors::TextDim);
+    }
+
+    if (renderer.Button("Back to Jobs", 70, GRenderer::H - 60, 160, 36, focusIdx++))
+    {
+        skillTreeJobIdx = -1;
+        skillTreePage = 0;
+        return;
+    }
+
+    if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 60, 120, 36, focusIdx++))
+    {
+        skillTreeJobIdx = -1;
+        skillTreePage = 0;
+        currentState = GameState::Jobs;
+    }
+}
+
+void Game::StateJobUpgrades()
+{
+    if (!player) { currentState = GameState::Exploring; return; }
+    keyboardNav.Update();
+    renderer.SetCurrentFocus(keyboardNav.GetFocus());
+
+    auto& js = player->GetJobSystem();
+    auto& locUpgrades = js.GetLocationUpgrades();
+    const auto& weather = js.GetEnvironment();
+    JobType jobTypes[] = { JobType::Mining, JobType::Lumberjacking, JobType::Fishing, JobType::Smithing };
+    const char* jobNames[] = { "Mining", "Lumberjacking", "Fishing", "Smithing" };
+    Color jobColors[] = {
+        {160, 120, 80, 255},
+        {80, 180, 80, 255},
+        {60, 120, 200, 255},
+        {200, 120, 60, 255}
+    };
+
+    // Weather info bar at top
+    renderer.DrawPanel(50, 40, GRenderer::W - 100, 50, "Current Conditions");
+    renderer.DrawText(weather.GetWeatherDescription(), 70, 60, 14, CQColors::TextDim);
+
+    // Show upgrade list
+    renderer.DrawPanel(50, 100, GRenderer::W - 100, GRenderer::H - 150, "Location Upgrades");
+
+    int y = 145;
+    renderer.DrawText("Gold: " + std::to_string(player->GetInventory().GetGold()), 70, y, 16, CQColors::TextGold);
+    y += 28;
+
+    const auto& upgrades = locUpgrades.upgrades;
+    keyboardNav.SetFocusCount(static_cast<int>(upgrades.size()) + 1); // upgrades + Back
+    int focusIdx = 0;
+
+    for (size_t i = 0; i < upgrades.size(); ++i)
+    {
+        const auto& u = upgrades[i];
+        int cost = (u.level < u.maxLevel) ? locUpgrades.GetUpgradeCost(u.type) : 0;
+        bool maxed = (u.level >= u.maxLevel);
+        bool canAfford = !maxed && player->GetInventory().GetGold() >= cost;
+
+        std::string label = u.name + "  Lv." + std::to_string(u.level) + "/" + std::to_string(u.maxLevel);
+        if (maxed)
+            label += " [MAX]";
+        else
+            label += "  Cost: " + std::to_string(cost) + "g";
+
+        renderer.DrawRect(70, y, GRenderer::W - 200, 32, CQColors::SkillCardBg(player->GetCharacterClass()));
+
+        Color textColor = maxed ? CQColors::TextGreen : (canAfford ? CQColors::TextGold : CQColors::TextDim);
+        renderer.DrawText(label, 80, y + 6, 15, textColor);
+
+        // Description
+        renderer.DrawText(u.description, 80, y + 24, 11, CQColors::TextDim);
+
+        // Bonus details
+        std::string bonuses;
+        if (u.speedBonusPerLevel > 0.0f)   bonuses += "Speed +" + std::to_string(static_cast<int>(u.speedBonusPerLevel * 100 * u.level)) + "% ";
+        if (u.qualityBonusPerLevel > 0.0f) bonuses += "Quality +" + std::to_string(static_cast<int>(u.qualityBonusPerLevel * 100 * u.level)) + "% ";
+        if (u.fatigueReductionPerLevel > 0.0f) bonuses += "Fatigue -" + std::to_string(static_cast<int>(u.fatigueReductionPerLevel * 100 * u.level)) + "% ";
+        if (u.rareFindBonusPerLevel > 0.0f) bonuses += "Rare +" + std::to_string(static_cast<int>(u.rareFindBonusPerLevel * 100 * u.level)) + "% ";
+        if (u.xpBonusPerLevel > 0.0f)       bonuses += "XP +" + std::to_string(static_cast<int>(u.xpBonusPerLevel * 100 * u.level)) + "% ";
+        if (u.storageBonusPerLevel > 0)     bonuses += "Storage +" + std::to_string(u.storageBonusPerLevel * u.level) + " ";
+        if (!bonuses.empty())
+            renderer.DrawText("Current: " + bonuses, 80, y + 38, 11, CQColors::TextGreen);
+
+        y += 52;
+
+        // Upgrade button
+        if (!maxed && canAfford)
+        {
+            if (renderer.Button("Upgrade (" + std::to_string(cost) + "g)", GRenderer::W - 260, y - 50, 180, 28, focusIdx++))
+            {
+                int gold = player->GetInventory().GetGold();
+                if (locUpgrades.PerformUpgrade(u.type, gold))
+                {
+                    player->GetInventory().RemoveGold(cost);
+                }
+            }
+        }
+        else
+        {
+            focusIdx++;
+        }
+    }
+
+    if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 50, 120, 36, focusIdx++))
+        currentState = GameState::Jobs;
 }
 
 void Game::StateSkillLoadout()
@@ -2841,7 +3168,10 @@ void Game::StateCraft()
         {
             auto item = crafting.Craft(i, player->GetInventory());
             if (item)
+            {
+                wiki.MarkItemDiscovered(item->name);
                 renderer.DrawText("Crafted: " + item->name + "!", cx, cy + 34, 14, CQColors::TextGreen);
+            }
         }
         col++;
         if (col >= 2) { col = 0; y += 90; }
@@ -3024,7 +3354,7 @@ void Game::StateShop()
     int shopSellMaxPage = (shopSellTotal > SHOP_SELL_PER_PAGE) ? ((shopSellTotal - 1) / SHOP_SELL_PER_PAGE) : 0;
     int shopSellNav = (shopSellMaxPage > 0) ? 2 : 0;
     int shopSellCount = shopSellVisible + shopSellNav;
-    keyboardNav.SetFocusCount(shopBuyCount + shopSellCount + 1); // +1 for Leave
+    keyboardNav.SetFocusCount(shopBuyCount + shopSellCount + 3 + 1); // +3 quick-sell + Leave
     int shopFocusIdx = 0;
     for (size_t i = 0; i < shopItems.size(); ++i)
     {
@@ -3075,6 +3405,7 @@ void Game::StateShop()
                 if (inv.AddItem(bought))
                 {
                     inv.RemoveGold(price);
+                    wiki.MarkItemDiscovered(bought->name);
                     achievementSystem.UpdateProgress("social_shop_50");
                     achievementSystem.UpdateProgress("social_shop_200");
                 }
@@ -3086,6 +3417,46 @@ void Game::StateShop()
     y = 100;
     renderer.DrawText("- Your Items -", xRight, y, 16, CQColors::TextDim);
     y += 24;
+
+    // Quick-sell buttons
+    auto quickSell = [&](int maxRarity, const char* label)
+    {
+        int totalGold = 0;
+        int sold = 0;
+        for (size_t si = 0; si < inv.GetItemCount(); )
+        {
+            auto item = inv.GetItem(si);
+            if (item && item->rarity <= maxRarity)
+            {
+                totalGold += item->sellValue * item->count;
+                inv.AddGold(item->sellValue * item->count);
+                inv.RemoveItem(si);
+                sold++;
+            }
+            else
+            {
+                si++;
+            }
+        }
+        if (sold > 0)
+        {
+            achievementSystem.UpdateProgress("social_sell_100", sold);
+            achievementSystem.UpdateProgress("social_sell_500", sold);
+            achievementSystem.UpdateProgress("social_sell_1000", sold);
+            int newTotal = static_cast<int>(inv.GetItemCount());
+            int newMaxPage = (newTotal > SHOP_SELL_PER_PAGE) ? ((newTotal - 1) / SHOP_SELL_PER_PAGE) : 0;
+            if (shopSellPage > newMaxPage) shopSellPage = newMaxPage;
+        }
+    };
+    int qsy = y;
+    if (renderer.Button("Sell ≤ Rare", xRight, qsy, 120, 22, shopFocusIdx++))
+        quickSell(static_cast<int>(Rarity::Rare), "Sell ≤ Rare");
+    if (renderer.Button("Sell ≤ Uncommon", xRight + 126, qsy, 140, 22, shopFocusIdx++))
+        quickSell(static_cast<int>(Rarity::Uncommon), "Sell ≤ Uncommon");
+    if (renderer.Button("Sell ≤ Common", xRight + 272, qsy, 130, 22, shopFocusIdx++))
+        quickSell(static_cast<int>(Rarity::Common), "Sell ≤ Common");
+    y += 28;
+
     if (inv.GetItemCount() == 0)
     {
         renderer.DrawText("No items to sell.", xRight, y, 14, CQColors::TextDim);
@@ -3390,9 +3761,17 @@ void Game::StateCombat()
     if (mon && mon->IsBoss())
         isBoss = true;
 
+    int playerXP = player->GetExperience();
+    int playerMaxXP = player->GetLevel() >= Character::MAX_LEVEL ? 0 : Character::CalculateRequiredXP(player->GetLevel());
+    FactionID areaFaction = reputationSystem.GetFactionByArea(currentAreaIndex);
+    int repValue = reputationSystem.GetRepIntoCurrentRank(areaFaction);
+    int repMax = reputationSystem.GetRepForCurrentRankBracket(areaFaction);
+    std::string repLabel = reputationSystem.GetRankTitle(areaFaction) + " Rep";
     BattleRenderer::DrawBattleScreen(renderer, *currentEnemy, *player, combatLog,
                                        combatPhase, enemyFlashTimer, isBoss, "",
-                                       &petManager, player->GetLevel());
+                                       &petManager, player->GetLevel(),
+                                       playerXP, playerMaxXP,
+                                       repValue, repMax, repLabel);
 
     // Update flash timer after rendering
     if (enemyFlashTimer > 0)
@@ -4310,6 +4689,7 @@ void Game::ProcessVictory(std::shared_ptr<Monster> enemy)
         for (auto& item : loot)
         {
             player->GetInventory().AddItem(item);
+            wiki.MarkItemDiscovered(item->name);
             std::string prefix = (item->rarity >= 5) ? "*** LEGENDARY *** " : (item->rarity >= 4) ? "*** EPIC *** " : "";
             AddCombatLog(prefix + "Legendary Loot: " + item->name);
         }
@@ -4324,6 +4704,7 @@ void Game::ProcessVictory(std::shared_ptr<Monster> enemy)
         for (auto& item : loot)
         {
             player->GetInventory().AddItem(item);
+            wiki.MarkItemDiscovered(item->name);
             AddCombatLog("Loot: " + item->name);
         }
 
@@ -4336,6 +4717,7 @@ void Game::ProcessVictory(std::shared_ptr<Monster> enemy)
                 if (unique)
                 {
                     player->GetInventory().AddItem(unique);
+                    wiki.MarkItemDiscovered(unique->name);
                     std::string prefix = (unique->rarity >= 5) ? "*** LEGENDARY DROP *** " : "*** EPIC DROP *** ";
                     AddCombatLog(prefix + unique->name + "!");
                 }
@@ -4351,6 +4733,7 @@ void Game::ProcessVictory(std::shared_ptr<Monster> enemy)
                 auto drop = std::make_shared<Resource>(sd.itemName, dropTier, dropTier * 5);
                 drop->count = qty;
                 player->GetInventory().AddItem(drop);
+                wiki.MarkItemDiscovered(sd.itemName);
                 AddCombatLog("Special Drop: " + sd.itemName + " x" + std::to_string(qty));
             }
         }
@@ -4539,7 +4922,7 @@ void Game::LoadGamePrompt()
 void Game::SaveToSlot(int slot)
 {
     if (!player) { currentState = GameState::Exploring; return; }
-    if (saveManager.SaveGame(player, slot, currentAreaIndex, religion, achievementSystem, reputationSystem, petManager))
+    if (saveManager.SaveGame(player, slot, currentAreaIndex, religion, achievementSystem, reputationSystem, petManager, wiki))
         renderer.DrawCenteredText("Game saved to Slot " + std::to_string(slot) + "!", 350, 24, CQColors::TextGreen);
     currentState = GameState::Exploring;
 }
@@ -4547,7 +4930,7 @@ void Game::SaveToSlot(int slot)
 void Game::LoadFromSlot(int slot)
 {
     static bool init = true;
-    auto loaded = saveManager.LoadGame(slot, currentAreaIndex, religion, achievementSystem, reputationSystem, petManager);
+    auto loaded = saveManager.LoadGame(slot, currentAreaIndex, religion, achievementSystem, reputationSystem, petManager, wiki);
     if (loaded)
     {
         player = loaded;
@@ -4558,7 +4941,29 @@ void Game::LoadFromSlot(int slot)
         currentState = GameState::Exploring;
         ApplyPetPassivesToPlayer();
         for (const auto& p : petManager.GetPets())
-            if (p.obtained) wiki.MarkPetObtained(p.id);
+        {
+            if (p.obtained)
+            {
+                wiki.MarkPetObtained(p.id);
+                wiki.MarkPetObtainedByName(p.name);
+            }
+        }
+        // Mark all carried equipment as discovered
+        for (size_t i = 0; i < player->GetInventory().GetItemCount(); ++i)
+            if (auto item = player->GetInventory().GetItem(i))
+                wiki.MarkItemDiscovered(item->name);
+        // Mark equipped items
+        auto& eq = player->GetEquipment();
+        if (eq.weapon) wiki.MarkItemDiscovered(eq.weapon->name);
+        if (eq.offhand) wiki.MarkItemDiscovered(eq.offhand->name);
+        if (eq.helmet) wiki.MarkItemDiscovered(eq.helmet->name);
+        if (eq.chest) wiki.MarkItemDiscovered(eq.chest->name);
+        if (eq.gloves) wiki.MarkItemDiscovered(eq.gloves->name);
+        if (eq.pants) wiki.MarkItemDiscovered(eq.pants->name);
+        if (eq.boots) wiki.MarkItemDiscovered(eq.boots->name);
+        if (eq.ring1) wiki.MarkItemDiscovered(eq.ring1->name);
+        if (eq.ring2) wiki.MarkItemDiscovered(eq.ring2->name);
+        if (eq.amulet) wiki.MarkItemDiscovered(eq.amulet->name);
     }
 }
 

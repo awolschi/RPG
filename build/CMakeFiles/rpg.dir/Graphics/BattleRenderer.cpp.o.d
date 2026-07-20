@@ -207,6 +207,8 @@ CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Engine/../Characters/../Jobs/JobPerk.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Engine/../Characters/../Jobs/JobSpecialization.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Engine/../Characters/../Jobs/JobSkillTree.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Engine/../Characters/../Jobs/JobEnvironment.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Engine/../Characters/../Jobs/LocationUpgrades.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Engine/../Characters/../Jobs/ResourceChain.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Engine/../Characters/../World/Quests/Quest.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Engine/Religion.hpp \

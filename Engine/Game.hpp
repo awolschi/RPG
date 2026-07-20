@@ -101,6 +101,8 @@ enum class GameState
     Achievements,
     Reputation,
     Pets,
+    JobSkillTree,
+    JobUpgrades,
     Exit
 };
 
@@ -189,6 +191,14 @@ private:
     int jobPerkPage = 0;
     static constexpr int PERKS_PER_PAGE = 8;
 
+    // Job skill tree state
+    int skillTreeJobIdx = -1;
+    int skillTreePage = 0;
+    static constexpr int SKILL_TREE_PER_PAGE = 10;
+
+    // Job upgrades state
+    int upgradeJobIdx = -1;
+
     // Reputation UI state
     int selectedFactionIdx = -1;
     int repQuestTab = 0;  // 0=Overview, 1=Repeatable Quests
@@ -198,7 +208,7 @@ private:
     // Inventory UI state
     int inventoryTab;
     int inventoryPage = 0;
-    static constexpr int INVENTORY_ITEMS_PER_PAGE = 18;
+    static constexpr int INVENTORY_ITEMS_PER_PAGE = 8;
 
     // Stats UI state (skill list pagination for high-level mages)
     int skillStatsPage = 0;
@@ -229,6 +239,8 @@ private:
     void StateSkillLoadout();
     void StateSkillUpgrade();
     void StateJobPerks();
+    void StateJobSkillTree();
+    void StateJobUpgrades();
     void StateAreaSelect();
     void StateQuestLog();
     void StateWiki();

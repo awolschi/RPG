@@ -30,6 +30,10 @@ public:
     static std::shared_ptr<Item> CreateRareArmor(int difficulty);
     static std::shared_ptr<Item> CreateBossWeapon(int difficulty);
     static std::shared_ptr<Item> CreateBossArmor(int difficulty);
+    static std::shared_ptr<Item> CreateEpicWeapon(int difficulty);
+    static std::shared_ptr<Item> CreateEpicArmor(int difficulty);
+    static std::shared_ptr<Item> CreateLegendaryWeapon(int difficulty);
+    static std::shared_ptr<Item> CreateLegendaryArmor(int difficulty);
     static std::shared_ptr<Item> CreateAccessory(int difficulty);
     static std::shared_ptr<Item> CreateLegendaryWeapon(CharacterClass charClass);
     static std::shared_ptr<Item> CreateLegendaryChest(CharacterClass charClass);

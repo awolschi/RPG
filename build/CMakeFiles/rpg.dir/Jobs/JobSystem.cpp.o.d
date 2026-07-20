@@ -168,6 +168,8 @@ CMakeFiles/rpg.dir/Jobs/JobSystem.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Jobs/JobPerk.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Jobs/JobSpecialization.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Jobs/JobSkillTree.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Jobs/JobEnvironment.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Jobs/LocationUpgrades.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Jobs/ResourceChain.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Jobs/../Inventory/Inventory.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Jobs/../Inventory/../Items/Item.hpp \

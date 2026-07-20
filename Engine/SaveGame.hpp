@@ -10,6 +10,7 @@
 #include "../Achievements/Achievement.hpp"
 #include "../Factions/FactionReputation.hpp"
 #include "../Factions/Pet.hpp"
+#include "Wiki.hpp"
 
 struct SaveSlotInfo
 {
@@ -24,12 +25,12 @@ class SaveGameManager
 {
 public:
     static constexpr int SLOT_COUNT = 5;
-    static constexpr int SAVE_VERSION = 8;  // v8: resource persistence; pet passive bonuses
+    static constexpr int SAVE_VERSION = 10; // v10: persist wiki discovery state
 
     SaveGameManager();
 
-    bool SaveGame(const std::shared_ptr<Player>& player, int slot, int areaIndex, const ReligionSystem& religion, const AchievementSystem& achievements, const ReputationSystem& reputation, const PetManager& pets);
-    std::shared_ptr<Player> LoadGame(int slot, int& outAreaIndex, ReligionSystem& outReligion, AchievementSystem& outAchievements, ReputationSystem& outReputation, PetManager& outPets);
+    bool SaveGame(const std::shared_ptr<Player>& player, int slot, int areaIndex, const ReligionSystem& religion, const AchievementSystem& achievements, const ReputationSystem& reputation, const PetManager& pets, const Wiki& wiki);
+    std::shared_ptr<Player> LoadGame(int slot, int& outAreaIndex, ReligionSystem& outReligion, AchievementSystem& outAchievements, ReputationSystem& outReputation, PetManager& outPets, Wiki& outWiki);
 
     bool IsSlotOccupied(int slot);
     SaveSlotInfo GetSlotInfo(int slot);

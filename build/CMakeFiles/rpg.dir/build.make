@@ -601,10 +601,38 @@ CMakeFiles/rpg.dir/Jobs/JobSkillTree.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/rpg.dir/Jobs/JobSkillTree.cpp.s"
 	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/awolschi/Desktop/OwnProjects/RPG/Jobs/JobSkillTree.cpp -o CMakeFiles/rpg.dir/Jobs/JobSkillTree.cpp.s
 
+CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.o: CMakeFiles/rpg.dir/flags.make
+CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.o: ../Jobs/JobEnvironment.cpp
+CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.o: CMakeFiles/rpg.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_39) "Building CXX object CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.o"
+	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.o -MF CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.o.d -o CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.o -c /home/awolschi/Desktop/OwnProjects/RPG/Jobs/JobEnvironment.cpp
+
+CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.i"
+	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/awolschi/Desktop/OwnProjects/RPG/Jobs/JobEnvironment.cpp > CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.i
+
+CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.s"
+	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/awolschi/Desktop/OwnProjects/RPG/Jobs/JobEnvironment.cpp -o CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.s
+
+CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.o: CMakeFiles/rpg.dir/flags.make
+CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.o: ../Jobs/LocationUpgrades.cpp
+CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.o: CMakeFiles/rpg.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_40) "Building CXX object CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.o"
+	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.o -MF CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.o.d -o CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.o -c /home/awolschi/Desktop/OwnProjects/RPG/Jobs/LocationUpgrades.cpp
+
+CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.i"
+	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/awolschi/Desktop/OwnProjects/RPG/Jobs/LocationUpgrades.cpp > CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.i
+
+CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.s"
+	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/awolschi/Desktop/OwnProjects/RPG/Jobs/LocationUpgrades.cpp -o CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.s
+
 CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.o: CMakeFiles/rpg.dir/flags.make
 CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.o: ../Items/Resources/Resources.cpp
 CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.o: CMakeFiles/rpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_39) "Building CXX object CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_41) "Building CXX object CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.o"
 	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.o -MF CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.o.d -o CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.o -c /home/awolschi/Desktop/OwnProjects/RPG/Items/Resources/Resources.cpp
 
 CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.i: cmake_force
@@ -618,7 +646,7 @@ CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.s: cmake_force
 CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o: CMakeFiles/rpg.dir/flags.make
 CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o: ../Items/Crafting/Crafting.cpp
 CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o: CMakeFiles/rpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_40) "Building CXX object CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_42) "Building CXX object CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o"
 	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o -MF CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o.d -o CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o -c /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/Crafting.cpp
 
 CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.i: cmake_force
@@ -632,7 +660,7 @@ CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.s: cmake_force
 CMakeFiles/rpg.dir/Achievements/Achievement.cpp.o: CMakeFiles/rpg.dir/flags.make
 CMakeFiles/rpg.dir/Achievements/Achievement.cpp.o: ../Achievements/Achievement.cpp
 CMakeFiles/rpg.dir/Achievements/Achievement.cpp.o: CMakeFiles/rpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_41) "Building CXX object CMakeFiles/rpg.dir/Achievements/Achievement.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_43) "Building CXX object CMakeFiles/rpg.dir/Achievements/Achievement.cpp.o"
 	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/rpg.dir/Achievements/Achievement.cpp.o -MF CMakeFiles/rpg.dir/Achievements/Achievement.cpp.o.d -o CMakeFiles/rpg.dir/Achievements/Achievement.cpp.o -c /home/awolschi/Desktop/OwnProjects/RPG/Achievements/Achievement.cpp
 
 CMakeFiles/rpg.dir/Achievements/Achievement.cpp.i: cmake_force
@@ -646,7 +674,7 @@ CMakeFiles/rpg.dir/Achievements/Achievement.cpp.s: cmake_force
 CMakeFiles/rpg.dir/Factions/FactionReputation.cpp.o: CMakeFiles/rpg.dir/flags.make
 CMakeFiles/rpg.dir/Factions/FactionReputation.cpp.o: ../Factions/FactionReputation.cpp
 CMakeFiles/rpg.dir/Factions/FactionReputation.cpp.o: CMakeFiles/rpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_42) "Building CXX object CMakeFiles/rpg.dir/Factions/FactionReputation.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_44) "Building CXX object CMakeFiles/rpg.dir/Factions/FactionReputation.cpp.o"
 	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/rpg.dir/Factions/FactionReputation.cpp.o -MF CMakeFiles/rpg.dir/Factions/FactionReputation.cpp.o.d -o CMakeFiles/rpg.dir/Factions/FactionReputation.cpp.o -c /home/awolschi/Desktop/OwnProjects/RPG/Factions/FactionReputation.cpp
 
 CMakeFiles/rpg.dir/Factions/FactionReputation.cpp.i: cmake_force
@@ -660,7 +688,7 @@ CMakeFiles/rpg.dir/Factions/FactionReputation.cpp.s: cmake_force
 CMakeFiles/rpg.dir/Factions/Pet.cpp.o: CMakeFiles/rpg.dir/flags.make
 CMakeFiles/rpg.dir/Factions/Pet.cpp.o: ../Factions/Pet.cpp
 CMakeFiles/rpg.dir/Factions/Pet.cpp.o: CMakeFiles/rpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_43) "Building CXX object CMakeFiles/rpg.dir/Factions/Pet.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_45) "Building CXX object CMakeFiles/rpg.dir/Factions/Pet.cpp.o"
 	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/rpg.dir/Factions/Pet.cpp.o -MF CMakeFiles/rpg.dir/Factions/Pet.cpp.o.d -o CMakeFiles/rpg.dir/Factions/Pet.cpp.o -c /home/awolschi/Desktop/OwnProjects/RPG/Factions/Pet.cpp
 
 CMakeFiles/rpg.dir/Factions/Pet.cpp.i: cmake_force
@@ -674,7 +702,7 @@ CMakeFiles/rpg.dir/Factions/Pet.cpp.s: cmake_force
 CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.o: CMakeFiles/rpg.dir/flags.make
 CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.o: ../Graphics/GRenderer.cpp
 CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.o: CMakeFiles/rpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_44) "Building CXX object CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_46) "Building CXX object CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.o"
 	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.o -MF CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.o.d -o CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.o -c /home/awolschi/Desktop/OwnProjects/RPG/Graphics/GRenderer.cpp
 
 CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.i: cmake_force
@@ -688,7 +716,7 @@ CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.s: cmake_force
 CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.o: CMakeFiles/rpg.dir/flags.make
 CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.o: ../Graphics/IconRenderer.cpp
 CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.o: CMakeFiles/rpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_45) "Building CXX object CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_47) "Building CXX object CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.o"
 	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.o -MF CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.o.d -o CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.o -c /home/awolschi/Desktop/OwnProjects/RPG/Graphics/IconRenderer.cpp
 
 CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.i: cmake_force
@@ -702,7 +730,7 @@ CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.s: cmake_force
 CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.o: CMakeFiles/rpg.dir/flags.make
 CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.o: ../Graphics/TextureManager.cpp
 CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.o: CMakeFiles/rpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_46) "Building CXX object CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_48) "Building CXX object CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.o"
 	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.o -MF CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.o.d -o CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.o -c /home/awolschi/Desktop/OwnProjects/RPG/Graphics/TextureManager.cpp
 
 CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.i: cmake_force
@@ -716,7 +744,7 @@ CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.s: cmake_force
 CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.o: CMakeFiles/rpg.dir/flags.make
 CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.o: ../Graphics/PhotoEffects.cpp
 CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.o: CMakeFiles/rpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_47) "Building CXX object CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_49) "Building CXX object CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.o"
 	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.o -MF CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.o.d -o CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.o -c /home/awolschi/Desktop/OwnProjects/RPG/Graphics/PhotoEffects.cpp
 
 CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.i: cmake_force
@@ -730,7 +758,7 @@ CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.s: cmake_force
 CMakeFiles/rpg.dir/Graphics/BattleLayout.cpp.o: CMakeFiles/rpg.dir/flags.make
 CMakeFiles/rpg.dir/Graphics/BattleLayout.cpp.o: ../Graphics/BattleLayout.cpp
 CMakeFiles/rpg.dir/Graphics/BattleLayout.cpp.o: CMakeFiles/rpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_48) "Building CXX object CMakeFiles/rpg.dir/Graphics/BattleLayout.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_50) "Building CXX object CMakeFiles/rpg.dir/Graphics/BattleLayout.cpp.o"
 	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/rpg.dir/Graphics/BattleLayout.cpp.o -MF CMakeFiles/rpg.dir/Graphics/BattleLayout.cpp.o.d -o CMakeFiles/rpg.dir/Graphics/BattleLayout.cpp.o -c /home/awolschi/Desktop/OwnProjects/RPG/Graphics/BattleLayout.cpp
 
 CMakeFiles/rpg.dir/Graphics/BattleLayout.cpp.i: cmake_force
@@ -744,7 +772,7 @@ CMakeFiles/rpg.dir/Graphics/BattleLayout.cpp.s: cmake_force
 CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.o: CMakeFiles/rpg.dir/flags.make
 CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.o: ../Graphics/BattleRenderer.cpp
 CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.o: CMakeFiles/rpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_49) "Building CXX object CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_51) "Building CXX object CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.o"
 	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.o -MF CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.o.d -o CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.o -c /home/awolschi/Desktop/OwnProjects/RPG/Graphics/BattleRenderer.cpp
 
 CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.i: cmake_force
@@ -758,7 +786,7 @@ CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.s: cmake_force
 CMakeFiles/rpg.dir/Graphics/CreatureImageMapper.cpp.o: CMakeFiles/rpg.dir/flags.make
 CMakeFiles/rpg.dir/Graphics/CreatureImageMapper.cpp.o: ../Graphics/CreatureImageMapper.cpp
 CMakeFiles/rpg.dir/Graphics/CreatureImageMapper.cpp.o: CMakeFiles/rpg.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_50) "Building CXX object CMakeFiles/rpg.dir/Graphics/CreatureImageMapper.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_52) "Building CXX object CMakeFiles/rpg.dir/Graphics/CreatureImageMapper.cpp.o"
 	/usr/local/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/rpg.dir/Graphics/CreatureImageMapper.cpp.o -MF CMakeFiles/rpg.dir/Graphics/CreatureImageMapper.cpp.o.d -o CMakeFiles/rpg.dir/Graphics/CreatureImageMapper.cpp.o -c /home/awolschi/Desktop/OwnProjects/RPG/Graphics/CreatureImageMapper.cpp
 
 CMakeFiles/rpg.dir/Graphics/CreatureImageMapper.cpp.i: cmake_force
@@ -809,6 +837,8 @@ rpg_OBJECTS = \
 "CMakeFiles/rpg.dir/Jobs/JobQuest.cpp.o" \
 "CMakeFiles/rpg.dir/Jobs/JobSpecialization.cpp.o" \
 "CMakeFiles/rpg.dir/Jobs/JobSkillTree.cpp.o" \
+"CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.o" \
+"CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.o" \
 "CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.o" \
 "CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o" \
 "CMakeFiles/rpg.dir/Achievements/Achievement.cpp.o" \
@@ -863,6 +893,8 @@ rpg: CMakeFiles/rpg.dir/Jobs/ResourceChain.cpp.o
 rpg: CMakeFiles/rpg.dir/Jobs/JobQuest.cpp.o
 rpg: CMakeFiles/rpg.dir/Jobs/JobSpecialization.cpp.o
 rpg: CMakeFiles/rpg.dir/Jobs/JobSkillTree.cpp.o
+rpg: CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.o
+rpg: CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.o
 rpg: CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.o
 rpg: CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o
 rpg: CMakeFiles/rpg.dir/Achievements/Achievement.cpp.o
@@ -884,7 +916,7 @@ rpg: _deps/raylib-build/raylib/external/glfw/src/libglfw3.a
 rpg: /usr/lib/x86_64-linux-gnu/librt.a
 rpg: /usr/lib/x86_64-linux-gnu/libm.so
 rpg: CMakeFiles/rpg.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_51) "Linking CXX executable rpg"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/awolschi/Desktop/OwnProjects/RPG/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_53) "Linking CXX executable rpg"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/rpg.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

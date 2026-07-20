@@ -990,6 +990,30 @@ Items/Uniques/UniqueItems.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/Uniques/UniqueItems.cpp.s
 .PHONY : Items/Uniques/UniqueItems.cpp.s
 
+Jobs/JobEnvironment.o: Jobs/JobEnvironment.cpp.o
+.PHONY : Jobs/JobEnvironment.o
+
+# target to build an object file
+Jobs/JobEnvironment.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.o
+.PHONY : Jobs/JobEnvironment.cpp.o
+
+Jobs/JobEnvironment.i: Jobs/JobEnvironment.cpp.i
+.PHONY : Jobs/JobEnvironment.i
+
+# target to preprocess a source file
+Jobs/JobEnvironment.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.i
+.PHONY : Jobs/JobEnvironment.cpp.i
+
+Jobs/JobEnvironment.s: Jobs/JobEnvironment.cpp.s
+.PHONY : Jobs/JobEnvironment.s
+
+# target to generate assembly for a file
+Jobs/JobEnvironment.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.s
+.PHONY : Jobs/JobEnvironment.cpp.s
+
 Jobs/JobQuest.o: Jobs/JobQuest.cpp.o
 .PHONY : Jobs/JobQuest.o
 
@@ -1109,6 +1133,30 @@ Jobs/Jobs.s: Jobs/Jobs.cpp.s
 Jobs/Jobs.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/Jobs.cpp.s
 .PHONY : Jobs/Jobs.cpp.s
+
+Jobs/LocationUpgrades.o: Jobs/LocationUpgrades.cpp.o
+.PHONY : Jobs/LocationUpgrades.o
+
+# target to build an object file
+Jobs/LocationUpgrades.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.o
+.PHONY : Jobs/LocationUpgrades.cpp.o
+
+Jobs/LocationUpgrades.i: Jobs/LocationUpgrades.cpp.i
+.PHONY : Jobs/LocationUpgrades.i
+
+# target to preprocess a source file
+Jobs/LocationUpgrades.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.i
+.PHONY : Jobs/LocationUpgrades.cpp.i
+
+Jobs/LocationUpgrades.s: Jobs/LocationUpgrades.cpp.s
+.PHONY : Jobs/LocationUpgrades.s
+
+# target to generate assembly for a file
+Jobs/LocationUpgrades.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Jobs/LocationUpgrades.cpp.s
+.PHONY : Jobs/LocationUpgrades.cpp.s
 
 Jobs/ResourceChain.o: Jobs/ResourceChain.cpp.o
 .PHONY : Jobs/ResourceChain.o
@@ -1558,6 +1606,9 @@ help:
 	@echo "... Items/Uniques/UniqueItems.o"
 	@echo "... Items/Uniques/UniqueItems.i"
 	@echo "... Items/Uniques/UniqueItems.s"
+	@echo "... Jobs/JobEnvironment.o"
+	@echo "... Jobs/JobEnvironment.i"
+	@echo "... Jobs/JobEnvironment.s"
 	@echo "... Jobs/JobQuest.o"
 	@echo "... Jobs/JobQuest.i"
 	@echo "... Jobs/JobQuest.s"
@@ -1573,6 +1624,9 @@ help:
 	@echo "... Jobs/Jobs.o"
 	@echo "... Jobs/Jobs.i"
 	@echo "... Jobs/Jobs.s"
+	@echo "... Jobs/LocationUpgrades.o"
+	@echo "... Jobs/LocationUpgrades.i"
+	@echo "... Jobs/LocationUpgrades.s"
 	@echo "... Jobs/ResourceChain.o"
 	@echo "... Jobs/ResourceChain.i"
 	@echo "... Jobs/ResourceChain.s"

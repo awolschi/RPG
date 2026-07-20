@@ -1,76 +1,108 @@
-SAVE_VERSION 3
-Kowalle3
+SAVE_VERSION 10
+Kowallenheine
 3
 1
-7 260
-41 12
-160 130 16 26 10 20 11 9
-25 2178
-27|5|Copper Ore|1|5
-27|5|Wood|1|4
-30|5|Raw Fish|1|6
-27|5|Simple Ingot|1|8
-1|5|Oak Wood|1|9
-1|3|Mana Potion|2|10|C|0|58
-6|5|Slime Gel|1|5
-2|5|Bandit Mask|1|5
-7|5|Rat Tail|1|5
-4|3|Minor Health Potion|1|10|C|35|0
-3|3|Minor Mana Potion|1|10|C|0|24
-1|2|Band of Fortitude|2|10|AC|50|0|0|0
-4|5|Farm Key|3|15
-1|2|Amulet of the Sage|2|10|AC|15|36|0|0
-1|1|Merchant Prince's Vest|5|250|A|0|1|30|6|1|8|2|8|3|8|4|8|5|8|6|8
-5|5|Feather|1|5
-1|2|Orb of Focus|2|10|AC|0|48|0|0
-2|3|Health Potion|2|10|C|70|0
-1|0|Steel Axe|1|10|W|22|2|0|0
-1|1|Cloth Pants|1|10|A|0|3|4|1|1|5
-2|5|Elf Arrow|2|10
-2|5|Boar Tusk|2|10
-1|0|Training Staff|1|10|W|19|6|0|0
-1|5|Ectoplasm|2|10
-1|0|Training Staff|1|10|W|19|7|0|0
-1|0|Dagger|1|10|W|11|0|6|3
-1|0|Shortbow|1|10|W|14|0|0|0
-1|1|Reinforced Helm|2|10|A|1|0|7|1|2|3
-1|1|Leather Chest|1|10|A|1|1|3|1|5|2
+11 1320
+301 237
+200 150 24 38 14 28 15 13
+58 34737
+1|1|Straw-Filled Vest|5|250|-1|17|0|A|0|1|15|1|2|3
+1|1|Scarecrow's Hood|5|250|-1|15|0|A|0|0|12|1|1|5
+2|0|Overseer's Cleaver|5|250|-1|6|0|W|55|5|0|0
+6|5|Feather|1|5|-1|0|0|R|1|0|0|0
+2|3|Minor Health Potion|1|10|-1|0|0|C|40|0
+1|0|Doomhammer|3|10|-1|0|0|W|62|11|5|13
+1|1|Guardian Legplates|3|10|-1|0|0|A|2|3|12|1|2|3
+1|2|Band of Fortitude|2|10|-1|0|0|AC|60|0|0|0
+8|5|Farm Key|3|15|-1|0|0|R|3|0|0|0
+1|0|Training Staff|1|10|-1|0|0|W|17|6|0|0
+5|5|Bandit Mask|1|5|-1|0|0|R|1|0|0|0
+1|0|Arcane Staff|3|10|-1|0|0|W|47|36|4|13
+1|1|Gauntlets of Power|3|10|-1|0|0|A|2|2|12|0
+1|1|Coin-Lord's Crown|5|250|12|0|0|A|0|0|20|6|1|5|2|5|3|5|4|5|5|5|6|5
+4|3|Refreshing Draft|2|10|-1|0|0|C|36|26
+9|5|Rat Tail|1|5|-1|0|0|R|1|0|0|0
+3|0|Shortbow|1|10|-1|0|0|W|16|0|6|5
+1|1|Leather Boots|1|10|-1|0|0|A|1|4|3|1|1|4
+1|1|Leather Pants|1|10|-1|0|0|A|1|3|3|0
+1|0|Steel Axe|1|10|-1|0|0|W|20|0|0|0
+1|0|Apprentice Wand|1|10|-1|0|0|W|15|9|3|6
+2|1|Reinforced Gloves|2|10|-1|0|0|A|1|2|7|0
+1|0|Wooden Staff|1|10|-1|0|0|W|16|5|5|4
+12|5|Slime Gel|1|5|-1|0|0|R|1|0|0|0
+1|0|Frost Staff|2|10|-1|0|0|W|34|15|2|12
+2|0|Spellbook|1|10|-1|0|0|W|14|12|1|6
+1|0|Staff of Ages|3|10|-1|0|0|W|52|41|1|13
+2|3|Health Potion|2|10|-1|0|0|C|80|0
+1|0|Soul Reaper|3|10|-1|0|0|W|72|6|5|13
+1|1|Hands of the Weave|3|10|-1|0|0|A|0|2|12|1|5|4
+2|2|Pendant of Wisdom|2|10|-1|0|0|AC|0|46|0|0
+1|2|Gilded Signet|5|250|12|0|0|AC|80|40|4|10
+2|3|Minor Mana Potion|1|10|-1|0|0|C|0|28
+1|0|Thunderstrike Hammer|2|10|-1|0|0|W|42|4|3|14
+1|0|Iron Sword|1|10|-1|0|0|W|18|3|0|0
+5|3|Mana Potion|2|10|-1|0|0|C|0|66
+1|0|Wand of the Void|3|10|-1|0|0|W|49|46|4|13
+1|0|Venomfang Dagger|2|10|-1|0|0|W|34|10|5|14
+1|0|Apprentice Wand|1|10|-1|0|0|W|15|11|0|0
+1|1|Plate Boots|2|10|-1|0|0|A|2|4|7|0
+1|0|Dagger|1|10|-1|0|0|W|13|0|1|5
+1|0|Iron Sword|1|10|-1|0|0|W|18|1|2|5
+1|0|Wand of the Void|3|10|-1|0|0|W|65|49|4|17
+1|2|Elemental Loop|3|10|-1|0|0|AC|50|44|2|11
+1|1|Merchant Prince's Vest|5|250|12|0|0|A|0|1|30|6|1|8|2|8|3|8|4|8|5|8|6|8
+1|0|Dagger|1|10|-1|0|0|W|17|0|3|8
+1|1|Leather Pants|1|10|-1|0|0|A|1|3|4|0
+1|0|Holy Scepter|2|10|-1|0|0|W|48|17|6|17
+1|0|Scepter of Stars|3|10|-1|0|0|W|73|39|6|17
+1|0|Pitchfork of the Fields|5|250|-1|19|0|W|50|0|0|0
+1|0|Training Staff|1|10|-1|0|0|W|21|7|0|0
+1|0|Soul Reaper|3|10|-1|0|0|W|88|9|5|17
+1|1|Titan Chestplate|3|10|-1|0|0|A|2|1|15|0
+1|0|Shadowfang|2|10|-1|0|0|W|52|7|3|12
+2|1|Apprentice Hood|1|10|-1|0|0|A|0|0|4|1|3|4
+1|0|Crystal Staff|2|10|-1|0|0|W|44|19|5|12
+1|0|Shortbow|1|10|-1|0|0|W|20|0|0|0
+1|0|Apprentice Wand|1|10|-1|0|0|W|19|11|0|0
+1|0|Celestial Bow|3|10|-1|0|0|W|60|31|6|13
+1|0|Celestial Bow|3|10|-1|0|0|W|44|28|6|9
+1|1|Dragon Helm|3|10|-1|0|0|A|1|0|12|0
+1|1|Leather Chest|1|10|-1|0|0|A|1|1|3|0
+1|1|Leather Gloves|1|10|-1|0|0|A|1|2|3|1|6|5
 none
-none
-none
-none
-none
-none
-5
-Attack|1|33|0|25|0|6|0|0|0|0|0|0
-Piercing Shot|2|5|0|45|1|6|0|0|0|0|0|0
-Multi Shot|1|4|0|30|0|6|0|0|0|0|0|0
-Rain of Arrows|1|18|0|60|0|6|0|0|0|0|0|0
-Quick Shot|1|1|0|30|0|6|0|0|0|0|0|0
+1|1|Boots of Swiftness|3|10|-1|0|0|A|1|4|9|0
+1|2|Amulet of the Sage|2|10|-1|0|0|AC|20|52|0|0
+1|2|Ring of the Harvest|5|10|-1|51|0|AC|40|20|0|0
+1|2|Pendant of the Landlord|5|10|-1|50|0|AC|30|15|0|0
 4
-Piercing Shot
+Attack|2|56|0|29|1|6|0|0|0|0|0|0
+Multi Shot|1|0|0|30|0|6|0|0|0|0|0|0
+Rain of Arrows|1|0|0|60|0|6|0|0|0|0|0|0
+Quick Shot|1|0|0|30|0|6|0|0|0|0|0|0
+3
 Multi Shot
 Rain of Arrows
 Quick Shot
 4
-0 4 159 3 0
+0 1 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-1 5 28 4 0
+1 1 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-2 4 120 3 0
+2 1 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-3 4 131 3 0
+3 1 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-1
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0
 0
 0
 0
 0 0
 31
-Slime Exterminator|0|The slimes of Felrona have grown aggressive. Thin their numbers.|Slime|5|5|100|50|2|1
+Slime Exterminator|0|The slimes of Felrona have grown aggressive. Thin their numbers.|Slime|5|0|100|50|0|0
 Rat Catcher|0|Rats are infesting Felrona's buildings. Put a stop to it.|Rat|5|0|100|50|0|0
 Bandit Troubles|0|Bandits prey on travelers near Felrona. Teach them a lesson.|Bandit|5|0|150|75|0|0
-Gel Collection|1|Collect Slime Gel for the blacksmith's experiments.|Slime Gel|5|5|80|40|2|1
+Gel Collection|1|Collect Slime Gel for the blacksmith's experiments.|Slime Gel|5|0|80|40|0|0
 Rat Tails|1|Gather Rat Tails to prove your hunting prowess.|Rat Tail|5|0|80|40|0|0
 Wolf Hunter|0|Wolves stalk the Dark Woods paths. Reduce their pack.|Wolf|5|0|200|100|0|0
 Spider Menace|0|Giant Spiders spin their webs across Dark Woods. Clear them out.|Giant Spider|5|0|200|100|0|0
@@ -98,4 +130,7 @@ Citadel Siege|2|Storm The Citadel and face the corrupted knights within.|The Cit
 Abyssal Victory|2|The Abyssal Depths test even the strongest. Survive and emerge triumphant.|Abyssal Depths|1|0|1500|750|0|0
 Heavenly Ascent|2|The Heavenly Ascent challenges body and spirit. Ascend to glory.|The Heavenly Ascent|1|0|3000|1500|0|0
 Void Conqueror|2|The Endless Void consumes all who enter. Be the one who conquers it.|The Endless Void|1|0|5000|2500|0|0
-21|combat_boss_1,1,1,1|combat_boss_10,4,0,0|combat_boss_5,4,0,0|combat_first_kill,1,1,1|combat_kills_10,10,1,1|combat_kills_100,37,0,0|combat_kills_1000,37,0,0|combat_kills_50,37,0,0|combat_kills_500,37,0,0|explore_3_areas,2,0,0|explore_6_areas,2,0,0|explore_all_areas,2,0,0|gold_1000,1000,1,1|gold_10000,2178,0,0|gold_100000,2178,0,0|job_hours_100,100,1,1|job_hours_1000,117,0,0|job_hours_500,117,0,0|level_10,0,0,0|level_25,0,0,0|level_50,0,0,0 0000
+20|combat_boss_1,1,1,1|combat_boss_10,10,1,1|combat_boss_5,5,1,1|combat_first_kill,1,1,1|combat_kills_10,10,1,1|combat_kills_100,100,1,1|combat_kills_1000,128,0,0|combat_kills_50,50,1,1|combat_kills_500,128,0,0|gold_1000,1000,1,1|gold_10000,10000,1,1|gold_100000,34737,0,0|level_10,0,0,0|level_25,0,0,0|level_50,0,0,0|social_sell_100,74,0,0|social_sell_1000,74,0,0|social_sell_500,74,0,0|social_shop_200,1,0,0|social_shop_50,1,0,0 0000
+0:1534:5:1534;1:0:0:0;2:0:0:0;3:0:0:0;4:0:0:0;5:0:0:0;6:0:0:0;7:0:0:0;8:0:0:0;9:0:0:0;
+ember_sentinel:1:0:1:0:0;frost_wisp:0:0:1:0:0;storm_tide:0:0:1:0:0;arcane_drake:0:0:1:0:0;venom_shard:0:0:1:0:0;inferno_guardian:0:0:1:0:0;celestial_spark:0:0:1:0:0;void_mote:0:0:1:0:0;mana_weaver:0:0:1:0:0;chrono_spark:0:0:1:0:0;goblin_familiar:1:1:5:390:0;treant_sapling:0:0:1:0:0;kraken_ink:0:0:1:0:0;dragon_whelp:0:0:1:0:0;warlord_banner:0:0:1:0:0;void_shard:0:0:1:0:0;seraph_feather:0:0:1:0:0;primordial_heart:0:0:1:0:0;construct_core:0:0:1:0:0;chrono_fragment:0:0:1:0:0;
+Angry Chicken,Bandit,Farm Overseer,Rat,Slime;Ember Sentinel,Goblin Familiar,ember_sentinel,goblin_familiar;Amulet of the Sage,Apprentice Hood,Apprentice Sandals,Apprentice Trousers,Apprentice Wand,Arcane Staff,Arcane Wand,Band of Fortitude,Bandit Mask,Boots of Swiftness,Celestial Bow,Coin-Lord's Crown,Crown of the Archmage,Crystal Staff,Dagger,Doomhammer,Dragon Helm,Elemental Loop,Ember Ring,Enchanted Leggings,Ethereal Mantle,Farm Key,Feather,Flamebrand,Frost Staff,Gauntlets of Power,Gilded Signet,Glacial Bow,Guardian Legplates,Hands of the Weave,Health Potion,Holy Scepter,Iron Sword,Leather Boots,Leather Chest,Leather Gloves,Leather Helmet,Leather Pants,Legendary Sword,Leggings of Eternity,Mana Potion,Merchant Prince's Vest,Minor Health Potion,Minor Mana Potion,Mithril Mace,Orb of Focus,Overseer's Cleaver,Pendant of Wisdom,Pendant of the Landlord,Pitchfork of the Fields,Plate Boots,Rat Tail,Refreshing Draft,Reinforced Boots,Reinforced Gloves,Ring of the Harvest,Scarecrow's Hood,Scepter of Stars,Shadowfang,Shortbow,Slime Gel,Soul Reaper,Spellbook,Staff of Ages,Steel Axe,Straw-Filled Vest,Thunder Bow,Thunderstrike Hammer,Titan Chestplate,Training Staff,Venomfang Dagger,Wand of the Void,Wooden Staff

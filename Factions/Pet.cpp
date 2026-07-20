@@ -548,6 +548,7 @@ std::string PetManager::Serialize() const
 void PetManager::Deserialize(const std::string& data)
 {
     if (data.empty()) return;
+    if (pets.empty()) Initialize();
     std::istringstream ss(data);
     std::string entry;
     while (std::getline(ss, entry, ';'))

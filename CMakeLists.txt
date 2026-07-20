@@ -68,6 +68,8 @@ set(SOURCES
     Jobs/JobQuest.cpp
     Jobs/JobSpecialization.cpp
     Jobs/JobSkillTree.cpp
+    Jobs/JobEnvironment.cpp
+    Jobs/LocationUpgrades.cpp
     Items/Resources/Resources.cpp
     Items/Crafting/Crafting.cpp
 

@@ -317,6 +317,22 @@ int ReputationSystem::GetRankThreshold(RepRank rank) const
     return RANK_THRESHOLDS[static_cast<int>(rank)];
 }
 
+int ReputationSystem::GetRepIntoCurrentRank(FactionID faction) const
+{
+    const auto& f = GetFaction(faction);
+    int curThreshold = RANK_THRESHOLDS[static_cast<int>(f.rank)];
+    return f.reputation - curThreshold;
+}
+
+int ReputationSystem::GetRepForCurrentRankBracket(FactionID faction) const
+{
+    const auto& f = GetFaction(faction);
+    if (f.rank == RepRank::Legend) return 0;
+    int curThreshold = RANK_THRESHOLDS[static_cast<int>(f.rank)];
+    int nextThreshold = RANK_THRESHOLDS[static_cast<int>(f.rank) + 1];
+    return nextThreshold - curThreshold;
+}
+
 const FactionData& ReputationSystem::GetFactionData(FactionID faction) const
 {
     return GetFaction(faction);

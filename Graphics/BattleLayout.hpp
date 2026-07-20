@@ -18,7 +18,7 @@ struct BattleLayout
     int abilityY = 600;
     int abilitySize = 80;
     int abilitySpacing = 20;
-    int playerBarY = 720;
+    int playerBarY = 700;
 
     void Calculate(int screenW, int screenH);
 };
