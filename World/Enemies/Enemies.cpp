@@ -1,5 +1,4 @@
 #include "Enemies.hpp"
-#include <cstdlib>
 #include "../../Characters/Monster.hpp"
 
 // ============================================================
@@ -579,6 +578,7 @@ std::shared_ptr<Monster> EnemyDatabase::CreateArcaneGuardian()
     m->SetResistance(ElementType::Arcane, 0.5f);      // Arcane guardian resists arcane
     m->SetDropTier(9);
     m->AddSpecialDrop("Arcane Fragment", 30, 1, 1);
+    m->AddSpecialDrop("Arcane Crystal", 25, 1, 1);
     return m;
 }
 
@@ -591,6 +591,7 @@ std::shared_ptr<Monster> EnemyDatabase::CreateManaWisp()
     m->SetResistance(ElementType::Physical, 0.75f);   // Resists physical
     m->SetDropTier(9);
     m->AddSpecialDrop("Mana Crystal", 35, 1, 2);
+    m->AddSpecialDrop("Arcane Crystal", 25, 1, 1);
     return m;
 }
 
@@ -603,6 +604,7 @@ std::shared_ptr<Monster> EnemyDatabase::CreateCrystalElemental()
     m->SetResistance(ElementType::Lightning, 1.5f);   // Weak to lightning
     m->SetDropTier(9);
     m->AddSpecialDrop("Crystal Shard", 30, 1, 1);
+    m->AddSpecialDrop("Arcane Crystal", 25, 1, 1);
     return m;
 }
 
@@ -615,6 +617,7 @@ std::shared_ptr<Monster> EnemyDatabase::CreateSpellblade()
     m->SetResistance(ElementType::Physical, 0.75f);   // Skilled warrior
     m->SetDropTier(9);
     m->AddSpecialDrop("Spell Essence", 25, 1, 1);
+    m->AddSpecialDrop("Arcane Crystal", 25, 1, 1);
     return m;
 }
 
@@ -679,6 +682,7 @@ std::shared_ptr<Monster> EnemyDatabase::CreateArcaneConstruct()
     m->SetResistance(ElementType::Arcane, 0.25f);     // Arcane construct immune to arcane
     m->SetDropTier(11);
     m->AddSpecialDrop("Arcane Core", 100, 1, 1);
+    m->AddSpecialDrop("Arcane Crystal", 100, 1, 2);
     return m;
 }
 

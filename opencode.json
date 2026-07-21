@@ -1,0 +1,41 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "plan": {
+      "mode": "primary",
+      "model": "opencode-go/kimi-k3",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    },
+    "build": {
+      "mode": "primary",
+      "model": "opencode-go/qwen3.7-plus",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    },
+    "code-reviewer": {
+      "description": "Audits codebase for performance flaws, memory leaks, or state tracking issues.",
+      "mode": "subagent",
+      "model": "opencode-go/deepseek-v4-pro",
+      "prompt": "You are a senior graphics and gameplay mechanics auditor. Evaluate code strictly for game-loop optimization, frame-budget bottlenecks, and race conditions.",
+      "permission": {
+        "edit": "deny",
+        "bash": "deny"
+      }
+    },
+    "script-monkey": {
+      "description": "Generates isolated utility functions, boilerplate, and math helpers.",
+      "mode": "subagent",
+      "model": "opencode-go/deepseek-v4-flash",
+      "prompt": "You are a high-speed utility script writer. Output clean, modular, standalone game code blocks with zero unnecessary text conversational fluff.",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    }
+  }
+}

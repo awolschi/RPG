@@ -173,11 +173,40 @@ CMakeFiles/rpg.dir/Items/Passives.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Items/../Characters/../Items/Equipment/Equipment.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Items/../Characters/../Skills/Skills.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Items/../Characters/../Skills/Skill.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Items/../Engine/RNG.hpp \
+ /usr/include/c++/10/random /usr/include/c++/10/cmath /usr/include/math.h \
+ /usr/include/x86_64-linux-gnu/bits/math-vector.h \
+ /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
+ /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \
+ /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
+ /usr/include/x86_64-linux-gnu/bits/fp-fast.h \
+ /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h \
+ /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
+ /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
+ /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
+ /usr/include/c++/10/bits/specfun.h /usr/include/c++/10/limits \
+ /usr/include/c++/10/tr1/gamma.tcc \
+ /usr/include/c++/10/tr1/special_function_util.h \
+ /usr/include/c++/10/tr1/bessel_function.tcc \
+ /usr/include/c++/10/tr1/beta_function.tcc \
+ /usr/include/c++/10/tr1/ell_integral.tcc \
+ /usr/include/c++/10/tr1/exp_integral.tcc \
+ /usr/include/c++/10/tr1/hypergeometric.tcc \
+ /usr/include/c++/10/tr1/legendre_function.tcc \
+ /usr/include/c++/10/tr1/modified_bessel_func.tcc \
+ /usr/include/c++/10/tr1/poly_hermite.tcc \
+ /usr/include/c++/10/tr1/poly_laguerre.tcc \
+ /usr/include/c++/10/tr1/riemann_zeta.tcc \
+ /usr/include/c++/10/bits/random.h \
+ /usr/include/c++/10/bits/uniform_int_dist.h \
+ /usr/include/x86_64-linux-gnu/c++/10/bits/opt_random.h \
+ /usr/include/c++/10/bits/random.tcc /usr/include/c++/10/numeric \
+ /usr/include/c++/10/bits/stl_numeric.h \
+ /usr/include/c++/10/pstl/glue_numeric_defs.h \
  /usr/include/c++/10/functional /usr/include/c++/10/bits/std_function.h \
  /usr/include/c++/10/unordered_map /usr/include/c++/10/bits/hashtable.h \
- /usr/include/c++/10/bits/hashtable_policy.h /usr/include/c++/10/limits \
+ /usr/include/c++/10/bits/hashtable_policy.h \
  /usr/include/c++/10/bits/unordered_map.h \
  /usr/include/c++/10/bits/stl_algo.h \
  /usr/include/c++/10/bits/algorithmfwd.h \
- /usr/include/c++/10/bits/stl_heap.h \
- /usr/include/c++/10/bits/uniform_int_dist.h
+ /usr/include/c++/10/bits/stl_heap.h

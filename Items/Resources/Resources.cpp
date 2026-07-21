@@ -1,5 +1,5 @@
 #include "Resources.hpp"
-#include <cstdlib>
+#include "Engine/RNG.hpp"
 
 Resource::Resource(const std::string& name, int tier, int sellValue,
                    int healAmount, int manaAmount, ResourceQuality quality)
@@ -40,7 +40,7 @@ std::string Resource::GetFullName() const
 
 ResourceQuality ResourceFactory::RollQuality(int jobLevel)
 {
-    int roll = rand() % 100;
+    int roll = RNG::Percent();
     int masterworkChance = 0;
     int fineChance = 0;
 

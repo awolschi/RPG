@@ -774,6 +774,30 @@ Graphics/PhotoEffects.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.s
 .PHONY : Graphics/PhotoEffects.cpp.s
 
+Graphics/SoundManager.o: Graphics/SoundManager.cpp.o
+.PHONY : Graphics/SoundManager.o
+
+# target to build an object file
+Graphics/SoundManager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/SoundManager.cpp.o
+.PHONY : Graphics/SoundManager.cpp.o
+
+Graphics/SoundManager.i: Graphics/SoundManager.cpp.i
+.PHONY : Graphics/SoundManager.i
+
+# target to preprocess a source file
+Graphics/SoundManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/SoundManager.cpp.i
+.PHONY : Graphics/SoundManager.cpp.i
+
+Graphics/SoundManager.s: Graphics/SoundManager.cpp.s
+.PHONY : Graphics/SoundManager.s
+
+# target to generate assembly for a file
+Graphics/SoundManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Graphics/SoundManager.cpp.s
+.PHONY : Graphics/SoundManager.cpp.s
+
 Graphics/TextureManager.o: Graphics/TextureManager.cpp.o
 .PHONY : Graphics/TextureManager.o
 
@@ -1579,6 +1603,9 @@ help:
 	@echo "... Graphics/PhotoEffects.o"
 	@echo "... Graphics/PhotoEffects.i"
 	@echo "... Graphics/PhotoEffects.s"
+	@echo "... Graphics/SoundManager.o"
+	@echo "... Graphics/SoundManager.i"
+	@echo "... Graphics/SoundManager.s"
 	@echo "... Graphics/TextureManager.o"
 	@echo "... Graphics/TextureManager.i"
 	@echo "... Graphics/TextureManager.s"

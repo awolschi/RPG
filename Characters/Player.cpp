@@ -13,6 +13,7 @@ Player::Player(const std::string& name, CharacterClass characterClass, Character
       characterClass(characterClass), race(race),
       inventory()
 {
+    inventory.SetCapacity(20);
     skills.AddSkill(std::make_shared<CommonAttack>());
     InitializeClassSkills();
     RebuildLoadout();
@@ -21,6 +22,14 @@ Player::Player(const std::string& name, CharacterClass characterClass, Character
     jobSystem.AddJob(JobType::Lumberjacking);
     jobSystem.AddJob(JobType::Fishing);
     jobSystem.AddJob(JobType::Smithing);
+}
+
+int Player::GetBagBonus() const
+{
+    auto oh = std::dynamic_pointer_cast<Offhand>(equipment.offhand);
+    if (oh && oh->offhandType == OffhandType::Bag)
+        return oh->defense * 2; // Each bag defense point adds 2 capacity
+    return 0;
 }
 
 void Player::LevelUp()
@@ -50,6 +59,23 @@ void Player::InitializeClassSkills()
                 auto bc = std::make_shared<BattleCry>(); bc->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(bc, level);
                 auto ex = std::make_shared<Execute>(); ex->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(ex, level);
                 auto ws = std::make_shared<WarStomp>(); ws->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(ws, level);
+                auto cl = std::make_shared<Cleave>(); cl->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(cl, level);
+                auto sw = std::make_shared<ShieldWall>(); sw->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(sw, level);
+                auto rc = std::make_shared<RallyingCry>(); rc->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(rc, level);
+                auto hs = std::make_shared<HammerSlam>(); hs->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(hs, level);
+                auto vr = std::make_shared<VictoryRush>(); vr->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(vr, level);
+                auto ch = std::make_shared<Charge>(); ch->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(ch, level);
+                auto cs = std::make_shared<CleaveStrike>(); cs->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(cs, level);
+                auto im = std::make_shared<Intimidate>(); im->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(im, level);
+                auto br = std::make_shared<BerserkerRage>(); br->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(br, level);
+                auto ic = std::make_shared<Intercept>(); ic->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(ic, level);
+                auto ft = std::make_shared<Fortress>(); ft->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(ft, level);
+                auto sc = std::make_shared<ShieldCharge>(); sc->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(sc, level);
+                auto dv = std::make_shared<Devastate>(); dv->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(dv, level);
+                auto wb = std::make_shared<Warbanner>(); wb->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(wb, level);
+                auto cs2 = std::make_shared<ColossusStrike>(); cs2->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(cs2, level);
+                auto rm = std::make_shared<Rampage>(); rm->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(rm, level);
+                auto tg = std::make_shared<TitansGrip>(); tg->characterClass = CharacterClass::Warrior; skills.AddSkillIfLevelMet(tg, level);
             }
             break;
 
@@ -93,6 +119,29 @@ void Player::InitializeClassSkills()
                 auto rn = std::make_shared<Renew>(); rn->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(rn, level);
                 auto hn = std::make_shared<HolyNova>(); hn->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(hn, level);
                 auto dw = std::make_shared<DivineWrath>(); dw->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(dw, level);
+                auto pm = std::make_shared<PrayerOfMending>(); pm->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(pm, level);
+                auto cl = std::make_shared<CleansingLight>(); cl->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(cl, level);
+                auto hs2 = std::make_shared<HolySmiteII>(); hs2->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(hs2, level);
+                auto rd = std::make_shared<Radiance>(); rd->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(rd, level);
+                auto su = std::make_shared<SmiteUndead>(); su->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(su, level);
+                auto ba = std::make_shared<Barrier>(); ba->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(ba, level);
+                auto ph = std::make_shared<PrayerOfHealing>(); ph->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(ph, level);
+                auto pu = std::make_shared<Purify>(); pu->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(pu, level);
+                auto bn = std::make_shared<Benediction>(); bn->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(bn, level);
+                auto hf = std::make_shared<HolyFire>(); hf->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(hf, level);
+                auto cg = std::make_shared<ConsecratedGround>(); cg->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(cg, level);
+                auto sr = std::make_shared<Serenity>(); sr->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(sr, level);
+                auto ab = std::make_shared<ArchangelsBlessing>(); ab->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(ab, level);
+                auto jd = std::make_shared<Judgement>(); jd->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(jd, level);
+                auto as = std::make_shared<Ascension>(); as->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(as, level);
+                auto ex = std::make_shared<Exorcism>(); ex->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(ex, level);
+                auto dh = std::make_shared<DivineHurricane>(); dh->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(dh, level);
+                auto pn = std::make_shared<Penance>(); pn->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(pn, level);
+                auto rp = std::make_shared<Rapture>(); rp->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(rp, level);
+                auto hp = std::make_shared<HolyPrism>(); hp->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(hp, level);
+                auto gg = std::make_shared<GraceOfGod>(); gg->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(gg, level);
+                auto cj = std::make_shared<CelestialJudgment>(); cj->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(cj, level);
+                auto ap = std::make_shared<Apotheosis>(); ap->characterClass = CharacterClass::Priest; skills.AddSkillIfLevelMet(ap, level);
             }
             break;
 
@@ -105,6 +154,30 @@ void Player::InitializeClassSkills()
                 auto sn = std::make_shared<Snipe>(); sn->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(sn, level);
                 auto ast = std::make_shared<ArrowStorm>(); ast->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(ast, level);
                 auto dm = std::make_shared<DeathMark>(); dm->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(dm, level);
+                auto pa = std::make_shared<PoisonedArrow>(); pa->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(pa, level);
+                auto ev = std::make_shared<Evade>(); ev->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(ev, level);
+                auto as = std::make_shared<AimedShot>(); as->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(as, level);
+                auto vo = std::make_shared<Volley>(); vo->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(vo, level);
+                auto ts = std::make_shared<TrapShot>(); ts->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(ts, level);
+                auto he = std::make_shared<HawkEye>(); he->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(he, level);
+                auto ew = std::make_shared<ExploitWeakness>(); ew->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(ew, level);
+                auto cs = std::make_shared<ConcussiveShot>(); cs->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(cs, level);
+                auto cm = std::make_shared<Camouflage>(); cm->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(cm, level);
+                auto dt = std::make_shared<DoubleTap>(); dt->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(dt, level);
+                auto ss = std::make_shared<ScatterShot>(); ss->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(ss, level);
+                auto mt = std::make_shared<MarkTarget>(); mt->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(mt, level);
+                auto hs = std::make_shared<Headshot>(); hs->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(hs, level);
+                auto ba = std::make_shared<Barrage>(); ba->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(ba, level);
+                auto sm = std::make_shared<Shadowmeld>(); sm->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(sm, level);
+                auto sob = std::make_shared<StormOfBlades>(); sob->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(sob, level);
+                auto em = std::make_shared<EvasiveManeuvers>(); em->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(em, level);
+                auto rf = std::make_shared<RapidFire>(); rf->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(rf, level);
+                auto wr = std::make_shared<Windrunner>(); wr->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(wr, level);
+                auto pb = std::make_shared<PiercingBarrage>(); pb->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(pb, level);
+                auto ss2 = std::make_shared<ShadowStep>(); ss2->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(ss2, level);
+                auto wa = std::make_shared<WindArrow>(); wa->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(wa, level);
+                auto ew2 = std::make_shared<EaglesWrath>(); ew2->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(ew2, level);
+                auto pv = std::make_shared<PhantomVolley>(); pv->characterClass = CharacterClass::Archer; skills.AddSkillIfLevelMet(pv, level);
             }
             break;
 
@@ -117,6 +190,30 @@ void Player::InitializeClassSkills()
                 auto iv = std::make_shared<Invest>(); iv->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(iv, level);
                 auto cs = std::make_shared<CoinStorm>(); cs->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(cs, level);
                 auto gh = std::make_shared<GoldenHurricane>(); gh->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(gh, level);
+                auto po = std::make_shared<PurchaseOrder>(); po->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(po, level);
+                auto aw = std::make_shared<AssessWeakness>(); aw->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(aw, level);
+                auto pc = std::make_shared<PriceCheck>(); pc->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(pc, level);
+                auto ms = std::make_shared<MarketSwing>(); ms->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(ms, level);
+                auto bd = std::make_shared<BulkDeal>(); bd->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(bd, level);
+                auto lq = std::make_shared<Liquidate>(); lq->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(lq, level);
+                auto ht = std::make_shared<HostileTakeover>(); ht->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(ht, level);
+                auto ip = std::make_shared<InsurancePolicy>(); ip->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(ip, level);
+                auto ss = std::make_shared<ShortSell>(); ss->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(ss, level);
+                auto pl = std::make_shared<PredatoryLending>(); pl->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(pl, level);
+                auto gr = std::make_shared<GoldReserves>(); gr->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(gr, level);
+                auto mc = std::make_shared<MarginCall>(); mc->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(mc, level);
+                auto mo = std::make_shared<Monopoly>(); mo->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(mo, level);
+                auto mk = std::make_shared<MarketCrash>(); mk->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(mk, level);
+                auto tx = std::make_shared<Taxation>(); tx->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(tx, level);
+                auto pl2 = std::make_shared<Plunder>(); pl2->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(pl2, level);
+                auto cm = std::make_shared<CornerMarket>(); cm->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(cm, level);
+                auto ff = std::make_shared<FortunesFavor>(); ff->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(ff, level);
+                auto hb = std::make_shared<HostileBid>(); hb->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(hb, level);
+                auto ec = std::make_shared<EconomicCollapse>(); ec->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(ec, level);
+                auto mz = std::make_shared<Monopolize>(); mz->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(mz, level);
+                auto hm = std::make_shared<HostileMerger>(); hm->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(hm, level);
+                auto gh2 = std::make_shared<GoldenHandshake>(); gh2->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(gh2, level);
+                auto lb = std::make_shared<LegendaryBargain>(); lb->characterClass = CharacterClass::Merchant; skills.AddSkillIfLevelMet(lb, level);
             }
             break;
 
@@ -128,6 +225,7 @@ void Player::InitializeClassSkills()
 bool Player::CanEquip(const std::shared_ptr<Item>& item) const
 {
     if (!item) return false;
+    if (item->requiredLevel > GetLevel()) return false;
 
     ClassData classData = ClassDatabase::Get(characterClass);
 
@@ -398,15 +496,36 @@ void Player::CheckNewSkills()
     switch (characterClass)
     {
         case CharacterClass::Warrior:
+            learned |= addIfMissing("Power Strike", []{ return std::make_shared<PowerStrike>(); });
+            learned |= addIfMissing("Whirlwind", []{ return std::make_shared<Whirlwind>(); });
             learned |= addIfMissing("Defensive Stance", []{ return std::make_shared<DefensiveStance>(); });
             learned |= addIfMissing("War Cry", []{ return std::make_shared<WarCry>(); });
             learned |= addIfMissing("Shield Bash", []{ return std::make_shared<ShieldBash>(); });
             learned |= addIfMissing("Battle Cry", []{ return std::make_shared<BattleCry>(); });
             learned |= addIfMissing("Execute", []{ return std::make_shared<Execute>(); });
             learned |= addIfMissing("War Stomp", []{ return std::make_shared<WarStomp>(); });
+            learned |= addIfMissing("Cleave", []{ return std::make_shared<Cleave>(); });
+            learned |= addIfMissing("Shield Wall", []{ return std::make_shared<ShieldWall>(); });
+            learned |= addIfMissing("Rallying Cry", []{ return std::make_shared<RallyingCry>(); });
+            learned |= addIfMissing("Hammer Slam", []{ return std::make_shared<HammerSlam>(); });
+            learned |= addIfMissing("Victory Rush", []{ return std::make_shared<VictoryRush>(); });
+            learned |= addIfMissing("Charge", []{ return std::make_shared<Charge>(); });
+            learned |= addIfMissing("Cleave Strike", []{ return std::make_shared<CleaveStrike>(); });
+            learned |= addIfMissing("Intimidate", []{ return std::make_shared<Intimidate>(); });
+            learned |= addIfMissing("Berserker Rage", []{ return std::make_shared<BerserkerRage>(); });
+            learned |= addIfMissing("Intercept", []{ return std::make_shared<Intercept>(); });
+            learned |= addIfMissing("Fortress", []{ return std::make_shared<Fortress>(); });
+            learned |= addIfMissing("Shield Charge", []{ return std::make_shared<ShieldCharge>(); });
+            learned |= addIfMissing("Devastate", []{ return std::make_shared<Devastate>(); });
+            learned |= addIfMissing("Warbanner", []{ return std::make_shared<Warbanner>(); });
+            learned |= addIfMissing("Colossus Strike", []{ return std::make_shared<ColossusStrike>(); });
+            learned |= addIfMissing("Rampage", []{ return std::make_shared<Rampage>(); });
+            learned |= addIfMissing("Titan's Grip", []{ return std::make_shared<TitansGrip>(); });
             break;
 
         case CharacterClass::Mage:
+            learned |= addIfMissing("Fireball", []{ return std::make_shared<Fireball>(); });
+            learned |= addIfMissing("Ice Bolt", []{ return std::make_shared<IceBolt>(); });
             learned |= addIfMissing("Arcane Bolt", []{ return std::make_shared<ArcaneBolt>(); });
             learned |= addIfMissing("Meteor", []{ return std::make_shared<Meteor>(); });
             learned |= addIfMissing("Frost Ward", []{ return std::make_shared<FrostWard>(); });
@@ -433,21 +552,71 @@ void Player::CheckNewSkills()
             break;
 
         case CharacterClass::Priest:
+            learned |= addIfMissing("Holy Smite", []{ return std::make_shared<HolySmite>(); });
+            learned |= addIfMissing("Heal", []{ return std::make_shared<Heal>(); });
             learned |= addIfMissing("Mass Heal", []{ return std::make_shared<MassHeal>(); });
             learned |= addIfMissing("Divine Shield", []{ return std::make_shared<DivineShield>(); });
             learned |= addIfMissing("Smite", []{ return std::make_shared<Smite>(); });
             learned |= addIfMissing("Renew", []{ return std::make_shared<Renew>(); });
             learned |= addIfMissing("Holy Nova", []{ return std::make_shared<HolyNova>(); });
             learned |= addIfMissing("Divine Wrath", []{ return std::make_shared<DivineWrath>(); });
+            learned |= addIfMissing("Prayer of Mending", []{ return std::make_shared<PrayerOfMending>(); });
+            learned |= addIfMissing("Cleansing Light", []{ return std::make_shared<CleansingLight>(); });
+            learned |= addIfMissing("Holy Smite II", []{ return std::make_shared<HolySmiteII>(); });
+            learned |= addIfMissing("Radiance", []{ return std::make_shared<Radiance>(); });
+            learned |= addIfMissing("Smite Undead", []{ return std::make_shared<SmiteUndead>(); });
+            learned |= addIfMissing("Barrier", []{ return std::make_shared<Barrier>(); });
+            learned |= addIfMissing("Prayer of Healing", []{ return std::make_shared<PrayerOfHealing>(); });
+            learned |= addIfMissing("Purify", []{ return std::make_shared<Purify>(); });
+            learned |= addIfMissing("Benediction", []{ return std::make_shared<Benediction>(); });
+            learned |= addIfMissing("Holy Fire", []{ return std::make_shared<HolyFire>(); });
+            learned |= addIfMissing("Consecrated Ground", []{ return std::make_shared<ConsecratedGround>(); });
+            learned |= addIfMissing("Serenity", []{ return std::make_shared<Serenity>(); });
+            learned |= addIfMissing("Archangel's Blessing", []{ return std::make_shared<ArchangelsBlessing>(); });
+            learned |= addIfMissing("Judgement", []{ return std::make_shared<Judgement>(); });
+            learned |= addIfMissing("Ascension", []{ return std::make_shared<Ascension>(); });
+            learned |= addIfMissing("Exorcism", []{ return std::make_shared<Exorcism>(); });
+            learned |= addIfMissing("Divine Hurricane", []{ return std::make_shared<DivineHurricane>(); });
+            learned |= addIfMissing("Penance", []{ return std::make_shared<Penance>(); });
+            learned |= addIfMissing("Rapture", []{ return std::make_shared<Rapture>(); });
+            learned |= addIfMissing("Holy Prism", []{ return std::make_shared<HolyPrism>(); });
+            learned |= addIfMissing("Grace of God", []{ return std::make_shared<GraceOfGod>(); });
+            learned |= addIfMissing("Celestial Judgment", []{ return std::make_shared<CelestialJudgment>(); });
+            learned |= addIfMissing("Apotheosis", []{ return std::make_shared<Apotheosis>(); });
             break;
 
         case CharacterClass::Archer:
+            learned |= addIfMissing("Piercing Shot", []{ return std::make_shared<PiercingShot>(); });
             learned |= addIfMissing("Multi Shot", []{ return std::make_shared<MultiShot>(); });
             learned |= addIfMissing("Rain of Arrows", []{ return std::make_shared<RainOfArrows>(); });
             learned |= addIfMissing("Quick Shot", []{ return std::make_shared<QuickShot>(); });
             learned |= addIfMissing("Snipe", []{ return std::make_shared<Snipe>(); });
             learned |= addIfMissing("Arrow Storm", []{ return std::make_shared<ArrowStorm>(); });
             learned |= addIfMissing("Death Mark", []{ return std::make_shared<DeathMark>(); });
+            learned |= addIfMissing("Poisoned Arrow", []{ return std::make_shared<PoisonedArrow>(); });
+            learned |= addIfMissing("Evade", []{ return std::make_shared<Evade>(); });
+            learned |= addIfMissing("Aimed Shot", []{ return std::make_shared<AimedShot>(); });
+            learned |= addIfMissing("Volley", []{ return std::make_shared<Volley>(); });
+            learned |= addIfMissing("Trap Shot", []{ return std::make_shared<TrapShot>(); });
+            learned |= addIfMissing("Hawk Eye", []{ return std::make_shared<HawkEye>(); });
+            learned |= addIfMissing("Exploit Weakness", []{ return std::make_shared<ExploitWeakness>(); });
+            learned |= addIfMissing("Concussive Shot", []{ return std::make_shared<ConcussiveShot>(); });
+            learned |= addIfMissing("Camouflage", []{ return std::make_shared<Camouflage>(); });
+            learned |= addIfMissing("Double Tap", []{ return std::make_shared<DoubleTap>(); });
+            learned |= addIfMissing("Scatter Shot", []{ return std::make_shared<ScatterShot>(); });
+            learned |= addIfMissing("Mark Target", []{ return std::make_shared<MarkTarget>(); });
+            learned |= addIfMissing("Headshot", []{ return std::make_shared<Headshot>(); });
+            learned |= addIfMissing("Barrage", []{ return std::make_shared<Barrage>(); });
+            learned |= addIfMissing("Shadowmeld", []{ return std::make_shared<Shadowmeld>(); });
+            learned |= addIfMissing("Storm of Blades", []{ return std::make_shared<StormOfBlades>(); });
+            learned |= addIfMissing("Evasive Maneuvers", []{ return std::make_shared<EvasiveManeuvers>(); });
+            learned |= addIfMissing("Rapid Fire", []{ return std::make_shared<RapidFire>(); });
+            learned |= addIfMissing("Windrunner", []{ return std::make_shared<Windrunner>(); });
+            learned |= addIfMissing("Piercing Barrage", []{ return std::make_shared<PiercingBarrage>(); });
+            learned |= addIfMissing("Shadow Step", []{ return std::make_shared<ShadowStep>(); });
+            learned |= addIfMissing("Wind Arrow", []{ return std::make_shared<WindArrow>(); });
+            learned |= addIfMissing("Eagle's Wrath", []{ return std::make_shared<EaglesWrath>(); });
+            learned |= addIfMissing("Phantom Volley", []{ return std::make_shared<PhantomVolley>(); });
             break;
 
         case CharacterClass::Merchant:

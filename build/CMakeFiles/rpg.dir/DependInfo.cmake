@@ -30,6 +30,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/awolschi/Desktop/OwnProjects/RPG/Graphics/GRenderer.cpp" "CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.o" "gcc" "CMakeFiles/rpg.dir/Graphics/GRenderer.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Graphics/IconRenderer.cpp" "CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.o" "gcc" "CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Graphics/PhotoEffects.cpp" "CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.o" "gcc" "CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.o.d"
+  "/home/awolschi/Desktop/OwnProjects/RPG/Graphics/SoundManager.cpp" "CMakeFiles/rpg.dir/Graphics/SoundManager.cpp.o" "gcc" "CMakeFiles/rpg.dir/Graphics/SoundManager.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Graphics/TextureManager.cpp" "CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.o" "gcc" "CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Inventory/Inventory.cpp" "CMakeFiles/rpg.dir/Inventory/Inventory.cpp.o" "gcc" "CMakeFiles/rpg.dir/Inventory/Inventory.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/Crafting.cpp" "CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o" "gcc" "CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o.d"

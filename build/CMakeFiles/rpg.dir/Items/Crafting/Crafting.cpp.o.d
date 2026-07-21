@@ -177,6 +177,10 @@ CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../Resources/../Item.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../../Inventory/Inventory.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../../Inventory/../Items/Item.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../../Jobs/Job.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../../Jobs/../Items/Resources/Resources.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../../Jobs/JobPerk.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../../Jobs/JobSpecialization.hpp \
  /usr/include/c++/10/algorithm \
  /usr/include/c++/10/pstl/glue_algorithm_defs.h \
  /usr/include/c++/10/iostream /usr/include/c++/10/ostream \

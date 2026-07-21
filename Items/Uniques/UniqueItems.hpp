@@ -89,6 +89,15 @@ private:
     static void RegisterMageEpics();
     static void RegisterBossLegendaries();
     static void RegisterSetItems();
+    static void RegisterMerchantUniques();
+    static void RegisterMerchantEpics();
+    static void RegisterWarriorLegendaries();
+    static void RegisterWarriorEpics();
+    static void RegisterArcherLegendaries();
+    static void RegisterArcherEpics();
+    static void RegisterPriestLegendaries();
+    static void RegisterPriestEpics();
+    static void RegisterAchievementItems();
 };
 
 #endif

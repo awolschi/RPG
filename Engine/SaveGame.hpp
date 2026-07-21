@@ -25,7 +25,7 @@ class SaveGameManager
 {
 public:
     static constexpr int SLOT_COUNT = 5;
-    static constexpr int SAVE_VERSION = 10; // v10: persist wiki discovery state
+    static constexpr int SAVE_VERSION = 13; // v13: job fatigue persistence
 
     SaveGameManager();
 

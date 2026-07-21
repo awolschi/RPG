@@ -171,7 +171,7 @@ CMakeFiles/rpg.dir/Engine/Religion.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Items/Equipment/../../Skills/../Characters/Stats/Stats.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Skills/Skills.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Characters/../Skills/Skill.hpp \
- /usr/include/c++/10/iostream /usr/include/c++/10/ostream \
+ /usr/include/c++/10/sstream /usr/include/c++/10/istream \
  /usr/include/c++/10/ios /usr/include/c++/10/bits/ios_base.h \
  /usr/include/c++/10/bits/locale_classes.h \
  /usr/include/c++/10/bits/locale_classes.tcc \
@@ -186,7 +186,7 @@ CMakeFiles/rpg.dir/Engine/Religion.cpp.o: \
  /usr/include/c++/10/bits/streambuf_iterator.h \
  /usr/include/x86_64-linux-gnu/c++/10/bits/ctype_inline.h \
  /usr/include/c++/10/bits/locale_facets.tcc \
- /usr/include/c++/10/bits/basic_ios.tcc \
- /usr/include/c++/10/bits/ostream.tcc /usr/include/c++/10/istream \
- /usr/include/c++/10/bits/istream.tcc /usr/include/c++/10/sstream \
+ /usr/include/c++/10/bits/basic_ios.tcc /usr/include/c++/10/ostream \
+ /usr/include/c++/10/bits/ostream.tcc \
+ /usr/include/c++/10/bits/istream.tcc \
  /usr/include/c++/10/bits/sstream.tcc

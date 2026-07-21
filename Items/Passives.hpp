@@ -4,7 +4,6 @@
 #include "Item.hpp"
 #include "Equipment/Equipment.hpp"
 #include <vector>
-#include <cstdlib>
 
 class Character;
 

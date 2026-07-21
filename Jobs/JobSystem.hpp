@@ -38,6 +38,8 @@ public:
     void DisplayAllJobs() const;
     std::string WorkJob(JobType type, int hours, Inventory& inventory, AchievementSystem* achSystem = nullptr);
     std::vector<Job>& GetJobs() { return jobs; }
+    void ResetAllFatigue();
+    void ReduceAllFatigue(int amount);
 
     // Combat synergy - total bonuses from all jobs
     int GetTotalCombatDefense() const;
@@ -90,6 +92,7 @@ private:
     std::vector<JobSynergy> synergies;
     int totalHoursWorked = 0;
     Job* FindJob(JobType type);
+    bool IsSynergyActive(const JobSynergy& syn) const;
 };
 
 #endif

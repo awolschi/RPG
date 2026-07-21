@@ -13,7 +13,8 @@ enum class ItemType
     Accessory,
     Consumable,
     QuestItem,
-    Resource
+    Resource,
+    Offhand
 };
 
 enum class Rarity : int
@@ -217,6 +218,7 @@ public:
         auto c = std::make_shared<Item>(name, type, rarity, passive1, passive2);
         c->setId = setId;
         c->sellValue = sellValue;
+        c->requiredLevel = requiredLevel;
         return c;
     }
 
@@ -232,6 +234,7 @@ public:
     int sellValue;
     int count;
     int setId = -1;  // Set membership (-1 = not a set item)
+    int requiredLevel = 1;
     ItemPassive passive1;
     ItemPassive passive2;
 };
@@ -253,6 +256,7 @@ public:
         auto c = std::make_shared<Weapon>(name, damage, manaCost, rarity, element, elementDamage, weaponType, passive1, passive2);
         c->setId = setId;
         c->count = 1;
+        c->requiredLevel = requiredLevel;
         return c;
     }
 
@@ -279,6 +283,7 @@ public:
         auto c = std::make_shared<Armor>(name, armorType, piece, defense, rarity, elementalResist, passive1, passive2);
         c->setId = setId;
         c->count = 1;
+        c->requiredLevel = requiredLevel;
         return c;
     }
 
@@ -311,6 +316,7 @@ public:
         auto c = std::make_shared<Accessory>(name, bonusHealth, bonusMana, rarity, element, elementDamage, passive1, passive2);
         c->setId = setId;
         c->count = 1;
+        c->requiredLevel = requiredLevel;
         return c;
     }
 
@@ -346,7 +352,7 @@ public:
     Offhand(const std::string& name, OffhandType offhandType, int defense, int manaBonus,
             int arcaneDamage = 0, int rarity = 1,
             ItemPassive passive1 = ItemPassive::None, ItemPassive passive2 = ItemPassive::None)
-        : Item(name, ItemType::Weapon, rarity, passive1, passive2), offhandType(offhandType),
+        : Item(name, ItemType::Offhand, rarity, passive1, passive2), offhandType(offhandType),
           defense(defense), manaBonus(manaBonus), arcaneDamage(arcaneDamage)
     {
     }
@@ -356,6 +362,7 @@ public:
         auto c = std::make_shared<Offhand>(name, offhandType, defense, manaBonus, arcaneDamage, rarity, passive1, passive2);
         c->setId = setId;
         c->count = 1;
+        c->requiredLevel = requiredLevel;
         return c;
     }
 
@@ -378,6 +385,9 @@ inline bool Item::IsSameAs(const Item& other) const
     if (auto ac = dynamic_cast<const Accessory*>(this))
         if (auto oac = dynamic_cast<const Accessory*>(&other))
             return ac->bonusHealth == oac->bonusHealth && ac->bonusMana == oac->bonusMana;
+    if (auto oh = dynamic_cast<const Offhand*>(this))
+        if (auto ooh = dynamic_cast<const Offhand*>(&other))
+            return oh->offhandType == ooh->offhandType && oh->defense == ooh->defense && oh->manaBonus == ooh->manaBonus;
     return true;
 }
 

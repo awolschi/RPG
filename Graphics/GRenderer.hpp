@@ -24,6 +24,9 @@ public:
     void Clear(Color bg);
     void DrawRect(int x, int y, int w, int h, Color c);
     void DrawRectLines(int x, int y, int w, int h, Color c, int thick = 2);
+    void DrawCircle(int cx, int cy, float radius, Color c);
+    void DrawCircleLines(int cx, int cy, float radius, Color c, int thick = 2);
+    void DrawLine(int x1, int y1, int x2, int y2, Color c, int thick = 2);
     void DrawText(const std::string& text, int x, int y, int size, Color c);
     void DrawCenteredText(const std::string& text, int y, int size, Color c);
     void DrawRightText(const std::string& text, int rx, int y, int size, Color c);
@@ -34,7 +37,7 @@ public:
     void DrawBarLabeled(int val, int max, int x, int y, int w, int h, Color fg, Color bg, const std::string& label);
 
     // ---- Interactive ----
-    bool Button(const std::string& text, int x, int y, int w, int h, int focusIndex = -1);
+    bool Button(const std::string& text, int x, int y, int w, int h, int focusIndex = -1, int fontSize = 18);
     int  ButtonList(const std::vector<std::string>& items, int x, int y,
                     int w = 260, int h = 42, int spacing = 6, int focusStart = -1);
 

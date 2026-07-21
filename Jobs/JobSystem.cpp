@@ -1,9 +1,9 @@
 #include "JobSystem.hpp"
 #include "../Inventory/Inventory.hpp"
 #include "../Achievements/Achievement.hpp"
+#include "../Engine/RNG.hpp"
 #include <iostream>
 #include <sstream>
-#include <cstdlib>
 
 JobSystem::JobSystem()
 {
@@ -28,6 +28,22 @@ Job& JobSystem::GetJob(JobType type)
     throw std::runtime_error("Job not found");
 }
 
+void JobSystem::ResetAllFatigue()
+{
+    for (auto& job : jobs)
+    {
+        job.fatigue = 0;
+    }
+}
+
+void JobSystem::ReduceAllFatigue(int amount)
+{
+    for (auto& job : jobs)
+    {
+        job.ReduceFatigue(amount);
+    }
+}
+
 void JobSystem::DisplayAllJobs() const
 {
     std::cout << "\n=== YOUR JOBS ===" << std::endl;
@@ -48,14 +64,13 @@ std::string JobSystem::WorkJob(JobType type, int hours, Inventory& inventory, Ac
         return "Job not found!";
 
     const WeatherEffect& weather = environment.GetEffect();
-    LocationUpgrades& locUpgrades = locationUpgrades;
 
-    float speedBonus = skillTree.GetSpeedBonus(type) + locUpgrades.GetTotalSpeedBonus();
-    float fatigueReduction = skillTree.GetFatigueReduction(type) + locUpgrades.GetTotalFatigueReduction();
-    float qualityBonus = skillTree.GetQualityBonus(type) + locUpgrades.GetTotalQualityBonus();
-    float rareFindBonus = skillTree.GetRareFindBonus(type) + locUpgrades.GetTotalRareFindBonus();
+    float speedBonus = skillTree.GetSpeedBonus(type) + locationUpgrades.GetTotalSpeedBonus();
+    float fatigueReduction = skillTree.GetFatigueReduction(type) + locationUpgrades.GetTotalFatigueReduction();
+    float qualityBonus = skillTree.GetQualityBonus(type) + locationUpgrades.GetTotalQualityBonus();
+    float rareFindBonus = skillTree.GetRareFindBonus(type) + locationUpgrades.GetTotalRareFindBonus();
     float doubleChanceBonus = skillTree.GetDoubleChanceBonus(type);
-    float xpBonusMult = skillTree.GetXPBonus(type) + locUpgrades.GetTotalXPBonus();
+    float xpBonusMult = skillTree.GetXPBonus(type) + locationUpgrades.GetTotalXPBonus();
     float sellValueBonus = skillTree.GetSellValueBonus(type);
     bool hasAutoPickup = skillTree.HasAutoPickup(type);
     bool hasPerfectQuality = skillTree.HasPerfectQuality(type);
@@ -105,7 +120,7 @@ std::string JobSystem::WorkJob(JobType type, int hours, Inventory& inventory, Ac
             collected++;
 
             // Apply quality bonus from skill tree
-            if (qualityBonus > 0.0f && (rand() % 100) < static_cast<int>(qualityBonus * 100.0f))
+            if (qualityBonus > 0.0f && RNG::Next(100) < static_cast<int>(qualityBonus * 100.0f))
             {
                 resource->quality = static_cast<ResourceQuality>(
                     std::min(static_cast<int>(resource->quality) + 1, static_cast<int>(ResourceQuality::Masterwork)));
@@ -119,7 +134,7 @@ std::string JobSystem::WorkJob(JobType type, int hours, Inventory& inventory, Ac
 
             // Double chance roll (from perks + skill tree)
             int doubleChance = job->GetDoubleChance() + static_cast<int>(doubleChanceBonus * 100.0f);
-            if (doubleChance > 0 && (rand() % 100) < doubleChance)
+            if (doubleChance > 0 && RNG::Next(100) < doubleChance)
             {
                 auto bonus = job->CollectResource();
                 if (bonus && inventory.AddItem(bonus))
@@ -131,7 +146,7 @@ std::string JobSystem::WorkJob(JobType type, int hours, Inventory& inventory, Ac
 
             // Level-based bonus resource roll
             int levelBonus = job->GetBonusResourceChance();
-            if (levelBonus > 0 && (rand() % 100) < levelBonus)
+            if (levelBonus > 0 && RNG::Next(100) < levelBonus)
             {
                 auto bonus = job->CollectResource();
                 if (bonus && inventory.AddItem(bonus))
@@ -142,7 +157,7 @@ std::string JobSystem::WorkJob(JobType type, int hours, Inventory& inventory, Ac
 
             // Rare find roll (from perks + skill tree)
             int rareChance = job->GetRareFindChance() + static_cast<int>(rareFindBonus * 100.0f);
-            if (rareChance > 0 && (rand() % 100) < rareChance)
+            if (rareChance > 0 && RNG::Next(100) < rareChance)
             {
                 auto rare = std::make_shared<Resource>(
                     "Rare " + resource->name, resource->tier + 1,
@@ -154,7 +169,7 @@ std::string JobSystem::WorkJob(JobType type, int hours, Inventory& inventory, Ac
             }
 
             // Legendary quality from skill tree
-            if (hasLegendaryQuality && (rand() % 100) < 5)
+            if (hasLegendaryQuality && RNG::Next(100) < 5)
             {
                 auto legendary = std::make_shared<Resource>(
                     "Legendary " + resource->name, resource->tier + 2,
@@ -166,7 +181,7 @@ std::string JobSystem::WorkJob(JobType type, int hours, Inventory& inventory, Ac
             }
 
             // Ultra-rare from skill tree
-            if (hasUltraRare && (rand() % 100) < 3)
+            if (hasUltraRare && RNG::Next(100) < 3)
             {
                 auto ultra = std::make_shared<Resource>(
                     "Ultra-Rare " + resource->name, resource->tier + 3,
@@ -178,7 +193,7 @@ std::string JobSystem::WorkJob(JobType type, int hours, Inventory& inventory, Ac
             }
 
             // Mythical from skill tree
-            if (hasMythical && (rand() % 100) < 1)
+            if (hasMythical && RNG::Next(100) < 1)
             {
                 auto myth = std::make_shared<Resource>(
                     "Mythical " + resource->name, resource->tier + 4,
@@ -462,25 +477,27 @@ void JobSystem::InitializeSynergies()
     });
 }
 
+bool JobSystem::IsSynergyActive(const JobSynergy& syn) const
+{
+    const Job* job1 = nullptr;
+    const Job* job2 = nullptr;
+    for (const auto& job : jobs)
+    {
+        if (job.type == syn.job1) job1 = &job;
+        if (job.type == syn.job2) job2 = &job;
+    }
+    return job1 && job2 &&
+           job1->level >= syn.requiredLevel1 &&
+           job2->level >= syn.requiredLevel2;
+}
+
 std::vector<JobSynergy> JobSystem::GetActiveSynergies() const
 {
     std::vector<JobSynergy> active;
     for (const auto& syn : synergies)
     {
-        const Job* job1 = nullptr;
-        const Job* job2 = nullptr;
-        for (const auto& job : jobs)
-        {
-            if (job.type == syn.job1) job1 = &job;
-            if (job.type == syn.job2) job2 = &job;
-        }
-
-        if (job1 && job2 &&
-            job1->level >= syn.requiredLevel1 &&
-            job2->level >= syn.requiredLevel2)
-        {
+        if (IsSynergyActive(syn))
             active.push_back(syn);
-        }
     }
     return active;
 }
@@ -490,17 +507,7 @@ float JobSystem::GetSynergyXPBonus(JobType jobType) const
     float totalBonus = 0.0f;
     for (const auto& syn : synergies)
     {
-        const Job* job1 = nullptr;
-        const Job* job2 = nullptr;
-        for (const auto& job : jobs)
-        {
-            if (job.type == syn.job1) job1 = &job;
-            if (job.type == syn.job2) job2 = &job;
-        }
-
-        if (job1 && job2 &&
-            job1->level >= syn.requiredLevel1 &&
-            job2->level >= syn.requiredLevel2)
+        if (IsSynergyActive(syn))
         {
             if (jobType == syn.job1)
                 totalBonus += syn.xpBonus1;
@@ -516,21 +523,8 @@ float JobSystem::GetSynergyRareFindBonus(JobType jobType) const
     float totalBonus = 0.0f;
     for (const auto& syn : synergies)
     {
-        const Job* job1 = nullptr;
-        const Job* job2 = nullptr;
-        for (const auto& job : jobs)
-        {
-            if (job.type == syn.job1) job1 = &job;
-            if (job.type == syn.job2) job2 = &job;
-        }
-
-        if (job1 && job2 &&
-            job1->level >= syn.requiredLevel1 &&
-            job2->level >= syn.requiredLevel2)
-        {
-            if (jobType == syn.job1 || jobType == syn.job2)
-                totalBonus += syn.rareFindBonus;
-        }
+        if (IsSynergyActive(syn) && (jobType == syn.job1 || jobType == syn.job2))
+            totalBonus += syn.rareFindBonus;
     }
     return totalBonus;
 }
@@ -540,20 +534,8 @@ float JobSystem::GetSynergyCraftingSpeed() const
     float totalBonus = 0.0f;
     for (const auto& syn : synergies)
     {
-        const Job* job1 = nullptr;
-        const Job* job2 = nullptr;
-        for (const auto& job : jobs)
-        {
-            if (job.type == syn.job1) job1 = &job;
-            if (job.type == syn.job2) job2 = &job;
-        }
-
-        if (job1 && job2 &&
-            job1->level >= syn.requiredLevel1 &&
-            job2->level >= syn.requiredLevel2)
-        {
+        if (IsSynergyActive(syn))
             totalBonus += syn.craftingSpeed;
-        }
     }
     return totalBonus;
 }
@@ -563,20 +545,8 @@ float JobSystem::GetSynergyQualityBonus() const
     float totalBonus = 0.0f;
     for (const auto& syn : synergies)
     {
-        const Job* job1 = nullptr;
-        const Job* job2 = nullptr;
-        for (const auto& job : jobs)
-        {
-            if (job.type == syn.job1) job1 = &job;
-            if (job.type == syn.job2) job2 = &job;
-        }
-
-        if (job1 && job2 &&
-            job1->level >= syn.requiredLevel1 &&
-            job2->level >= syn.requiredLevel2)
-        {
+        if (IsSynergyActive(syn))
             totalBonus += syn.qualityBonus;
-        }
     }
     return totalBonus;
 }

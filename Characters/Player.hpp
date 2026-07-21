@@ -18,6 +18,8 @@ public:
     CharacterRace GetRace() const { return race; }
     Inventory& GetInventory() { return inventory; }
     const Inventory& GetInventory() const { return inventory; }
+    int GetInventoryCap() const { return inventory.GetCapacity() + GetBagBonus(); }
+    int GetBagBonus() const;
     JobSystem& GetJobSystem() { return jobSystem; }
     QuestManager& GetQuestManager() { return questManager; }
     const QuestManager& GetQuestManager() const { return questManager; }
@@ -40,6 +42,10 @@ public:
     void AutoFillLoadout();
     bool IsInLoadout(int skillIndex) const;
 
+    // Custom attack skill (replaces standard attack)
+    int GetAttackSkillIndex() const { return attackSkillIndex; }
+    void SetAttackSkillIndex(int idx) { attackSkillIndex = idx; }
+
 private:
     CharacterClass characterClass;
     CharacterRace race;
@@ -47,6 +53,7 @@ private:
     JobSystem jobSystem;
     QuestManager questManager;
     std::vector<int> skillLoadout;
+    int attackSkillIndex = 0;
 };
 
 #endif

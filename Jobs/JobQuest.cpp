@@ -1,5 +1,5 @@
 #include "JobQuest.hpp"
-#include <cstdlib>
+#include "../Engine/RNG.hpp"
 #include <sstream>
 #include <algorithm>
 
@@ -17,7 +17,7 @@ void JobQuestSystem::GenerateDailyQuests(const std::vector<Job>& jobs)
     // Generate 2-3 daily quests per job
     for (const auto& job : jobs)
     {
-        int questCount = 2 + (rand() % 2); // 2-3 quests per job
+        int questCount = 2 + RNG::Next(2); // 2-3 quests per job
 
         for (int i = 0; i < questCount; ++i)
         {
@@ -32,7 +32,7 @@ void JobQuestSystem::GenerateDailyQuests(const std::vector<Job>& jobs)
             quest.requiredJobLevel = 1;
 
             // Random quest type
-            int typeRoll = rand() % 100;
+            int typeRoll = RNG::Next(100);
             if (typeRoll < 40)
             {
                 quest.questType = JobQuestType::Collect;
@@ -45,7 +45,7 @@ void JobQuestSystem::GenerateDailyQuests(const std::vector<Job>& jobs)
             {
                 quest.questType = JobQuestType::WorkHours;
                 quest.targetName = job.GetJobName() + " hours";
-                quest.targetCount = 1 + (rand() % 3); // 1-3 hours
+                quest.targetCount = 1 + RNG::Next(3); // 1-3 hours
                 quest.title = "Work " + std::to_string(quest.targetCount) + " " + job.GetJobName() + " hours";
                 quest.description = "Spend time working as a " + job.GetJobName() + ".";
             }
@@ -53,7 +53,7 @@ void JobQuestSystem::GenerateDailyQuests(const std::vector<Job>& jobs)
             {
                 quest.questType = JobQuestType::FindRare;
                 quest.targetName = "Rare " + job.GetJobName() + " finds";
-                quest.targetCount = 1 + (rand() % 2); // 1-2 rare finds
+                quest.targetCount = 1 + RNG::Next(2); // 1-2 rare finds
                 quest.title = "Find " + std::to_string(quest.targetCount) + " rare resources";
                 quest.description = "Discover rare materials while " + job.GetJobName() + ".";
             }
@@ -61,7 +61,7 @@ void JobQuestSystem::GenerateDailyQuests(const std::vector<Job>& jobs)
             {
                 quest.questType = JobQuestType::QualityFind;
                 quest.targetName = "Quality " + job.GetJobName() + " items";
-                quest.targetCount = 1 + (rand() % 3); // 1-3 quality items
+                quest.targetCount = 1 + RNG::Next(3); // 1-3 quality items
                 quest.title = "Find " + std::to_string(quest.targetCount) + " quality items";
                 quest.description = "Find Fine or Masterwork quality items.";
             }
@@ -458,7 +458,7 @@ int JobQuestSystem::GetRandomTarget(JobQuestType type, int jobLevel) const
             break;
     }
 
-    return base + (rand() % range);
+    return base + RNG::Next(range);
 }
 
 int JobQuestSystem::GetQuestReward(JobQuestType type, int targetCount) const

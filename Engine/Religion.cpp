@@ -1,8 +1,6 @@
 #include "Religion.hpp"
 #include "../Characters/Character.hpp"
-#include <iostream>
 #include <sstream>
-#include <cstdlib>
 
 ReligionSystem::ReligionSystem()
     : currentGod(GodType::None), devotionLevel(0), totalDonated(0),
@@ -79,12 +77,12 @@ void ReligionSystem::RestoreState(GodType god, int devotion, int donated)
     totalDonated = donated;
 }
 
-void ReligionSystem::ApplyDevotionBonus(std::shared_ptr<Character> player) const
+std::string ReligionSystem::ApplyDevotionBonus(std::shared_ptr<Character> player) const
 {
     if (!player || currentGod == GodType::None || devotionLevel == 0)
-        return;
+        return "";
 
-    std::cout << "\n" << GetGodName() << "'s blessing empowers you (Devotion " << devotionLevel << ")!\n";
+    std::string msg = GetGodName() + "'s blessing empowers you (Devotion " + std::to_string(devotionLevel) + ")!";
 
     switch (currentGod)
     {
@@ -93,7 +91,7 @@ void ReligionSystem::ApplyDevotionBonus(std::shared_ptr<Character> player) const
             break;
         case GodType::Karosh:
             player->SetAttackBonus(devotionLevel * 2);
-            std::cout << "Your attacks deal +" << (devotionLevel * 2) << " damage.\n";
+            msg += " Your attacks deal +" + std::to_string(devotionLevel * 2) + " damage.";
             break;
         case GodType::Amala:
             player->IncreaseTempDefense(devotionLevel * 2);
@@ -105,6 +103,7 @@ void ReligionSystem::ApplyDevotionBonus(std::shared_ptr<Character> player) const
         default:
             break;
     }
+    return msg;
 }
 
 // Prayer system
@@ -159,9 +158,11 @@ std::string ReligionSystem::Pray(std::shared_ptr<Character> player)
     }
 
     // Small devotion gain from praying
-    if (prayersToday == 1)
+    if (prayersToday == 1 && devotionLevel < 10)
+    {
+        devotionLevel++;
         result += " (Devotion +1)";
-    // Only first prayer of the day gives devotion
+    }
 
     return result;
 }
@@ -305,7 +306,7 @@ void ReligionSystem::GenerateQuest()
     switch (currentGod)
     {
         case GodType::Shaim:
-            activeQuest = { "Purify 5 undead creatures", "Zombie", 5, 0, 1, false };
+            activeQuest = { "Purify 5 undead creatures", "Wraith", 5, 0, 1, false };
             break;
         case GodType::Karosh:
             activeQuest = { "Slay 10 enemies in combat", "", 10, 0, 2, false };
@@ -319,6 +320,28 @@ void ReligionSystem::GenerateQuest()
         default:
             break;
     }
+}
+
+void ReligionSystem::EnsureQuest()
+{
+    if (currentGod == GodType::None) return;
+    if (activeQuest.targetEnemy.empty() && activeQuest.targetCount == 0 && activeQuest.description.empty())
+        GenerateQuest();
+}
+
+void ReligionSystem::RestoreQuest(const std::string& desc, const std::string& target, int targetCount,
+                                   int currentCount, int rewardDevotion, bool completed)
+{
+    if (currentGod == GodType::None) return;
+    if (!desc.empty())
+    {
+        activeQuest.description = desc;
+        activeQuest.targetEnemy = target;
+        activeQuest.targetCount = targetCount;
+        activeQuest.rewardDevotion = rewardDevotion;
+    }
+    activeQuest.currentCount = currentCount;
+    activeQuest.completed = completed;
 }
 
 bool ReligionSystem::ProgressQuest(const std::string& enemyName)

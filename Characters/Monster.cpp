@@ -1,5 +1,4 @@
 #include "Monster.hpp"
-#include <cstdlib>
 
 Monster::Monster(const std::string& name, const Stats& baseStats,
                  int experienceReward, int goldReward, bool isBoss)

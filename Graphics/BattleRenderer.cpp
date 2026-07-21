@@ -142,15 +142,14 @@ void BattleRenderer::DrawBattleScreen(GRenderer& renderer,
                   layout.playerBarY,
                   playerXP, playerMaxXP);
 
-    // Show equipped pet info (above player bar, left side)
-    int extraInfoY = layout.playerBarY - 8;
+    // Show equipped pet info (inside player bar area, right side)
+    int petInfoY = layout.playerBarY;
     if (petManager)
     {
         const Pet* pet = petManager->GetEquippedPet();
         if (pet)
         {
-            extraInfoY -= 30;
-            int petInfoX = 30;
+            int petInfoX = GRenderer::W - 250;
 
             Color elemCol = CQColors::TextDim;
             switch (pet->element)
@@ -164,59 +163,45 @@ void BattleRenderer::DrawBattleScreen(GRenderer& renderer,
                 default:                     elemCol = {200, 200, 200, 255}; break;
             }
 
-            DrawText(pet->GetCurrentName().c_str(), petInfoX, extraInfoY, 13, elemCol);
+            DrawText(pet->GetCurrentName().c_str(), petInfoX, petInfoY + 6, 13, elemCol);
 
             int petDmg = petManager->CalculatePetDamage(playerLevel);
             std::string dmgText = "ATK:" + std::to_string(petDmg);
-            DrawText(dmgText.c_str(), petInfoX + 140, extraInfoY, 12, CQColors::TextDim);
+            DrawText(dmgText.c_str(), petInfoX + 130, petInfoY + 6, 12, CQColors::TextDim);
 
             // Pet XP bar
             int petLvl = pet->level;
             if (petLvl < Pet::MAX_PET_LEVEL)
             {
                 int petXpBarX = petInfoX;
-                int petXpBarY = extraInfoY + 16;
-                int petXpBarW = 220;
+                int petXpBarY = petInfoY + 22;
+                int petXpBarW = 200;
                 int petXpCurrent = pet->experience;
                 int petXpMax = Pet::CalculateRequiredXP(petLvl);
                 if (petXpMax > 0)
-                    renderer.DrawBarLabeled(petXpCurrent, petXpMax, petXpBarX, petXpBarY, petXpBarW, 10,
+                    renderer.DrawBarLabeled(petXpCurrent, petXpMax, petXpBarX, petXpBarY, petXpBarW, 12,
                                             CQColors::XpFg, CQColors::XpBg, "Lv." + std::to_string(petLvl));
             }
             else
             {
-                DrawText(("Lv." + std::to_string(petLvl) + " MAX").c_str(), petInfoX, extraInfoY + 16, 10, CQColors::TextGold);
+                DrawText(("Lv." + std::to_string(petLvl) + " MAX").c_str(), petInfoX, petInfoY + 22, 10, CQColors::TextGold);
             }
-            extraInfoY -= 30;
         }
     }
 
-    // Faction reputation bar (above player bar, below pet info)
+    // Faction reputation bar (inside player bar area, bottom)
     if (reputationMax > 0)
     {
         int repBarX = 30;
+        int repBarY = layout.playerBarY + 64;
         int repBarW = GRenderer::W - 60;
-        renderer.DrawBarLabeled(reputationValue, reputationMax, repBarX, extraInfoY, repBarW, 12,
+        renderer.DrawBarLabeled(reputationValue, reputationMax, repBarX, repBarY, repBarW, 14,
                                 CQColors::RepFg, CQColors::RepBg, repLabel);
     }
 
     if (phase == CombatPhase::PlayerTurn)
     {
-        int btnSize = layout.abilitySize;
-        int btnSpacing = layout.abilitySpacing;
-        int totalW = 5 * btnSize + 4 * btnSpacing;
-        int startX = (GRenderer::W - totalW) / 2;
-        int btnY = layout.abilityY;
-
-        const char* labels[] = {"ATK", "SKL", "DEF", "ITM", "FLY"};
-        Color colors[] = {RED, {100, 150, 255, 255}, {100, 200, 100, 255}, {255, 200, 50, 255}, {180, 180, 180, 255}};
-
-        for (int i = 0; i < 5; ++i)
-        {
-            int bx = startX + i * (btnSize + btnSpacing);
-            bool hover = renderer.IsMouseInRect(bx, btnY, btnSize, btnSize);
-            DrawAbilityButton(renderer, labels[i], bx, btnY, btnSize, hover, false, colors[i]);
-        }
+        // Action buttons are drawn interactively by Game::StateCombat
     }
 }
 
@@ -280,19 +265,19 @@ void BattleRenderer::DrawPlayerBar(GRenderer& renderer,
     int hpBarX = barX + 10;
     int hpBarY = y + 24;
     int hpBarW = 160;
-    renderer.DrawBarLabeled(currentHP, maxHP, hpBarX, hpBarY, hpBarW, 14,
+    renderer.DrawBarLabeled(currentHP, maxHP, hpBarX, hpBarY, hpBarW, 16,
                             CQColors::HpFg, CQColors::HpBg, "HP");
 
     int mpBarX = hpBarX + hpBarW + 10;
-    renderer.DrawBarLabeled(currentMP, maxMP, mpBarX, hpBarY, hpBarW, 14,
+    renderer.DrawBarLabeled(currentMP, maxMP, mpBarX, hpBarY, hpBarW, 16,
                             CQColors::ManaFg, CQColors::ManaBg, "MP");
 
     // XP bar
     int xpBarX = barX + 10;
-    int xpBarY = y + 42;
+    int xpBarY = y + 44;
     int xpBarW = barW - 20;
     if (maxXP > 0)
-        renderer.DrawBarLabeled(currentXP, maxXP, xpBarX, xpBarY, xpBarW, 12,
+        renderer.DrawBarLabeled(currentXP, maxXP, xpBarX, xpBarY, xpBarW, 14,
                                 CQColors::XpFg, CQColors::XpBg, "XP");
     else
         renderer.DrawText("MAX LEVEL", xpBarX, xpBarY, 12, CQColors::TextGold);

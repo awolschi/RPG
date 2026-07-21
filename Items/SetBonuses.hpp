@@ -65,6 +65,7 @@ struct SetInfo
     int setId;
     std::vector<std::string> pieceNames;
     std::vector<SetBonus> twoPiece;
+    std::vector<SetBonus> threePiece;
     std::vector<SetBonus> fourPiece;
 };
 

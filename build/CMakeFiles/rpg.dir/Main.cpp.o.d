@@ -225,5 +225,6 @@ CMakeFiles/rpg.dir/Main.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Crafting/../Item.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Crafting/../Resources/Resources.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Crafting/../../Inventory/Inventory.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Crafting/../../Jobs/Job.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Jobs/JobQuest.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Jobs/Job.hpp

@@ -8,6 +8,7 @@ bool Inventory::AddItem(std::shared_ptr<Item> item)
 {
     if (!item) return false;
 
+    // Always allow stacking onto existing piles
     for (auto& entry : items)
     {
         if (entry->IsSameAs(*item))
@@ -16,6 +17,9 @@ bool Inventory::AddItem(std::shared_ptr<Item> item)
             return true;
         }
     }
+
+    // Check capacity for new stacks
+    if (IsFull()) return false;
 
     items.push_back(item);
     return true;

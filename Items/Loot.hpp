@@ -11,17 +11,17 @@ class LootTable
 {
 public:
     // Normal enemy loot — dropTier caps the maximum rarity
-    static std::vector<std::shared_ptr<Item>> GenerateLoot(int difficulty, int dropTier = 10, int roll = -1);
+    static std::vector<std::shared_ptr<Item>> GenerateLoot(int difficulty, int dropTier = 10, int roll = -1, CharacterClass cc = CharacterClass::Warrior);
 
     // Boss loot — dropTier caps the maximum rarity
-    static std::vector<std::shared_ptr<Item>> GenerateBossLoot(int difficulty, int dropTier = 10, int roll = -1);
+    static std::vector<std::shared_ptr<Item>> GenerateBossLoot(int difficulty, int dropTier = 10, int roll = -1, CharacterClass cc = CharacterClass::Warrior);
 
     // Legendary class-specific gear (from Primordial One)
     static std::vector<std::shared_ptr<Item>> GenerateLegendaryClassLoot(CharacterClass charClass);
 
     // Roll for a unique (Epic/Legendary) drop from the UniqueItemRegistry
     static std::shared_ptr<Item> GenerateUniqueDrop(
-        const std::string& enemyName, int difficulty, bool isBoss);
+        const std::string& enemyName, int difficulty, bool isBoss, CharacterClass cc);
 
     // Individual item generators (public for shop)
     static std::shared_ptr<Item> CreateCommonWeapon(int difficulty);

@@ -1,5 +1,6 @@
 #include "Game.hpp"
 #include "KeyboardNav.hpp"
+#include "RNG.hpp"
 #include "../Graphics/Colors.hpp"
 #include "../Graphics/IconRenderer.hpp"
 #include "../Graphics/BattleRenderer.hpp"
@@ -13,8 +14,6 @@
 #include "../Items/Uniques/UniqueItems.hpp"
 #include "../World/Enemies/Enemies.hpp"
 #include "../World/NPCs/NPC.hpp"
-#include <cstdlib>
-#include <ctime>
 #include <algorithm>
 #include <cmath>
 
@@ -53,7 +52,6 @@ Game::Game()
       enemyFlashTimer(0),
       previousState(GameState::MainMenu)
 {
-    srand(static_cast<unsigned>(time(nullptr)));
     UniqueItemRegistry::Initialize();
     InitializeAreas();
     wiki.SetAreas(areas);
@@ -75,7 +73,7 @@ void Game::InitializeAreas()
 
         areas.emplace_back("Felrona",
             "The Fair City of Felrona, a peaceful starting hub.",
-            1, std::vector<Dungeon>{ farm });
+            1, std::vector<Dungeon>{ farm }, std::vector<int>{1, 2});
     }
 
     // ---- Dark Woods ----
@@ -93,7 +91,7 @@ void Game::InitializeAreas()
 
         areas.emplace_back("Dark Woods",
             "A shadowy forest where strange creatures lurk.",
-            2, std::vector<Dungeon>{ hollow });
+            2, std::vector<Dungeon>{ hollow }, std::vector<int>{0, 2, 3});
     }
 
     // ---- Salty Siren Coast ----
@@ -111,7 +109,7 @@ void Game::InitializeAreas()
 
         areas.emplace_back("Salty Siren Coast",
             "A rocky coastline where pirates and sea monsters roam.",
-            3, std::vector<Dungeon>{ grotto });
+            3, std::vector<Dungeon>{ grotto }, std::vector<int>{0, 1, 3});
     }
 
     // ---- Dragon's Peak ----
@@ -130,7 +128,7 @@ void Game::InitializeAreas()
 
         areas.emplace_back("Dragon's Peak",
             "A dangerous mountain where orcs and dragons roam.",
-            4, std::vector<Dungeon>{ summit });
+            4, std::vector<Dungeon>{ summit }, std::vector<int>{1, 2, 4});
     }
 
     // ---- Aran Highlands ----
@@ -149,7 +147,7 @@ void Game::InitializeAreas()
 
         areas.emplace_back("Aran Highlands",
             "Wind-swept highlands home to the proud Aran people.",
-            5, std::vector<Dungeon>{ citadel });
+            5, std::vector<Dungeon>{ citadel }, std::vector<int>{3, 5});
     }
 
     // ---- Shadow Dungeon ----
@@ -169,7 +167,7 @@ void Game::InitializeAreas()
 
         areas.emplace_back("Shadow Dungeon",
             "The ultimate challenge beneath the land of Eluna.",
-            6, std::vector<Dungeon>{ abyss });
+            6, std::vector<Dungeon>{ abyss }, std::vector<int>{4, 6});
     }
 
     // ---- Celestial Spire ----
@@ -188,7 +186,7 @@ void Game::InitializeAreas()
 
         areas.emplace_back("Celestial Spire",
             "A towering spire of pure light reaching into the heavens.",
-            7, std::vector<Dungeon>{ ascent });
+            7, std::vector<Dungeon>{ ascent }, std::vector<int>{5, 7});
     }
 
     // ---- The Void Beyond ----
@@ -208,7 +206,7 @@ void Game::InitializeAreas()
 
         areas.emplace_back("The Void Beyond",
             "The edge of all existence, where the Primordial One dwells.",
-            8, std::vector<Dungeon>{ endless });
+            8, std::vector<Dungeon>{ endless }, std::vector<int>{6, 8});
     }
 
     // ---- Arcane Sanctum ----
@@ -226,7 +224,7 @@ void Game::InitializeAreas()
 
         areas.emplace_back("Arcane Sanctum",
             "A floating fortress of pure magic, hidden beyond a forgotten rift.",
-            9, std::vector<Dungeon>{ sanctum });
+            9, std::vector<Dungeon>{ sanctum }, std::vector<int>{7, 9});
     }
 
     // ---- Chronos Depths ----
@@ -245,7 +243,7 @@ void Game::InitializeAreas()
 
         areas.emplace_back("Chronos Depths",
             "The final frontier — a wound in reality where time itself has been broken.",
-            10, std::vector<Dungeon>{ chronos });
+            10, std::vector<Dungeon>{ chronos }, std::vector<int>{8});
     }
 }
 
@@ -356,6 +354,7 @@ void Game::Run()
         DrawReputationNotifications();
         petManager.UpdateNotifications(GetFrameTime());
         DrawPetNotifications();
+        DrawTutorialHints();
         achievementSystem.Tick(GetFrameTime());
         achievementSystem.CheckUnlockables();
 
@@ -479,7 +478,19 @@ void Game::CheckAchievementNotifications()
         AchievementProgress ap = achievementSystem.GetNextUnnotified();
         const AchievementDefinition* def = achievementSystem.GetDefinition(ap.achievementId);
         if (def)
+        {
             achNotifications.emplace_back(def->name, def->description);
+            // Grant item reward if defined
+            if (player && !def->reward.itemId.empty())
+            {
+                auto item = UniqueItemRegistry::Create(def->reward.itemId, player->GetLevel());
+                if (item)
+                {
+                    player->GetInventory().AddItem(item);
+                    AddCombatLog("Achievement Reward: " + item->name + "!");
+                }
+            }
+        }
         achievementSystem.MarkNotified(ap.achievementId);
     }
 }
@@ -528,6 +539,59 @@ void Game::DrawAchievementNotifications()
         DrawText("ACHIEVEMENT UNLOCKED", px + 24, py + 6, 12, goldText);
         DrawText(n.name.c_str(), px + 10, py + 22, 14, goldText);
         DrawText(n.description.c_str(), px + 10, py + 38, 11, whiteText);
+
+        yOffset += panelH + 6.0f;
+    }
+}
+
+void Game::AddTutorialHint(const std::string& title, const std::string& message)
+{
+    if (!tutorialEnabled) return;
+    tutorialHints.emplace_back(title, message);
+}
+
+void Game::DrawTutorialHints()
+{
+    float dt = GetFrameTime();
+    float yOffset = 60.0f;
+
+    for (int i = static_cast<int>(tutorialHints.size()) - 1; i >= 0; --i)
+    {
+        auto& h = tutorialHints[i];
+        h.life -= dt;
+
+        if (h.life <= 0.0f)
+        {
+            tutorialHints.erase(tutorialHints.begin() + i);
+            continue;
+        }
+
+        float alpha = 1.0f;
+        if (h.life < 0.5f)
+            alpha = h.life / 0.5f;
+
+        int panelW = 340;
+        int panelH = 56;
+        int px = GRenderer::W - panelW - 10;
+        int py = static_cast<int>(yOffset);
+
+        // Slide in from right
+        float slideProgress = 1.0f;
+        if (h.life > h.maxLife - 0.3f)
+            slideProgress = (h.maxLife - h.life) / 0.3f;
+        px = GRenderer::W - static_cast<int>((panelW + 10) * slideProgress);
+
+        Color bg = {25, 30, 40, static_cast<unsigned char>(220 * alpha)};
+        Color border = {100, 160, 220, static_cast<unsigned char>(255 * alpha)};
+        Color titleColor = {140, 200, 255, static_cast<unsigned char>(255 * alpha)};
+        Color msgColor = {200, 210, 220, static_cast<unsigned char>(255 * alpha)};
+
+        DrawRectangle(px, py, panelW, panelH, bg);
+        DrawRectangleLines(px, py, panelW, panelH, border);
+
+        DrawText("?", px + 8, py + 6, 18, titleColor);
+        DrawText(h.title.c_str(), px + 26, py + 6, 13, titleColor);
+        DrawText(h.message.c_str(), px + 10, py + 24, 12, msgColor);
 
         yOffset += panelH + 6.0f;
     }
@@ -764,6 +828,8 @@ void Game::StateCharacterCreation()
         player = std::make_shared<Player>(name, selectedClass, selectedRace);
         player->GetQuestManager().InitializeDefaultQuests();
         currentAreaIndex = 0;
+        selectedSkillIdx = -1;
+        selectedAchievementCategory = -1;
         initialized = false;
         ClearLog();
         currentState = GameState::Exploring;
@@ -822,20 +888,27 @@ void Game::StateExplore()
     };
 
     int bx = GRenderer::W - 240;
-    int by = 110;
+    int by = 100;
+    int btnH = 34;
+    int btnSpacing = 36;
     keyboardNav.SetFocusCount(static_cast<int>(labels.size()) + extraButtons);
     for (size_t i = 0; i < labels.size(); ++i)
     {
-        if (renderer.Button(labels[i], bx, by + static_cast<int>(i) * 44, 220, 38, static_cast<int>(i)))
+        if (renderer.Button(labels[i], bx, by + static_cast<int>(i) * btnSpacing, 220, btnH, static_cast<int>(i)))
         {
             if (i == 0) StartAreaEncounter();
             else if (i == 10) { currentState = GameState::Shop; renderer.StartTransition(); }
             else if (i == 11) {
+                if (!tutorialRestedAtInn) { tutorialRestedAtInn = true; AddTutorialHint("Rest", "Resting restores HP/MP and reduces fatigue. Visit the inn often!"); }
                 player->RestoreHealth(player->GetMaxHealth());
                 player->RestoreMana(player->GetMaxMana());
                 player->ResetTempDefense();
                 // Advance day for weather and other daily effects
                 player->GetJobSystem().GetEnvironment().UpdateDaily();
+                // Reset job fatigue
+                player->GetJobSystem().ResetAllFatigue();
+                // Restock shops
+                shopItems.clear();
             }
             else if (i == 12) { currentState = GameState::Wiki; renderer.StartTransition(); }
             else if (i == 13) { currentState = GameState::Achievements; renderer.StartTransition(); }
@@ -843,8 +916,7 @@ void Game::StateExplore()
             else if (i == 15) { currentState = GameState::Pets; petListPage = 0; renderer.StartTransition(); }
             else if (i == 16) currentState = GameState::SavePrompt;
             else if (i == 17) {
-                if (player->IsAlive()) currentState = GameState::MainMenu;
-                else { player.reset(); currentState = GameState::MainMenu; }
+                currentState = GameState::MainMenu;
             }
             else {
                 static std::vector<GameState> tgts = {
@@ -855,6 +927,7 @@ void Game::StateExplore()
                 int idx = static_cast<int>(i) - 1;
                 if (idx >= 0 && idx < static_cast<int>(tgts.size()))
                 {
+                    if (idx == 0 && !tutorialTraveled) { tutorialTraveled = true; AddTutorialHint("Travel", "Visit connected areas on the world map. New areas mean new loot!"); }
                     currentState = tgts[idx];
                     renderer.StartTransition();
                 }
@@ -914,7 +987,7 @@ void Game::StateDungeonSelect()
             {
                 const auto& rooms = d.rooms;
                 dungeonRoomEnemyCount = rooms[0].minEnemies
-                    + rand() % (rooms[0].maxEnemies - rooms[0].minEnemies + 1);
+                    + RNG::Next(rooms[0].maxEnemies - rooms[0].minEnemies + 1);
             }
             currentState = GameState::DungeonExplore;
         }
@@ -1005,7 +1078,7 @@ void Game::StateDungeonExplore()
             {
                 if (!pool.empty())
                 {
-                    int idx = rand() % pool.size();
+                    int idx = RNG::Next(static_cast<int>(pool.size()));
                     auto m = pool[idx].factory();
                     if (m)
                     {
@@ -1299,6 +1372,7 @@ static std::string SlotLabel(const std::string& slot, const std::shared_ptr<Item
 void Game::StateInventory()
 {
     if (!player) { currentState = GameState::Exploring; return; }
+    if (!tutorialInventoryOpened) { tutorialInventoryOpened = true; AddTutorialHint("Inventory", "Equip gear to boost stats. Green arrows mean upgrades."); }
     keyboardNav.Update();
     renderer.SetCurrentFocus(keyboardNav.GetFocus());
     renderer.DrawPanel(50, 50, GRenderer::W - 100, GRenderer::H - 110, "Inventory");
@@ -1385,7 +1459,7 @@ void Game::StateInventory()
         switch (inventoryTab)
         {
             case 0: show = true; break; // All
-            case 1: show = (item->type == ItemType::Weapon); break;
+            case 1: show = (item->type == ItemType::Weapon || item->type == ItemType::Offhand); break;
             case 2: show = (item->type == ItemType::Armor); break;
             case 3: show = (item->type == ItemType::Accessory); break;
             case 4: show = (item->type == ItemType::Consumable); break;
@@ -1475,7 +1549,7 @@ void Game::StateInventory()
         size_t i = filteredIndices[invStart + idx];
         auto item = inv.GetItem(i);
         if (!item) continue;
-        if (item->type == ItemType::Weapon || item->type == ItemType::Armor || item->type == ItemType::Accessory)
+        if (item->type == ItemType::Weapon || item->type == ItemType::Armor || item->type == ItemType::Accessory || item->type == ItemType::Offhand)
         {
             actionCountPerItem[idx] = 1; // D
             if (player->CanEquip(item)) actionCountPerItem[idx]++; // Eq
@@ -1645,6 +1719,8 @@ void Game::StateInventory()
             {
                 std::string tip = item->name;
                 tip += "\nRarity: " + std::string(RarityName(static_cast<Rarity>(item->rarity)));
+                if (item->requiredLevel > 1)
+                    tip += "\nReq. Level: " + std::to_string(item->requiredLevel);
                 if (auto w = std::dynamic_pointer_cast<Weapon>(item))
                 {
                     tip += "\nDamage: " + std::to_string(w->damage);
@@ -1687,7 +1763,7 @@ void Game::StateInventory()
             // Action buttons (right side of card)
             int btnX = xLeft + cardW - 110;
             int btnY = iy + 8;
-            if (item->type == ItemType::Weapon || item->type == ItemType::Armor || item->type == ItemType::Accessory)
+            if (item->type == ItemType::Weapon || item->type == ItemType::Armor || item->type == ItemType::Accessory || item->type == ItemType::Offhand)
             {
                 bool canEquip = player->CanEquip(item);
                 if (canEquip)
@@ -1800,6 +1876,8 @@ void Game::StateInventory()
         std::string selectedHeader = selectedItem->name;
         if (!selectedSetName.empty())
             selectedHeader += " [" + selectedSetName + "]";
+        if (selectedItem->requiredLevel > 1)
+            selectedHeader += " (Lv " + std::to_string(selectedItem->requiredLevel) + ")";
         renderer.DrawText("Selected: " + selectedHeader, panelX + 10, panelY + 10, 16, selectedRarityColor);
 
         // Get currently equipped item for comparison
@@ -2275,6 +2353,13 @@ void Game::StateJobs()
         {
             renderer.DrawText("Milestone!", barX + barW + 10, barY + 1, 11, CQColors::TextGreen);
         }
+
+        // Fatigue display
+        float fatiguePct = (static_cast<float>(job.fatigue) / Job::MAX_FATIGUE) * 100.0f;
+        Color fatigueColor = (fatiguePct < 33.0f) ? CQColors::TextGreen :
+                             (fatiguePct < 66.0f) ? CQColors::TextGold : CQColors::TextRed;
+        std::string fatigueText = "Fatigue: " + std::to_string(static_cast<int>(fatiguePct)) + "%";
+        renderer.DrawText(fatigueText, barX + barW + 10, barY + 16, 11, fatigueColor);
 
         // Show what's next
         std::string nextUnlock;
@@ -2818,15 +2903,22 @@ void Game::StateJobUpgrades()
 void Game::StateSkillLoadout()
 {
     if (!player) { currentState = GameState::Exploring; return; }
+    if (!tutorialSkillsOpened) { tutorialSkillsOpened = true; AddTutorialHint("Skills", "Equip skills in your loadout. Earn skill XP by using them in combat!"); }
     keyboardNav.Update();
     renderer.SetCurrentFocus(keyboardNav.GetFocus());
+
+    // Initialize editing state on first entry
+    if (!loadoutEditActive)
+    {
+        loadoutEditCopy = player->GetSkillLoadout();
+        loadoutAttackSkillEdit = player->GetAttackSkillIndex();
+        loadoutEditActive = true;
+    }
+
     renderer.DrawPanel(50, 60, GRenderer::W - 100, GRenderer::H - 120, "Skill Loadout — Select up to 4");
     int y = 110;
     renderer.DrawText("Click a skill to toggle it in your loadout (max 4):", 70, y, 16, CQColors::TextDim);
     y += 30;
-
-    auto& loadout = player->GetSkillLoadout();
-    auto loadoutCopy = loadout;
 
     // Build list of non-Attack skill indices
     std::vector<int> skillIndices;
@@ -2846,8 +2938,8 @@ void Game::StateSkillLoadout()
     int startIdx = skillLoadoutPage * skillsPerPage;
     int endIdx = std::min(startIdx + skillsPerPage, totalSkills);
     int visibleSkills = endIdx - startIdx;
-    int loadoutFocusCount = visibleSkills + 2; // skills + Save + Back
-    if (maxPage > 0) loadoutFocusCount += 2; // Prev/Next
+    int loadoutFocusCount = visibleSkills * 2 + 2;
+    if (maxPage > 0) loadoutFocusCount += 2;
     keyboardNav.SetFocusCount(loadoutFocusCount);
 
     int focusIdx = 0;
@@ -2857,35 +2949,46 @@ void Game::StateSkillLoadout()
         auto sk = player->GetSkills().GetSkill(i);
         if (!sk) continue;
 
-        bool inLoadout = player->IsInLoadout(i);
+        bool inLoadout = std::find(loadoutEditCopy.begin(), loadoutEditCopy.end(), i) != loadoutEditCopy.end();
+        bool isAttackSkill = (i == loadoutAttackSkillEdit);
         std::string elemStr = (sk->element != ElementType::Physical) ? " [" + std::string(ElementName(sk->element)) + "]" : "";
         std::string label = sk->name + elemStr
             + " (MP:" + std::to_string(sk->manaCost)
             + " CD:" + std::to_string(sk->cooldown)
             + " | Lv." + std::to_string(sk->level) + ")";
 
-        // Class-colored tinted background for skill card
         Color cardBg = CQColors::SkillCardBg(sk->characterClass);
-        renderer.DrawRect(70, y, 600, 30, cardBg);
+        renderer.DrawRect(70, y, 750, 30, cardBg);
 
-        if (inLoadout)
-        {
-            // Golden equipped badge
-            renderer.DrawRect(675, y, 95, 30, { 70, 55, 15, 255 });
-            renderer.DrawText("EQUIPPED", 680, y + 7, 14, CQColors::GoldBright);
-        }
-
-        if (renderer.Button(label, 70, y, 600, 30, focusIdx))
+        if (renderer.Button(label, 70, y, 620, 30, focusIdx))
         {
             if (inLoadout)
             {
-                auto it = std::find(loadoutCopy.begin(), loadoutCopy.end(), i);
-                if (it != loadoutCopy.end()) loadoutCopy.erase(it);
+                auto it = std::find(loadoutEditCopy.begin(), loadoutEditCopy.end(), i);
+                if (it != loadoutEditCopy.end()) loadoutEditCopy.erase(it);
             }
-            else if (loadoutCopy.size() < Player::MAX_LOADOUT_SKILLS)
+            else if (loadoutEditCopy.size() < Player::MAX_LOADOUT_SKILLS)
             {
-                loadoutCopy.push_back(i);
+                loadoutEditCopy.push_back(i);
             }
+        }
+        focusIdx++;
+
+        if (renderer.Button(isAttackSkill ? "Unset" : "Set ATK", 690, y, 55, 30, focusIdx))
+        {
+            loadoutAttackSkillEdit = isAttackSkill ? 0 : i;
+        }
+
+        if (inLoadout)
+        {
+            renderer.DrawRect(615, y, 70, 30, { 70, 55, 15, 255 });
+            renderer.DrawText("EQUIP", 627, y + 7, 14, CQColors::GoldBright);
+        }
+
+        if (isAttackSkill)
+        {
+            renderer.DrawRect(690, y, 55, 30, { 140, 40, 40, 255 });
+            renderer.DrawText("ATK", 698, y + 7, 14, WHITE);
         }
         renderer.DrawText("  " + sk->description, 85, y + 30, 14, CQColors::TextDim);
         std::string formula = sk->GetDamageFormula();
@@ -2900,7 +3003,6 @@ void Game::StateSkillLoadout()
         {
             y += 60;
         }
-        focusIdx++;
     }
 
     // Pagination controls
@@ -2916,18 +3018,23 @@ void Game::StateSkillLoadout()
     }
 
     int bottomY = GRenderer::H - 100;
-    renderer.DrawText("Selected: " + std::to_string(loadoutCopy.size())
+    renderer.DrawText("Selected: " + std::to_string(loadoutEditCopy.size())
         + " / " + std::to_string(Player::MAX_LOADOUT_SKILLS),
         70, bottomY - 50, 16, CQColors::TextGold);
 
     if (renderer.Button("Save", 70, bottomY - 20, 120, 36, focusIdx))
     {
-        player->SetSkillLoadout(loadoutCopy);
+        player->SetSkillLoadout(loadoutEditCopy);
+        player->SetAttackSkillIndex(loadoutAttackSkillEdit);
+        loadoutEditActive = false;
         currentState = GameState::Exploring;
     }
     focusIdx++;
     if (renderer.Button("Back", renderer.CenterX(120), bottomY - 20, 120, 36, focusIdx))
+    {
+        loadoutEditActive = false;
         currentState = GameState::Exploring;
+    }
 }
 
 void Game::StateSkillUpgrade()
@@ -2936,8 +3043,6 @@ void Game::StateSkillUpgrade()
 
     keyboardNav.Update();
     renderer.SetCurrentFocus(keyboardNav.GetFocus());
-
-    static int selectedSkillIdx = -1;
 
     auto& skills = player->GetSkills();
 
@@ -3117,6 +3222,7 @@ void Game::StateSkillUpgrade()
 void Game::StateCraft()
 {
     if (!player) { currentState = GameState::Exploring; return; }
+    if (!tutorialCraftingOpened) { tutorialCraftingOpened = true; AddTutorialHint("Crafting", "Combine resources to forge weapons and armor. Higher job levels unlock recipes!"); }
     keyboardNav.Update();
     renderer.SetCurrentFocus(keyboardNav.GetFocus());
     renderer.DrawPanel(50, 60, GRenderer::W - 100, GRenderer::H - 120, "Crafting");
@@ -3254,7 +3360,11 @@ void Game::StateReligion()
         {
             int donate = std::min(nc - religion.GetTotalDonated(), player->GetInventory().GetGold());
             if (donate > 0 && player->GetInventory().RemoveGold(donate))
-                if (religion.Donate(donate)) religion.ApplyDevotionBonus(player);
+                if (religion.Donate(donate))
+                {
+                    std::string msg = religion.ApplyDevotionBonus(player);
+                    if (!msg.empty()) AddCombatLog(msg);
+                }
         }
         y += 50;
 
@@ -3326,15 +3436,18 @@ void Game::StateShop()
 
     if (shopItems.empty())
     {
-        shopItems.push_back(LootTable::CreatePotion(areas[currentAreaIndex].difficulty));
-        shopItems.push_back(LootTable::CreatePotion(areas[currentAreaIndex].difficulty));
-        shopItems.push_back(LootTable::CreatePotion(areas[currentAreaIndex].difficulty));
-        shopItems.push_back(LootTable::CreateCommonWeapon(areas[currentAreaIndex].difficulty));
-        shopItems.push_back(LootTable::CreateCommonArmor(areas[currentAreaIndex].difficulty));
-        if (rand() % 2 == 0)
-            shopItems.push_back(LootTable::CreateRareWeapon(areas[currentAreaIndex].difficulty));
+        int diff = areas[currentAreaIndex].difficulty;
+        int reqLv = std::max(1, (diff - 1) * 5 + 1);
+        auto addShop = [&](std::shared_ptr<Item> item) { if (item) { item->requiredLevel = reqLv; shopItems.push_back(item); } };
+        addShop(LootTable::CreatePotion(diff));
+        addShop(LootTable::CreatePotion(diff));
+        addShop(LootTable::CreatePotion(diff));
+        addShop(LootTable::CreateCommonWeapon(diff));
+        addShop(LootTable::CreateCommonArmor(diff));
+        if (RNG::Next(2) == 0)
+            addShop(LootTable::CreateRareWeapon(diff));
         else
-            shopItems.push_back(LootTable::CreateRareArmor(areas[currentAreaIndex].difficulty));
+            addShop(LootTable::CreateRareArmor(diff));
     }
 
     int xLeft = 70;
@@ -3375,6 +3488,8 @@ void Game::StateShop()
         {
             std::string tip = item->name;
             tip += "\nRarity: " + std::string(RarityName(static_cast<Rarity>(item->rarity)));
+            if (item->requiredLevel > 1)
+                tip += "\nReq. Level: " + std::to_string(item->requiredLevel);
             tip += "\nPrice: " + std::to_string(price) + "g";
             if (auto w = std::dynamic_pointer_cast<Weapon>(item))
             {
@@ -3408,6 +3523,11 @@ void Game::StateShop()
                     wiki.MarkItemDiscovered(bought->name);
                     achievementSystem.UpdateProgress("social_shop_50");
                     achievementSystem.UpdateProgress("social_shop_200");
+                    // Remove non-consumable items from stock (potions stay infinite)
+                    if (item->type != ItemType::Consumable)
+                    {
+                        shopItems.erase(shopItems.begin() + i);
+                    }
                 }
             }
         }
@@ -3520,44 +3640,152 @@ void Game::StateAreaSelect()
     if (!player) { currentState = GameState::Exploring; return; }
     keyboardNav.Update();
     renderer.SetCurrentFocus(keyboardNav.GetFocus());
-    renderer.DrawPanel(100, 60, GRenderer::W - 200, GRenderer::H - 130, "Travel Across Eluna");
-    int y = 110;
-    keyboardNav.SetFocusCount(static_cast<int>(areas.size()) + 1); // +1 for Back
-    for (size_t i = 0; i < areas.size(); ++i)
-    {
-        std::string lbl = areas[i].name
-            + " (D:" + std::to_string(areas[i].difficulty) + ")";
-        if (renderer.Button(lbl, 130, y, 280, 36, static_cast<int>(i)))
-        {
-            currentAreaIndex = static_cast<int>(i);
-            religion.ResetPrayers();
 
-            // Track exploration achievements
-            int areasVisited = 0;
-            for (size_t a = 0; a <= static_cast<size_t>(currentAreaIndex); ++a)
-                areasVisited++;
-            achievementSystem.SetProgress("explore_3_areas", areasVisited);
-            achievementSystem.SetProgress("explore_6_areas", areasVisited);
-            achievementSystem.SetProgress("explore_all_areas", areasVisited);
-        }
-        renderer.DrawText(areas[i].description, 430, y + 8, 14, CQColors::TextLight);
-        if (!areas[i].dungeons.empty())
-        {
-            int cnt = 0;
-            for (const auto& d : areas[i].dungeons) cnt += d.rooms.size();
-            renderer.DrawText(std::to_string(areas[i].dungeons.size()) + " dungeon(s), "
-                              + std::to_string(cnt) + " rooms total",
-                              430, y + 26, 12, CQColors::TextDim);
-        }
-        y += 44;
+    // Title
+    renderer.DrawPanel(100, 30, GRenderer::W - 200, 50, "World Map of Eluna");
+
+    // Node positions — 4 rows
+    struct NodePos { float x, y; };
+    std::vector<NodePos> positions(10);
+
+    // Row 0: nodes 0, 1, 2
+    positions[0] = { 200, 180 };
+    positions[1] = { 512, 180 };
+    positions[2] = { 824, 180 };
+    // Row 1: nodes 3, 4
+    positions[3] = { 356, 330 };
+    positions[4] = { 668, 330 };
+    // Row 2: nodes 5, 6
+    positions[5] = { 356, 480 };
+    positions[6] = { 668, 480 };
+    // Row 3: nodes 7, 8, 9
+    positions[7] = { 200, 630 };
+    positions[8] = { 512, 630 };
+    positions[9] = { 824, 630 };
+
+    float nodeRadius = 28.0f;
+    int currentNode = currentAreaIndex;
+
+    // Determine reachable areas (connected to current)
+    std::vector<bool> reachable(areas.size(), false);
+    reachable[currentNode] = true;
+    for (int conn : areas[currentNode].connections)
+        reachable[conn] = true;
+
+    // Mouse position for hover
+    Vector2 mousePos = GetMousePosition();
+    int hoveredNode = -1;
+    for (int i = 0; i < static_cast<int>(areas.size()); ++i)
+    {
+        float dx = mousePos.x - positions[i].x;
+        float dy = mousePos.y - positions[i].y;
+        if (dx * dx + dy * dy <= nodeRadius * nodeRadius)
+            hoveredNode = i;
     }
-    if (renderer.Button("Back", renderer.CenterX(120), y + 20, 120, 40, static_cast<int>(areas.size())))
+
+    // Draw lines first (behind nodes)
+    for (int i = 0; i < static_cast<int>(areas.size()); ++i)
+    {
+        for (int conn : areas[i].connections)
+        {
+            if (conn > i) // draw each line once
+            {
+                bool bothReachable = reachable[i] && reachable[conn];
+                Color lineColor = bothReachable ? CQColors::GoldDim : CQColors::BtnBg;
+                int thick = bothReachable ? 2 : 1;
+                renderer.DrawLine(
+                    static_cast<int>(positions[i].x), static_cast<int>(positions[i].y),
+                    static_cast<int>(positions[conn].x), static_cast<int>(positions[conn].y),
+                    lineColor, thick);
+            }
+        }
+    }
+
+    // Draw nodes
+    keyboardNav.SetFocusCount(static_cast<int>(areas.size()) + 1); // +1 for Back
+    for (int i = 0; i < static_cast<int>(areas.size()); ++i)
+    {
+        int cx = static_cast<int>(positions[i].x);
+        int cy = static_cast<int>(positions[i].y);
+
+        Color fillColor;
+        Color outlineColor;
+        int outlineThick = 2;
+
+        if (i == currentNode)
+        {
+            fillColor = CQColors::GoldBright;
+            outlineColor = CQColors::Gold;
+            outlineThick = 3;
+        }
+        else if (reachable[i])
+        {
+            fillColor = CQColors::TextGreen;
+            outlineColor = CQColors::GoldDim;
+        }
+        else
+        {
+            fillColor = CQColors::BtnBg;
+            outlineColor = CQColors::TextDim;
+        }
+
+        // Hovered highlight
+        if (i == hoveredNode && i != currentNode)
+        {
+            outlineColor = CQColors::FocusBorder;
+            outlineThick = 3;
+        }
+
+        // Clickable check
+        if (reachable[i] && i != currentNode)
+        {
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && i == hoveredNode)
+            {
+                currentAreaIndex = i;
+                religion.ResetPrayers();
+                player->GetJobSystem().ReduceAllFatigue(10);
+
+                int areasVisited = currentAreaIndex + 1;
+                achievementSystem.SetProgress("explore_3_areas", areasVisited);
+                achievementSystem.SetProgress("explore_6_areas", areasVisited);
+                achievementSystem.SetProgress("explore_all_areas", areasVisited);
+            }
+        }
+
+        // Draw node
+        renderer.DrawCircle(cx, cy, nodeRadius, fillColor);
+        renderer.DrawCircleLines(cx, cy, nodeRadius, outlineColor, outlineThick);
+
+        // Area name below node
+        renderer.DrawCenteredText(areas[i].name, cy + static_cast<int>(nodeRadius) + 4, 12,
+                                  reachable[i] ? CQColors::TextLight : CQColors::TextDim);
+
+        // Difficulty below name
+        std::string diffText = "D:" + std::to_string(areas[i].difficulty);
+        renderer.DrawCenteredText(diffText, cy + static_cast<int>(nodeRadius) + 18, 11,
+                                  reachable[i] ? CQColors::TextGold : CQColors::TextDim);
+    }
+
+    // Tooltip for hovered node
+    if (hoveredNode >= 0 && hoveredNode < static_cast<int>(areas.size()))
+    {
+        int tx = static_cast<int>(positions[hoveredNode].x) - 140;
+        int ty = static_cast<int>(positions[hoveredNode].y) + static_cast<int>(nodeRadius) + 34;
+        if (ty > GRenderer::H - 80) ty = static_cast<int>(positions[hoveredNode].y) - 80;
+        renderer.DrawTooltip(areas[hoveredNode].description, tx, ty, 280);
+    }
+
+    // Back button
+    int backY = GRenderer::H - 60;
+    keyboardNav.SetFocusCount(static_cast<int>(areas.size()) + 1);
+    if (renderer.Button("Back", renderer.CenterX(120), backY, 120, 40, static_cast<int>(areas.size())))
         currentState = GameState::Exploring;
 }
 
 void Game::StateQuestLog()
 {
     if (!player) { currentState = GameState::Exploring; return; }
+    if (!tutorialQuestsChecked) { tutorialQuestsChecked = true; AddTutorialHint("Quests", "Complete quests for bonus XP and gold. Check objectives carefully!"); }
     keyboardNav.Update();
     renderer.SetCurrentFocus(keyboardNav.GetFocus());
     renderer.DrawPanel(60, 50, GRenderer::W - 120, GRenderer::H - 110, "Quest Board");
@@ -3793,7 +4021,7 @@ void Game::StateCombat()
         else
             roomInfo += " (Enemy " + std::to_string(currentRoomEnemyIndex + 1)
                 + "/" + std::to_string(roomQueue.size()) + ")";
-        renderer.DrawText(roomInfo, 30, layout.playerBarY - 20, 14, CQColors::TextGold);
+        renderer.DrawText(roomInfo, 30, layout.playerBarY - 16, 14, CQColors::TextGold);
     }
 
     // Actions - draw on top of the battle screen
@@ -3802,11 +4030,31 @@ void Game::StateCombat()
         int btnSize = layout.abilitySize;
         int btnSpacing = layout.abilitySpacing;
         
-        // Count available buttons (5 base + god abilities)
+        // Build button list: Attack, loadout skills, Defend, Items, Flee, god abilities
+        struct BtnInfo { std::string label; Color color; };
+        std::vector<BtnInfo> btns;
+        btns.push_back({"Attack", RED});
+
+        const auto& loadout = player->GetSkillLoadout();
+        for (size_t j = 0; j < loadout.size(); ++j)
+        {
+            int idx = loadout[j];
+            auto sk = player->GetSkills().GetSkill(idx);
+            if (!sk) continue;
+            std::string sLabel = sk->name;
+            if (sLabel.size() > 10) sLabel = sLabel.substr(0, 10);
+            Color sColor = {100, 150, 255, 255};
+            btns.push_back({sLabel, sColor});
+        }
+
+        btns.push_back({"Defend", {100, 200, 100, 255}});
+        btns.push_back({"Items", {255, 200, 50, 255}});
+        btns.push_back({"Flee", {180, 180, 180, 255}});
+
         int godBtnCount = 0;
         if (religion.CanUseGodAbility1()) godBtnCount++;
         if (religion.CanUseGodAbility2()) godBtnCount++;
-        int totalButtons = 5 + godBtnCount;
+        int totalButtons = static_cast<int>(btns.size()) + godBtnCount;
         
         int totalW = totalButtons * btnSize + (totalButtons - 1) * btnSpacing;
         int startX = (GRenderer::W - totalW) / 2;
@@ -3814,75 +4062,62 @@ void Game::StateCombat()
 
         keyboardNav.SetFocusCount(totalButtons);
 
-        const char* labels[] = {"Attack", "Skills", "Defend", "Items", "Flee"};
         int focusIdx = 0;
-        if (renderer.Button(labels[0], startX, btnY, btnSize, btnSize, focusIdx++))
-            DoPlayerAttack(CombatAction::Attack);
-        if (renderer.Button(labels[1], startX + (btnSize + btnSpacing), btnY, btnSize, btnSize, focusIdx++))
-            combatPhase = CombatPhase::SkillSelect;
-        if (renderer.Button(labels[2], startX + 2 * (btnSize + btnSpacing), btnY, btnSize, btnSize, focusIdx++))
-            DoPlayerAttack(CombatAction::Defend);
-        if (renderer.Button(labels[3], startX + 3 * (btnSize + btnSpacing), btnY, btnSize, btnSize, focusIdx++))
-            combatPhase = CombatPhase::ItemSelect;
-        if (renderer.Button(labels[4], startX + 4 * (btnSize + btnSpacing), btnY, btnSize, btnSize, focusIdx++))
+        int loadoutOffset = 1 + static_cast<int>(loadout.size());
+        for (size_t b = 0; b < btns.size(); ++b)
         {
-            leveledUpThisCombat = false;
-            AddCombatLog("You fled from combat!");
-            if (!roomQueue.empty()) roomQueue.clear();
-            currentEnemy.reset();
-            currentState = isDungeonBossFight ? GameState::DungeonExplore : GameState::Exploring;
+            int bx = startX + static_cast<int>(b) * (btnSize + btnSpacing);
+            if (renderer.Button(btns[b].label, bx, btnY, btnSize, btnSize, focusIdx++, 14))
+            {
+                if (b == 0)
+                    DoPlayerAttack(CombatAction::Attack, player->GetAttackSkillIndex());
+                else if (b < loadoutOffset && b > 0)
+                    DoPlayerAttack(CombatAction::UseSkill, loadout[b - 1]);
+                else if (btns[b].label == "Defend")
+                    DoPlayerAttack(CombatAction::Defend);
+                else if (btns[b].label == "Items")
+                    combatPhase = CombatPhase::ItemSelect;
+                else if (btns[b].label == "Flee")
+                {
+                    if (isDungeonBossFight)
+                    {
+                        AddCombatLog("There is no escape from a boss!");
+                    }
+                    else
+                    {
+                        int chance = std::clamp(50 + 5 * (player->GetLevel() - currentEnemy->GetLevel()), 10, 95);
+                        if (RNG::Percent() < chance)
+                        {
+                            leveledUpThisCombat = false;
+                            AddCombatLog("You fled from combat!");
+                            if (!roomQueue.empty()) roomQueue.clear();
+                            currentEnemy.reset();
+                            currentState = GameState::Exploring;
+                        }
+                        else
+                        {
+                            AddCombatLog("Couldn't escape! (" + std::to_string(chance) + "% chance)");
+                            combatPhase = CombatPhase::EnemyTurn;
+                            enemyActionTime = renderer.GetTime();
+                        }
+                    }
+                }
+            }
         }
         
         // God ability buttons
         if (religion.CanUseGodAbility1())
         {
             auto ab1 = religion.GetGodAbility1();
-            if (renderer.Button(ab1.name, startX + 5 * (btnSize + btnSpacing), btnY, btnSize, btnSize, focusIdx++))
+            if (renderer.Button(ab1.name, startX + static_cast<int>(btns.size()) * (btnSize + btnSpacing), btnY, btnSize, btnSize, focusIdx++, 14))
                 DoPlayerGodAbility(1);
         }
         if (religion.CanUseGodAbility2())
         {
             auto ab2 = religion.GetGodAbility2();
-            if (renderer.Button(ab2.name, startX + (godBtnCount > 1 ? 6 : 5) * (btnSize + btnSpacing), btnY, btnSize, btnSize, focusIdx++))
+            if (renderer.Button(ab2.name, startX + (static_cast<int>(btns.size()) + (godBtnCount > 1 ? 1 : 0)) * (btnSize + btnSpacing), btnY, btnSize, btnSize, focusIdx++, 14))
                 DoPlayerGodAbility(2);
         }
-    }
-    else if (combatPhase == CombatPhase::SkillSelect)
-    {
-        int panelX = 30;
-        int panelY = layout.abilityY - 10;
-        int panelW = GRenderer::W - 60;
-        int panelH = 200;
-        renderer.DrawRect(panelX, panelY, panelW, panelH, {15, 15, 20, 230});
-        renderer.DrawRectLines(panelX, panelY, panelW, panelH, {80, 80, 100, 200});
-
-        renderer.DrawText("Select Skill:", panelX + 10, panelY + 8, 16, CQColors::TextGold);
-        int sky = panelY + 30;
-        const auto& loadout = player->GetSkillLoadout();
-        int skillFocusCount = 0;
-        for (size_t j = 0; j < loadout.size(); ++j)
-        {
-            int idx = loadout[j];
-            auto sk = player->GetSkills().GetSkill(idx);
-            if (sk) skillFocusCount++;
-        }
-        skillFocusCount++;
-        keyboardNav.SetFocusCount(skillFocusCount);
-        int focusIdx = 0;
-        for (size_t j = 0; j < loadout.size(); ++j)
-        {
-            int idx = loadout[j];
-            auto sk = player->GetSkills().GetSkill(idx);
-            if (!sk) continue;
-            if (renderer.Button(sk->name + " [" + ElementName(sk->element) + "] (" + std::to_string(sk->manaCost) + "MP)", panelX + 10, sky, 350, 26, focusIdx))
-            {
-                DoPlayerAttack(CombatAction::UseSkill, idx);
-            }
-            sky += 30;
-            focusIdx++;
-        }
-        if (renderer.Button("Cancel", panelX + panelW - 110, panelY + 8, 100, 26, focusIdx))
-            combatPhase = CombatPhase::PlayerTurn;
     }
     else if (combatPhase == CombatPhase::ItemSelect)
     {
@@ -3983,14 +4218,13 @@ void Game::StateCombat()
             renderer.DrawCenteredText("LEVEL UP!", 380, 40, CQColors::BgDark);
         }
 
-        keyboardNav.SetFocusCount(1);
-        if (renderer.Button("Continue", renderer.CenterX(160), 600, 160, 44, 0))
+        // Check if we're in a dungeon with more enemies
+        if (!roomQueue.empty() && currentRoomEnemyIndex + 1 < static_cast<int>(roomQueue.size()))
         {
-            leveledUpThisCombat = false;
-
-            // Check if we're in a dungeon with more enemies
-            if (!roomQueue.empty() && currentRoomEnemyIndex + 1 < static_cast<int>(roomQueue.size()))
+            keyboardNav.SetFocusCount(1);
+            if (renderer.Button("Continue", renderer.CenterX(160), 600, 160, 44, 0))
             {
+                leveledUpThisCombat = false;
                 // Rest between enemies
                 int healHP = player->GetMaxHealth() * 30 / 100;
                 int healMP = player->GetMaxMana() * 30 / 100;
@@ -4002,16 +4236,26 @@ void Game::StateCombat()
                 currentRoomEnemyIndex++;
                 StartCombatWithEnemy(roomQueue[currentRoomEnemyIndex], false);
             }
-            else if (isDungeonBossFight)
+        }
+        else if (isDungeonBossFight)
+        {
+            keyboardNav.SetFocusCount(1);
+            if (renderer.Button("Continue", renderer.CenterX(160), 600, 160, 44, 0))
             {
+                leveledUpThisCombat = false;
                 // Dungeon done
                 dungeonCompleted = true;
                 currentEnemy.reset();
                 ClearLog();
                 currentState = GameState::DungeonComplete;
             }
-            else if (inDungeonEncounter)
+        }
+        else if (inDungeonEncounter)
+        {
+            keyboardNav.SetFocusCount(1);
+            if (renderer.Button("Continue", renderer.CenterX(160), 600, 160, 44, 0))
             {
+                leveledUpThisCombat = false;
                 currentEnemy.reset();
                 ClearLog();
                 roomQueue.clear();
@@ -4022,7 +4266,7 @@ void Game::StateCombat()
                     {
                         const auto& rooms = dungeon.rooms;
                         dungeonRoomEnemyCount = rooms[currentDungeonRoom].minEnemies
-                            + rand() % (rooms[currentDungeonRoom].maxEnemies
+                            + RNG::Next(rooms[currentDungeonRoom].maxEnemies
                                        - rooms[currentDungeonRoom].minEnemies + 1);
                     }
                     currentState = GameState::DungeonExplore;
@@ -4033,9 +4277,15 @@ void Game::StateCombat()
                     currentState = GameState::DungeonComplete;
                 }
             }
-            else
+        }
+        else
+        {
+            // Area encounter — offer choice to continue or return
+            keyboardNav.SetFocusCount(2);
+            int btnY = 550;
+            if (renderer.Button("Keep Fighting", renderer.CenterX(160), btnY, 160, 44, 0))
             {
-                // Area encounter — chain into next random fight (unlimited)
+                leveledUpThisCombat = false;
                 ClearLog();
                 roomQueue.clear();
                 auto monsters = areas[currentAreaIndex].spawnMonsters();
@@ -4053,20 +4303,37 @@ void Game::StateCombat()
                     currentState = GameState::Exploring;
                 }
             }
+            else if (renderer.Button("Return to Camp", renderer.CenterX(160), btnY + 50, 160, 44, 1))
+            {
+                leveledUpThisCombat = false;
+                currentEnemy.reset();
+                ClearLog();
+                roomQueue.clear();
+                currentState = GameState::Exploring;
+            }
         }
     }
     else if (combatPhase == CombatPhase::Defeat)
     {
         renderer.DrawCenteredText("You were defeated...", 400, 36, CQColors::TextRed);
+        if (deathPenaltyApplied)
+        {
+            std::string penaltyMsg = "Lost " + std::to_string(deathGoldLost) + " gold and "
+                + std::to_string(deathXpLost) + " XP. Respawning at camp...";
+            renderer.DrawCenteredText(penaltyMsg, 400, 60, CQColors::TextDim);
+        }
         keyboardNav.SetFocusCount(1);
         if (renderer.Button("Continue", renderer.CenterX(160), 500, 160, 44, 0))
         {
             leveledUpThisCombat = false;
             if (!roomQueue.empty()) roomQueue.clear();
-            player.reset();
             currentEnemy.reset();
             ClearLog();
-            currentState = GameState::MainMenu;
+            // Respawn at current area with 50% HP/MP
+            player->SetCurrentHealth(player->GetMaxHealth() / 2);
+            player->SetCurrentMana(player->GetMaxMana() / 2);
+            currentState = GameState::Exploring;
+            deathPenaltyApplied = false;
         }
     }
 }
@@ -4361,21 +4628,21 @@ void Game::DoEnemyTurn()
     {
         case EnemyAIType::Aggressive:
             // Always attack, but use skills when available for more damage
-            if (hasSkills && rand() % 3 == 0)
+            if (hasSkills && RNG::Next(3) == 0)
             {
                 ea = CombatAction::UseSkill;
-                es = 1 + rand() % (skillCount - 1);
+                es = 1 + RNG::Next(skillCount - 1);
             }
             break;
             
         case EnemyAIType::Defensive:
             // Defends often (50%), attacks otherwise
-            if (rand() % 2 == 0)
+            if (RNG::Next(2) == 0)
                 ea = CombatAction::Defend;
-            else if (hasSkills && rand() % 2 == 0)
+            else if (hasSkills && RNG::Next(2) == 0)
             {
                 ea = CombatAction::UseSkill;
-                es = 1 + rand() % (skillCount - 1);
+                es = 1 + RNG::Next(skillCount - 1);
             }
             break;
             
@@ -4384,7 +4651,7 @@ void Game::DoEnemyTurn()
             if (hasSkills && currentEnemy->GetCurrentMana() > 10)
             {
                 ea = CombatAction::UseSkill;
-                es = 1 + rand() % (skillCount - 1);
+                es = 1 + RNG::Next(skillCount - 1);
             }
             break;
             
@@ -4393,18 +4660,18 @@ void Game::DoEnemyTurn()
             if (healthPercent < 50 && hasSkills)
             {
                 ea = CombatAction::UseSkill;
-                es = 1 + rand() % (skillCount - 1);
+                es = 1 + RNG::Next(skillCount - 1);
             }
             break;
             
         case EnemyAIType::Boss:
             // Smart behavior: heals/defends when low, uses skills when possible
-            if (healthPercent < 30 && rand() % 2 == 0)
+            if (healthPercent < 30 && RNG::Next(2) == 0)
                 ea = CombatAction::Defend;
             else if (hasSkills)
             {
                 ea = CombatAction::UseSkill;
-                es = 1 + rand() % (skillCount - 1);
+                es = 1 + RNG::Next(skillCount - 1);
             }
             break;
             
@@ -4412,13 +4679,13 @@ void Game::DoEnemyTurn()
         default:
             // Original random behavior
             {
-                int ec = rand() % 3;
+                int ec = RNG::Next(3);
                 switch (ec)
                 {
                     case 0: ea = CombatAction::Attack; break;
                     case 1:
                         if (hasSkills)
-                        { ea = CombatAction::UseSkill; es = 1 + rand() % (skillCount - 1); }
+                        { ea = CombatAction::UseSkill; es = 1 + RNG::Next(skillCount - 1); }
                         break;
                     case 2: ea = CombatAction::Defend; break;
                 }
@@ -4456,7 +4723,18 @@ void Game::DoEnemyTurn()
         combatPhase = CombatPhase::Victory;
     }
     else if (!player->IsAlive())
-    { AddCombatLog("You have been defeated..."); combatPhase = CombatPhase::Defeat; }
+    {
+        AddCombatLog("You have been defeated...");
+        // Apply death penalty: 10% gold + 10% XP (never de-level)
+        int goldLost = player->GetInventory().GetGold() / 10;
+        int xpLost = player->GetExperience() / 10;
+        player->GetInventory().RemoveGold(goldLost);
+        player->SetExperience(std::max(0, player->GetExperience() - xpLost));
+        deathGoldLost = goldLost;
+        deathXpLost = xpLost;
+        deathPenaltyApplied = true;
+        combatPhase = CombatPhase::Defeat;
+    }
     else
         combatPhase = CombatPhase::PlayerTurn;
 }
@@ -4621,7 +4899,10 @@ void Game::ProcessVictory(std::shared_ptr<Monster> enemy)
     achievementSystem.SetProgress("gold_100000", totalGold);
 
     if (religion.GetGod() != GodType::None && religion.GetDevotionLevel() > 0)
-        religion.ApplyDevotionBonus(player);
+    {
+        std::string msg = religion.ApplyDevotionBonus(player);
+        if (!msg.empty()) AddCombatLog(msg);
+    }
 
     // God quest progress
     if (religion.GetGod() != GodType::None && !religion.IsQuestComplete())
@@ -4699,21 +4980,27 @@ void Game::ProcessVictory(std::shared_ptr<Monster> enemy)
         int diff = 1 + (player->GetLevel() - 1) / 5;
         int dropTier = enemy->GetDropTier();
         auto loot = enemy->IsBoss()
-            ? LootTable::GenerateBossLoot(diff, dropTier)
-            : LootTable::GenerateLoot(diff, dropTier);
+            ? LootTable::GenerateBossLoot(diff, dropTier, -1, player->GetCharacterClass())
+            : LootTable::GenerateLoot(diff, dropTier, -1, player->GetCharacterClass());
         for (auto& item : loot)
         {
-            player->GetInventory().AddItem(item);
-            wiki.MarkItemDiscovered(item->name);
-            AddCombatLog("Loot: " + item->name);
+            if (player->GetInventory().AddItem(item))
+            {
+                wiki.MarkItemDiscovered(item->name);
+                AddCombatLog("Loot: " + item->name);
+            }
+            else
+            {
+                AddCombatLog("Inventory full! Lost: " + item->name);
+            }
         }
 
         // Unique item drop — bosses 30%, normal enemies 3%
         {
             int uniqueChance = enemy->IsBoss() ? 30 : 3;
-            if (rand() % 100 < uniqueChance)
+            if (RNG::Percent() < uniqueChance)
             {
-                auto unique = LootTable::GenerateUniqueDrop(enemy->GetName(), diff, enemy->IsBoss());
+                auto unique = LootTable::GenerateUniqueDrop(enemy->GetName(), diff, enemy->IsBoss(), player->GetCharacterClass());
                 if (unique)
                 {
                     player->GetInventory().AddItem(unique);
@@ -4727,9 +5014,9 @@ void Game::ProcessVictory(std::shared_ptr<Monster> enemy)
         // Special drops from this enemy type
         for (const auto& sd : enemy->GetSpecialDrops())
         {
-            if (rand() % 100 < sd.chance)
+            if (RNG::Percent() < sd.chance)
             {
-                int qty = sd.minQty + (rand() % (sd.maxQty - sd.minQty + 1));
+                int qty = sd.minQty + (RNG::Next(sd.maxQty - sd.minQty + 1));
                 auto drop = std::make_shared<Resource>(sd.itemName, dropTier, dropTier * 5);
                 drop->count = qty;
                 player->GetInventory().AddItem(drop);
@@ -4768,6 +5055,7 @@ void Game::TrackEnemyDefeat(const std::string& enemyName)
 void Game::StartAreaEncounter()
 {
     if (!player || !player->IsAlive()) return;
+    if (!tutorialExplored) { tutorialExplored = true; AddTutorialHint("Exploration", "Fight monsters to earn XP and loot. Use skills wisely!"); }
     auto monsters = areas[currentAreaIndex].spawnMonsters();
     if (monsters.empty()) { return; }
     for (auto& m : monsters)
@@ -4781,6 +5069,7 @@ void Game::StartAreaEncounter()
 void Game::StartCombatWithEnemy(std::shared_ptr<Monster> enemy, bool isBoss)
 {
     if (!player || !enemy) return;
+    if (!tutorialCombatEntered) { tutorialCombatEntered = true; AddTutorialHint("Combat", "Pick a skill or attack. Defend to reduce incoming damage."); }
 
     // Apply job combat synergy bonuses
     auto& js = player->GetJobSystem();
@@ -4863,13 +5152,37 @@ void Game::SaveGamePrompt()
         if ((hover && renderer.IsMouseClickedOn(200, sy, GRenderer::W - 400, 60))
             || (focused && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE))))
         {
-            SaveToSlot(i + 1);
-            return;
+            if (slots[i].occupied)
+            {
+                if (saveConfirmSlot == i + 1)
+                {
+                    SaveToSlot(i + 1);
+                    saveConfirmSlot = -1;
+                    return;
+                }
+                else
+                {
+                    saveConfirmSlot = i + 1;
+                }
+            }
+            else
+            {
+                SaveToSlot(i + 1);
+                saveConfirmSlot = -1;
+                return;
+            }
+        }
+        if (saveConfirmSlot == i + 1)
+        {
+            renderer.DrawText("Click again to OVERWRITE", 215 + 300, sy + 30, 12, CQColors::TextRed);
         }
         sy += 68;
     }
     if (renderer.Button("Cancel", renderer.CenterX(120), sy + 10, 120, 40, SaveGameManager::SLOT_COUNT))
+    {
+        saveConfirmSlot = -1;
         currentState = GameState::Exploring;
+    }
 }
 
 void Game::LoadGamePrompt()
@@ -4929,15 +5242,17 @@ void Game::SaveToSlot(int slot)
 
 void Game::LoadFromSlot(int slot)
 {
-    static bool init = true;
     auto loaded = saveManager.LoadGame(slot, currentAreaIndex, religion, achievementSystem, reputationSystem, petManager, wiki);
     if (loaded)
     {
         player = loaded;
+        if (currentAreaIndex < 0 || currentAreaIndex >= static_cast<int>(areas.size()))
+            currentAreaIndex = 0;
+        selectedSkillIdx = -1;
+        selectedAchievementCategory = -1;
         if (player->GetQuestManager().GetQuestCount() == 0)
             player->GetQuestManager().InitializeDefaultQuests();
         ClearLog();
-        init = true;
         currentState = GameState::Exploring;
         ApplyPetPassivesToPlayer();
         for (const auto& p : petManager.GetPets())
@@ -5191,7 +5506,6 @@ void Game::StateAchievements()
     y += 24;
 
     // Category tabs
-    static int selectedCategory = -1; // -1 = All
     static const char* categoryNames[] = { "All", "Job", "Combat", "Quest", "Exploration", "Progression", "Social" };
     static const AchievementCategory categoryValues[] = {
         AchievementCategory::Job, AchievementCategory::Job, AchievementCategory::Combat,
@@ -5202,12 +5516,12 @@ void Game::StateAchievements()
     int tabX = 130;
     for (int i = 0; i < 7; ++i)
     {
-        bool selected = (i == 0 && selectedCategory == -1) || (i > 0 && selectedCategory == static_cast<int>(categoryValues[i]));
+        bool selected = (i == 0 && selectedAchievementCategory == -1) || (i > 0 && selectedAchievementCategory == static_cast<int>(categoryValues[i]));
         Color tabColor = selected ? CQColors::Gold : CQColors::TextDim;
 
         if (renderer.Button(categoryNames[i], tabX, y, 80, 28, focusIdx))
         {
-            selectedCategory = (i == 0) ? -1 : static_cast<int>(categoryValues[i]);
+            selectedAchievementCategory = (i == 0) ? -1 : static_cast<int>(categoryValues[i]);
             achievementsPage = 0;
         }
         tabX += 88;
@@ -5221,7 +5535,7 @@ void Game::StateAchievements()
     {
         const AchievementDefinition* def = achievementSystem.GetDefinition(prog.achievementId);
         if (!def) continue;
-        if (selectedCategory != -1 && static_cast<int>(def->category) != selectedCategory)
+        if (selectedAchievementCategory != -1 && static_cast<int>(def->category) != selectedAchievementCategory)
             continue;
         filtered.push_back(&prog);
     }
@@ -5376,9 +5690,9 @@ void Game::StateAchievements()
             renderer.DrawText("[LOCKED] Unlock all achievements", 150, y, 11, CQColors::TextDim);
     }
 
-    // Back button
-    y = GRenderer::H - 60;
-    if (renderer.Button("Back", 130, y, 120, 36, focusIdx))
+    // Back button — place below content or at bottom of screen, whichever is lower
+    int backY = std::max(y + 20, GRenderer::H - 60);
+    if (renderer.Button("Back", 130, backY, 120, 36, focusIdx))
     {
         currentState = GameState::Exploring;
         renderer.StartTransition();

@@ -43,6 +43,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/rpg.dir/Graphics/IconRenderer.cpp.o.d"
   "CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.o"
   "CMakeFiles/rpg.dir/Graphics/PhotoEffects.cpp.o.d"
+  "CMakeFiles/rpg.dir/Graphics/SoundManager.cpp.o"
+  "CMakeFiles/rpg.dir/Graphics/SoundManager.cpp.o.d"
   "CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.o"
   "CMakeFiles/rpg.dir/Graphics/TextureManager.cpp.o.d"
   "CMakeFiles/rpg.dir/Inventory/Inventory.cpp.o"

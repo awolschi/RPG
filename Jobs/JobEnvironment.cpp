@@ -1,4 +1,5 @@
 #include "JobEnvironment.hpp"
+#include "../Engine/RNG.hpp"
 #include <algorithm>
 
 JobEnvironment::JobEnvironment()
@@ -76,7 +77,7 @@ WeatherEffect JobEnvironment::GetWeatherEffect(WeatherType weather) const
 
 void JobEnvironment::RollWeather()
 {
-    int roll = rand() % 100;
+    int roll = RNG::Next(100);
     if (roll < 30)      currentWeather = WeatherType::Clear;
     else if (roll < 50) currentWeather = WeatherType::Rainy;
     else if (roll < 62) currentWeather = WeatherType::Windy;
@@ -86,7 +87,7 @@ void JobEnvironment::RollWeather()
     else                currentWeather = WeatherType::Scorching;
 
     effect = GetWeatherEffect(currentWeather);
-    daysUntilChange = 1 + (rand() % 3);
+    daysUntilChange = 1 + RNG::Next(3);
 }
 
 std::string JobEnvironment::GetWeatherDescription() const

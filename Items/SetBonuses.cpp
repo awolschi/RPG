@@ -123,6 +123,7 @@ void SetBonuses::Initialize()
         AddBonus(s.twoPiece, SetBonusType::SpellDmgBoost, 15);
         AddBonus(s.twoPiece, SetBonusType::ManaCostReduce, 10);
         AddBonus(s.twoPiece, SetBonusType::ManaRegen, 10);
+        AddBonus(s.threePiece, SetBonusType::SpellDmgBoost, 10);
         AddBonus(s.fourPiece, SetBonusType::DoubleCast, 15);
         AddBonus(s.fourPiece, SetBonusType::AllResist, 15);
         s_sets.push_back(s);
@@ -148,6 +149,7 @@ void SetBonuses::Initialize()
         };
         AddBonus(s.twoPiece, SetBonusType::SpellDmgBoost, 15);
         AddBonus(s.twoPiece, SetBonusType::HealOnKill, 10);
+        AddBonus(s.threePiece, SetBonusType::HpPerTurn, 15);
         AddBonus(s.fourPiece, SetBonusType::Revive, 50);
         AddBonus(s.fourPiece, SetBonusType::AllResist, 15);
         s_sets.push_back(s);
@@ -174,6 +176,7 @@ void SetBonuses::Initialize()
         };
         AddBonus(s.twoPiece, SetBonusType::DmgBoost, 15);
         AddBonus(s.twoPiece, SetBonusType::AllResist, 10);
+        AddBonus(s.threePiece, SetBonusType::CritBoost, 15);
         AddBonus(s.fourPiece, SetBonusType::DmgBoost, 25);
         AddBonus(s.fourPiece, SetBonusType::DefBoost, 10);
         AddBonus(s.fourPiece, SetBonusType::Thorns, 25);
@@ -305,6 +308,82 @@ void SetBonuses::Initialize()
         s_sets.push_back(s);
     }
 
+    // ================================================================
+    // Set 14: Bulwark (Warrior, 4 pieces)
+    // ================================================================
+    {
+        SetInfo s;
+        s.name = "Bulwark";
+        s.setId = 14;
+        s.pieceNames = {
+            "Bulwark Plate",
+            "Warlord's Casque",
+            "Drakeplate Gauntlets",
+            "Ironclad Warblade"
+        };
+        AddBonus(s.twoPiece, SetBonusType::DefBoost, 15);
+        AddBonus(s.fourPiece, SetBonusType::Thorns, 40);
+        AddBonus(s.fourPiece, SetBonusType::DmgBoost, 25);
+        s_sets.push_back(s);
+    }
+
+    // ================================================================
+    // Set 15: Redeemer's Light (Priest, 4 pieces)
+    // ================================================================
+    {
+        SetInfo s;
+        s.name = "Redeemer's Light";
+        s.setId = 15;
+        s.pieceNames = {
+            "Halo of the Redeemed",
+            "Vestments of the Martyr",
+            "Gauntlets of Grace",
+            "Arbiter's Mace"
+        };
+        AddBonus(s.twoPiece, SetBonusType::HealOnKill, 15);
+        AddBonus(s.fourPiece, SetBonusType::Revive, 50);
+        AddBonus(s.fourPiece, SetBonusType::ManaRegen, 10);
+        s_sets.push_back(s);
+    }
+
+    // ================================================================
+    // Set 16: Deadeye (Archer, 4 pieces)
+    // ================================================================
+    {
+        SetInfo s;
+        s.name = "Deadeye";
+        s.setId = 16;
+        s.pieceNames = {
+            "Pathfinder's Cap",
+            "Wyrmhide Jerkin",
+            "Shadowstalker Grips",
+            "Windrunner's Bow"
+        };
+        AddBonus(s.twoPiece, SetBonusType::CritBoost, 20);
+        AddBonus(s.fourPiece, SetBonusType::DmgBoost, 25);
+        AddBonus(s.fourPiece, SetBonusType::Dodge, 15);
+        s_sets.push_back(s);
+    }
+
+    // ================================================================
+    // Set 17: Trade Baron's (Merchant, 4 pieces)
+    // ================================================================
+    {
+        SetInfo s;
+        s.name = "Trade Baron's";
+        s.setId = 17;
+        s.pieceNames = {
+            "Coinlord's Cudgel",
+            "Merchant's Traveling Cloak",
+            "Ring of the Golden Touch",
+            "Amulet of Prosperity"
+        };
+        AddBonus(s.twoPiece, SetBonusType::GoldFind, 50);
+        AddBonus(s.fourPiece, SetBonusType::ExpBoost, 20);
+        AddBonus(s.fourPiece, SetBonusType::AllResist, 10);
+        s_sets.push_back(s);
+    }
+
     s_initialized = true;
 }
 
@@ -357,6 +436,12 @@ std::vector<SetBonus> SetBonuses::GetActiveBonuses(const Equipment& equip, int s
     if (pieces >= 2)
     {
         for (const auto& b : set->twoPiece)
+            result.push_back(b);
+    }
+
+    if (pieces >= 3)
+    {
+        for (const auto& b : set->threePiece)
             result.push_back(b);
     }
 

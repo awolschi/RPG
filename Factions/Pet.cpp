@@ -1,7 +1,7 @@
 #include "Pet.hpp"
+#include "../Engine/RNG.hpp"
 #include <sstream>
 #include <algorithm>
-#include <cstdlib>
 #include <cmath>
 
 PetManager::PetManager()
@@ -310,7 +310,7 @@ std::string PetManager::GetFactionLegendPetID(FactionID faction) const
 
 std::string PetManager::RollBossDropPet(int bossLevel, const std::string& bossName) const
 {
-    if (rand() % 100 >= 8) return "";
+    if (RNG::Percent() >= 8) return "";
 
     std::vector<std::string> candidates;
     for (const auto& p : pets)
@@ -320,7 +320,7 @@ std::string PetManager::RollBossDropPet(int bossLevel, const std::string& bossNa
     }
 
     if (candidates.empty()) return "";
-    return candidates[rand() % candidates.size()];
+    return candidates[RNG::Next(static_cast<int>(candidates.size()))];
 }
 
 int PetManager::CalculatePetDamage(int playerLevel) const
@@ -360,7 +360,7 @@ PetAbilityResult PetManager::TryProcPetAbility(int playerLevel) const
     if (pet->specialAbility == EffectType::None) return result;
 
     int procChance = (pet->evolutionTier == 1) ? 30 : 50;
-    if (rand() % 100 >= procChance) return result;
+    if (RNG::Percent() >= procChance) return result;
 
     result.procced = true;
     result.effect = pet->specialAbility;

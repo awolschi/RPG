@@ -8,6 +8,173 @@
 #include "../Items/Consumable.hpp"
 #include "../Items/Resources/Resources.hpp"
 
+static int SafeStoi(const std::string& s, int fallback = 0)
+{
+    if (s.empty()) return fallback;
+    try { return std::stoi(s); }
+    catch (...) { return fallback; }
+}
+
+template<typename E>
+static E SafeCastEnum(int v, int maxValid, E fallback)
+{
+    if (v < 0 || v > maxValid) return fallback;
+    return static_cast<E>(v);
+}
+
+static void SerializeItem(std::ostream& file, const std::shared_ptr<Item>& item, bool includeConsumableResource)
+{
+    if (!item) return;
+    file << item->count << "|" << static_cast<int>(item->type) << "|" << item->name << "|" << item->rarity << "|" << item->sellValue
+         << "|" << item->setId << "|" << static_cast<int>(item->passive1) << "|" << static_cast<int>(item->passive2);
+
+    if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
+        file << "|OH|" << oh->defense << "|" << oh->manaBonus << "|" << oh->arcaneDamage << "|" << static_cast<int>(oh->offhandType);
+    else if (auto w = std::dynamic_pointer_cast<Weapon>(item))
+        file << "|W|" << w->damage << "|" << w->manaCost << "|" << static_cast<int>(w->element) << "|" << w->elementDamage;
+    else if (auto a = std::dynamic_pointer_cast<Armor>(item))
+    {
+        file << "|A|" << static_cast<int>(a->armorType) << "|" << static_cast<int>(a->piece) << "|" << a->defense;
+        file << "|" << a->elementalResist.size();
+        for (const auto& [elem, val] : a->elementalResist)
+            file << "|" << static_cast<int>(elem) << "|" << val;
+    }
+    else if (auto ac = std::dynamic_pointer_cast<Accessory>(item))
+        file << "|AC|" << ac->bonusHealth << "|" << ac->bonusMana << "|" << static_cast<int>(ac->element) << "|" << ac->elementDamage;
+    else if (includeConsumableResource)
+    {
+        if (auto c = std::dynamic_pointer_cast<Consumable>(item))
+            file << "|C|" << c->healAmount << "|" << c->manaAmount;
+        else if (auto r = std::dynamic_pointer_cast<Resource>(item))
+            file << "|R|" << r->tier << "|" << static_cast<int>(r->quality) << "|" << r->healAmount << "|" << r->manaAmount;
+    }
+    file << "|" << item->requiredLevel << "\n";
+}
+
+static std::shared_ptr<Item> DeserializeItem(std::istringstream& ss, int saveVersion, int rarity, int sellVal, int setId,
+                                              ItemPassive passive1, ItemPassive passive2, int itemCount)
+{
+    std::string iname;
+    std::string typeStr;
+    std::getline(ss, iname, '|');
+    std::getline(ss, typeStr, '|');
+
+    std::string subType;
+    std::getline(ss, subType, '|');
+
+    std::shared_ptr<Item> item;
+    if (subType == "W")
+    {
+        std::string dmgStr, manaStr, elemStr, elemDmgStr;
+        std::getline(ss, dmgStr, '|');
+        std::getline(ss, manaStr, '|');
+        ElementType elem = ElementType::Physical;
+        int elemDmg = 0;
+        if (std::getline(ss, elemStr, '|') && !elemStr.empty())
+        {
+            elem = SafeCastEnum<ElementType>(SafeStoi(elemStr), 6, ElementType::Physical);
+            if (std::getline(ss, elemDmgStr, '|') && !elemDmgStr.empty())
+                elemDmg = SafeStoi(elemDmgStr);
+        }
+        item = std::make_shared<Weapon>(iname, SafeStoi(dmgStr), SafeStoi(manaStr), rarity, elem, elemDmg);
+    }
+    else if (subType == "A")
+    {
+        std::string atStr, apStr, defStr;
+        std::getline(ss, atStr, '|');
+        std::getline(ss, apStr, '|');
+        std::getline(ss, defStr, '|');
+        std::map<ElementType, int> elemResist;
+        std::string resistCountStr;
+        if (std::getline(ss, resistCountStr, '|') && !resistCountStr.empty())
+        {
+            int resistCount = SafeStoi(resistCountStr);
+            for (int r = 0; r < resistCount; ++r)
+            {
+                std::string elemStr, valStr;
+                std::getline(ss, elemStr, '|');
+                std::getline(ss, valStr, '|');
+                elemResist[SafeCastEnum<ElementType>(SafeStoi(elemStr), 6, ElementType::Physical)] = SafeStoi(valStr);
+            }
+        }
+        item = std::make_shared<Armor>(iname, SafeCastEnum<ArmorType>(SafeStoi(atStr), 2, ArmorType::Cloth),
+                                       SafeCastEnum<ArmorPiece>(SafeStoi(apStr), 4, ArmorPiece::Helmet), SafeStoi(defStr), rarity, elemResist);
+    }
+    else if (subType == "AC")
+    {
+        std::string bhStr, bmStr, elemStr, elemDmgStr;
+        std::getline(ss, bhStr, '|');
+        std::getline(ss, bmStr, '|');
+        ElementType elem = ElementType::Physical;
+        int elemDmg = 0;
+        if (std::getline(ss, elemStr, '|') && !elemStr.empty())
+        {
+            elem = SafeCastEnum<ElementType>(SafeStoi(elemStr), 6, ElementType::Physical);
+            if (std::getline(ss, elemDmgStr, '|') && !elemDmgStr.empty())
+                elemDmg = SafeStoi(elemDmgStr);
+        }
+        item = std::make_shared<Accessory>(iname, SafeStoi(bhStr), SafeStoi(bmStr), rarity, elem, elemDmg);
+    }
+    else if (subType == "C")
+    {
+        std::string healStr, manaStr;
+        std::getline(ss, healStr, '|');
+        std::getline(ss, manaStr, '|');
+        item = std::make_shared<Consumable>(iname, SafeStoi(healStr), SafeStoi(manaStr), rarity);
+    }
+    else if (subType == "OH")
+    {
+        std::string defStr, manaStr, arcStr, ohTypeStr;
+        std::getline(ss, defStr, '|');
+        std::getline(ss, manaStr, '|');
+        std::getline(ss, arcStr, '|');
+        std::getline(ss, ohTypeStr, '|');
+        item = std::make_shared<Offhand>(iname, SafeCastEnum<OffhandType>(SafeStoi(ohTypeStr), 3, OffhandType::Shield),
+            SafeStoi(defStr), SafeStoi(manaStr), SafeStoi(arcStr), rarity);
+    }
+    else if (subType == "R")
+    {
+        std::string tierStr, qualStr, healStr, manaStr;
+        std::getline(ss, tierStr, '|');
+        std::getline(ss, qualStr, '|');
+        std::getline(ss, healStr, '|');
+        std::getline(ss, manaStr, '|');
+        int rTier = tierStr.empty() ? 1 : SafeStoi(tierStr);
+        auto rQual = qualStr.empty() ? ResourceQuality::Normal
+                                     : SafeCastEnum<ResourceQuality>(SafeStoi(qualStr), 2, ResourceQuality::Normal);
+        int rHeal = healStr.empty() ? 0 : SafeStoi(healStr);
+        int rMana = manaStr.empty() ? 0 : SafeStoi(manaStr);
+        auto r = std::make_shared<Resource>(iname, rTier, sellVal, rHeal, rMana, ResourceQuality::Normal);
+        r->quality = rQual;
+        r->healAmount = rHeal;
+        r->manaAmount = rMana;
+        r->sellValue = sellVal;
+        item = r;
+    }
+    else if (static_cast<ItemType>(SafeStoi(typeStr)) == ItemType::Resource)
+    {
+        auto r = std::make_shared<Resource>(iname, SafeStoi(typeStr), sellVal);
+        r->sellValue = sellVal;
+        item = r;
+    }
+
+    if (item)
+    {
+        item->sellValue = sellVal;
+        item->count = itemCount;
+        item->setId = setId;
+        item->passive1 = passive1;
+        item->passive2 = passive2;
+        if (saveVersion >= 12)
+        {
+            std::string reqLvlStr;
+            if (std::getline(ss, reqLvlStr, '|') && !reqLvlStr.empty())
+                item->requiredLevel = SafeStoi(reqLvlStr, 1);
+        }
+    }
+    return item;
+}
+
 SaveGameManager::SaveGameManager()
 {
     saveDirectory = "./saves/";
@@ -55,49 +222,13 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
         {
             auto item = inv.GetItem(i);
             if (!item) continue;
-            file << item->count << "|" << static_cast<int>(item->type) << "|" << item->name << "|" << item->rarity << "|" << item->sellValue
-                 << "|" << item->setId << "|" << static_cast<int>(item->passive1) << "|" << static_cast<int>(item->passive2);
-
-            if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
-                file << "|OH|" << oh->defense << "|" << oh->manaBonus << "|" << oh->arcaneDamage << "|" << static_cast<int>(oh->offhandType);
-            else if (auto w = std::dynamic_pointer_cast<Weapon>(item))
-                file << "|W|" << w->damage << "|" << w->manaCost << "|" << static_cast<int>(w->element) << "|" << w->elementDamage;
-            else if (auto a = std::dynamic_pointer_cast<Armor>(item))
-            {
-                file << "|A|" << static_cast<int>(a->armorType) << "|" << static_cast<int>(a->piece) << "|" << a->defense;
-                file << "|" << a->elementalResist.size();
-                for (const auto& [elem, val] : a->elementalResist)
-                    file << "|" << static_cast<int>(elem) << "|" << val;
-            }
-            else if (auto ac = std::dynamic_pointer_cast<Accessory>(item))
-                file << "|AC|" << ac->bonusHealth << "|" << ac->bonusMana << "|" << static_cast<int>(ac->element) << "|" << ac->elementDamage;
-            else if (auto c = std::dynamic_pointer_cast<Consumable>(item))
-                file << "|C|" << c->healAmount << "|" << c->manaAmount;
-            else if (auto r = std::dynamic_pointer_cast<Resource>(item))
-                file << "|R|" << r->tier << "|" << static_cast<int>(r->quality) << "|" << r->healAmount << "|" << r->manaAmount;
-            file << "\n";
+            SerializeItem(file, item, true);
         }
 
         const Equipment& eq = player->GetEquipment();
         auto writeEquipSlot = [&](const std::shared_ptr<Item>& item) {
             if (!item) { file << "none\n"; return; }
-            file << item->count << "|" << static_cast<int>(item->type) << "|" << item->name
-                 << "|" << item->rarity << "|" << item->sellValue
-                 << "|" << item->setId << "|" << static_cast<int>(item->passive1) << "|" << static_cast<int>(item->passive2);
-            if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
-                file << "|OH|" << oh->defense << "|" << oh->manaBonus << "|" << oh->arcaneDamage << "|" << static_cast<int>(oh->offhandType);
-            else if (auto w = std::dynamic_pointer_cast<Weapon>(item))
-                file << "|W|" << w->damage << "|" << w->manaCost << "|" << static_cast<int>(w->element) << "|" << w->elementDamage;
-            else if (auto a = std::dynamic_pointer_cast<Armor>(item))
-            {
-                file << "|A|" << static_cast<int>(a->armorType) << "|" << static_cast<int>(a->piece) << "|" << a->defense;
-                file << "|" << a->elementalResist.size();
-                for (const auto& [elem, val] : a->elementalResist)
-                    file << "|" << static_cast<int>(elem) << "|" << val;
-            }
-            else if (auto ac = std::dynamic_pointer_cast<Accessory>(item))
-                file << "|AC|" << ac->bonusHealth << "|" << ac->bonusMana << "|" << static_cast<int>(ac->element) << "|" << ac->elementDamage;
-            file << "\n";
+            SerializeItem(file, item, false);
         };
         writeEquipSlot(eq.weapon); writeEquipSlot(eq.offhand);
         writeEquipSlot(eq.helmet); writeEquipSlot(eq.chest);
@@ -129,13 +260,16 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
             if (sk) file << sk->name << "\n";
         }
 
+        // Attack skill index (v11+)
+        file << player->GetAttackSkillIndex() << "\n";
+
         const auto& jobs = player->GetJobSystem().GetJobs();
         file << jobs.size() << "\n";
         for (const auto& j : jobs)
         {
             file << static_cast<int>(j.type) << " " << j.level << " "
                  << j.experience << " " << j.jobPoints << " " << j.skillPoints << " "
-                 << static_cast<int>(j.specialization) << "\n";
+                 << static_cast<int>(j.specialization) << " " << j.fatigue << "\n";
             for (size_t p = 0; p < j.perks.size(); ++p)
                 file << (j.perks[p].unlocked ? "1" : "0") << (p + 1 < j.perks.size() ? " " : "\n");
         }
@@ -153,6 +287,8 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
         // Extended religion data
         const auto& quest = religion.GetActiveQuest();
         file << quest.currentCount << " " << (quest.completed ? 1 : 0) << "\n";
+        // v12: full quest details
+        file << quest.targetEnemy << "|" << quest.targetCount << "|" << quest.rewardDevotion << "|" << quest.description << "\n";
 
         // Quests
         auto& qm = player->GetQuestManager();
@@ -166,7 +302,8 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
                  << q->targetCount << "|" << q->currentCount << "|"
                  << q->rewardXP << "|" << q->rewardGold << "|"
                  << static_cast<int>(q->status) << "|"
-                 << (q->rewarded ? "1" : "0") << "\n";
+                 << (q->rewarded ? "1" : "0") << "|"
+                 << q->gatherItemName << "\n";
         }
 
         // Achievements
@@ -212,7 +349,7 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
         // silently failed for every versioned save, corrupting the load.
         if (firstLine.size() >= 13 && firstLine.compare(0, 13, "SAVE_VERSION ") == 0)
         {
-            saveVersion = std::stoi(firstLine.substr(13));
+            saveVersion = SafeStoi(firstLine.substr(13));
         }
         else
         {
@@ -226,11 +363,11 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
 
         int classInt;
         file >> classInt; file.ignore();
-        CharacterClass cc = static_cast<CharacterClass>(classInt);
+        CharacterClass cc = SafeCastEnum<CharacterClass>(classInt, 4, CharacterClass::Warrior);
 
         int raceInt;
         file >> raceInt; file.ignore();
-        CharacterRace cr = static_cast<CharacterRace>(raceInt);
+        CharacterRace cr = SafeCastEnum<CharacterRace>(raceInt, 4, CharacterRace::Aran);
 
         auto player = std::make_shared<Player>(playerName, cc, cr);
 
@@ -268,9 +405,9 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
             std::getline(ss, iname, '|');
             std::getline(ss, rarityStr, '|');
             std::getline(ss, sellStr, '|');
-            int itemCount = std::stoi(countStr);
-            int rarity = std::stoi(rarityStr);
-            int sellVal = std::stoi(sellStr);
+            int itemCount = SafeStoi(countStr);
+            int rarity = SafeStoi(rarityStr);
+            int sellVal = SafeStoi(sellStr);
 
             int setId = -1;
             ItemPassive passive1 = ItemPassive::None;
@@ -281,123 +418,19 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 std::getline(ss, sidStr, '|');
                 std::getline(ss, p1Str, '|');
                 std::getline(ss, p2Str, '|');
-                if (!sidStr.empty()) setId = std::stoi(sidStr);
-                if (!p1Str.empty()) passive1 = static_cast<ItemPassive>(std::stoi(p1Str));
-                if (!p2Str.empty()) passive2 = static_cast<ItemPassive>(std::stoi(p2Str));
+                if (!sidStr.empty()) setId = SafeStoi(sidStr);
+                if (!p1Str.empty()) passive1 = SafeCastEnum<ItemPassive>(SafeStoi(p1Str), 51, ItemPassive::None);
+                if (!p2Str.empty()) passive2 = SafeCastEnum<ItemPassive>(SafeStoi(p2Str), 51, ItemPassive::None);
             }
 
-            std::string subType;
-            std::getline(ss, subType, '|');
+            // Reconstruct the stream for DeserializeItem
+            std::string remaining;
+            std::getline(ss, remaining, '\0');
+            std::istringstream itemStream(iname + "|" + typeStr + "|" + remaining);
 
-            std::shared_ptr<Item> item;
-            if (subType == "W")
-            {
-                std::string dmgStr, manaStr, elemStr, elemDmgStr;
-                std::getline(ss, dmgStr, '|');
-                std::getline(ss, manaStr, '|');
-                ElementType elem = ElementType::Physical;
-                int elemDmg = 0;
-                if (std::getline(ss, elemStr, '|') && !elemStr.empty())
-                {
-                    elem = static_cast<ElementType>(std::stoi(elemStr));
-                    if (std::getline(ss, elemDmgStr, '|') && !elemDmgStr.empty())
-                        elemDmg = std::stoi(elemDmgStr);
-                }
-                item = std::make_shared<Weapon>(iname, std::stoi(dmgStr), std::stoi(manaStr), rarity, elem, elemDmg);
-            }
-            else if (subType == "A")
-            {
-                std::string atStr, apStr, defStr;
-                std::getline(ss, atStr, '|');
-                std::getline(ss, apStr, '|');
-                std::getline(ss, defStr, '|');
-                std::map<ElementType, int> elemResist;
-                std::string resistCountStr;
-                if (std::getline(ss, resistCountStr, '|') && !resistCountStr.empty())
-                {
-                    int resistCount = std::stoi(resistCountStr);
-                    for (int r = 0; r < resistCount; ++r)
-                    {
-                        std::string elemStr, valStr;
-                        std::getline(ss, elemStr, '|');
-                        std::getline(ss, valStr, '|');
-                        elemResist[static_cast<ElementType>(std::stoi(elemStr))] = std::stoi(valStr);
-                    }
-                }
-                item = std::make_shared<Armor>(iname, static_cast<ArmorType>(std::stoi(atStr)),
-                                               static_cast<ArmorPiece>(std::stoi(apStr)), std::stoi(defStr), rarity, elemResist);
-            }
-            else if (subType == "AC")
-            {
-                std::string bhStr, bmStr, elemStr, elemDmgStr;
-                std::getline(ss, bhStr, '|');
-                std::getline(ss, bmStr, '|');
-                ElementType elem = ElementType::Physical;
-                int elemDmg = 0;
-                if (std::getline(ss, elemStr, '|') && !elemStr.empty())
-                {
-                    elem = static_cast<ElementType>(std::stoi(elemStr));
-                    if (std::getline(ss, elemDmgStr, '|') && !elemDmgStr.empty())
-                        elemDmg = std::stoi(elemDmgStr);
-                }
-                item = std::make_shared<Accessory>(iname, std::stoi(bhStr), std::stoi(bmStr), rarity, elem, elemDmg);
-            }
-            else if (subType == "C")
-            {
-                std::string healStr, manaStr;
-                std::getline(ss, healStr, '|');
-                std::getline(ss, manaStr, '|');
-                item = std::make_shared<Consumable>(iname, std::stoi(healStr), std::stoi(manaStr), rarity);
-            }
-            else if (subType == "OH")
-            {
-                std::string defStr, manaStr, arcStr, typeStr;
-                std::getline(ss, defStr, '|');
-                std::getline(ss, manaStr, '|');
-                std::getline(ss, arcStr, '|');
-                std::getline(ss, typeStr, '|');
-                auto oh = std::make_shared<Offhand>(iname, static_cast<OffhandType>(std::stoi(typeStr)),
-                    std::stoi(defStr), std::stoi(manaStr), std::stoi(arcStr), rarity);
-                oh->sellValue = sellVal;
-                item = oh;
-            }
-            else if (subType == "R")
-            {
-                std::string tierStr, qualStr, healStr, manaStr;
-                std::getline(ss, tierStr, '|');
-                std::getline(ss, qualStr, '|');
-                std::getline(ss, healStr, '|');
-                std::getline(ss, manaStr, '|');
-                int rTier = tierStr.empty() ? 1 : std::stoi(tierStr);
-                auto rQual = qualStr.empty() ? ResourceQuality::Normal
-                                             : static_cast<ResourceQuality>(std::stoi(qualStr));
-                int rHeal = healStr.empty() ? 0 : std::stoi(healStr);
-                int rMana = manaStr.empty() ? 0 : std::stoi(manaStr);
-                // Construct with Normal quality first to avoid the Resource
-                // constructor re-applying the quality multiplier to the
-                // already-multiplied saved values, then restore the real quality.
-                auto r = std::make_shared<Resource>(iname, rTier, sellVal, rHeal, rMana, ResourceQuality::Normal);
-                r->quality = rQual;
-                r->healAmount = rHeal;
-                r->manaAmount = rMana;
-                r->sellValue = sellVal;
-                item = r;
-            }
-            // Account for items saved without a subtype (old resources / quest
-            // items). Build a generic Resource so they aren't lost on load.
-            else if (static_cast<ItemType>(std::stoi(typeStr)) == ItemType::Resource)
-            {
-                auto r = std::make_shared<Resource>(iname, std::stoi(typeStr), sellVal);
-                r->sellValue = sellVal;
-                item = r;
-            }
+            auto item = DeserializeItem(itemStream, saveVersion, rarity, sellVal, setId, passive1, passive2, itemCount);
             if (item)
             {
-                item->sellValue = sellVal;
-                item->count = itemCount;
-                item->setId = setId;
-                item->passive1 = passive1;
-                item->passive2 = passive2;
                 player->GetInventory().AddItem(item);
             }
         }
@@ -415,8 +448,8 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
             std::getline(ss, iname, '|');
             std::getline(ss, rarityStr, '|');
             std::getline(ss, sellStr, '|');
-            int rarity = std::stoi(rarityStr);
-            int sellVal = std::stoi(sellStr);
+            int rarity = SafeStoi(rarityStr);
+            int sellVal = SafeStoi(sellStr);
 
             int setId = -1;
             ItemPassive passive1 = ItemPassive::None;
@@ -427,94 +460,30 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 std::getline(ss, sidStr, '|');
                 std::getline(ss, p1Str, '|');
                 std::getline(ss, p2Str, '|');
-                if (!sidStr.empty()) setId = std::stoi(sidStr);
-                if (!p1Str.empty()) passive1 = static_cast<ItemPassive>(std::stoi(p1Str));
-                if (!p2Str.empty()) passive2 = static_cast<ItemPassive>(std::stoi(p2Str));
+                if (!sidStr.empty()) setId = SafeStoi(sidStr);
+                if (!p1Str.empty()) passive1 = SafeCastEnum<ItemPassive>(SafeStoi(p1Str), 51, ItemPassive::None);
+                if (!p2Str.empty()) passive2 = SafeCastEnum<ItemPassive>(SafeStoi(p2Str), 51, ItemPassive::None);
             }
 
-            std::string subType;
-            std::getline(ss, subType, '|');
+            // Reconstruct the stream for DeserializeItem
+            std::string remaining;
+            std::getline(ss, remaining, '\0');
+            std::istringstream itemStream(iname + "|" + typeStr + "|" + remaining);
 
-            if (subType == "W")
+            auto item = DeserializeItem(itemStream, saveVersion, rarity, sellVal, setId, passive1, passive2, 1);
+            if (item)
             {
-                std::string dmgStr, manaStr, elemStr, elemDmgStr;
-                std::getline(ss, dmgStr, '|');
-                std::getline(ss, manaStr, '|');
-                ElementType elem = ElementType::Physical;
-                int elemDmg = 0;
-                if (std::getline(ss, elemStr, '|') && !elemStr.empty())
-                {
-                    elem = static_cast<ElementType>(std::stoi(elemStr));
-                    if (std::getline(ss, elemDmgStr, '|') && !elemDmgStr.empty())
-                        elemDmg = std::stoi(elemDmgStr);
-                }
-                auto w = std::make_shared<Weapon>(iname, std::stoi(dmgStr), std::stoi(manaStr), rarity, elem, elemDmg);
-                w->sellValue = sellVal;
-                w->setId = setId; w->passive1 = passive1; w->passive2 = passive2;
-                if (i == 0) player->GetEquipment().weapon = w;
-                else if (i == 1) player->GetEquipment().offhand = w;
-            }
-            else if (subType == "OH")
-            {
-                std::string defStr, manaStr, arcStr, typeStr;
-                std::getline(ss, defStr, '|');
-                std::getline(ss, manaStr, '|');
-                std::getline(ss, arcStr, '|');
-                std::getline(ss, typeStr, '|');
-                auto oh = std::make_shared<Offhand>(iname, static_cast<OffhandType>(std::stoi(typeStr)),
-                    std::stoi(defStr), std::stoi(manaStr), std::stoi(arcStr), rarity);
-                oh->sellValue = sellVal;
-                oh->setId = setId; oh->passive1 = passive1; oh->passive2 = passive2;
-                if (i == 1) player->GetEquipment().offhand = oh;
-            }
-            else if (subType == "A")
-            {
-                std::string atStr, apStr, defStr;
-                std::getline(ss, atStr, '|');
-                std::getline(ss, apStr, '|');
-                std::getline(ss, defStr, '|');
-                std::map<ElementType, int> elemResist;
-                std::string resistCountStr;
-                if (std::getline(ss, resistCountStr, '|') && !resistCountStr.empty())
-                {
-                    int resistCount = std::stoi(resistCountStr);
-                    for (int r = 0; r < resistCount; ++r)
-                    {
-                        std::string elemStr, valStr;
-                        std::getline(ss, elemStr, '|');
-                        std::getline(ss, valStr, '|');
-                        elemResist[static_cast<ElementType>(std::stoi(elemStr))] = std::stoi(valStr);
-                    }
-                }
-                auto a = std::make_shared<Armor>(iname, static_cast<ArmorType>(std::stoi(atStr)),
-                                                 static_cast<ArmorPiece>(std::stoi(apStr)), std::stoi(defStr), rarity, elemResist);
-                a->sellValue = sellVal;
-                a->setId = setId; a->passive1 = passive1; a->passive2 = passive2;
-                if (i == 2) player->GetEquipment().helmet = a;
-                else if (i == 3) player->GetEquipment().chest = a;
-                else if (i == 4) player->GetEquipment().gloves = a;
-                else if (i == 5) player->GetEquipment().pants = a;
-                else if (i == 6) player->GetEquipment().boots = a;
-            }
-            else if (subType == "AC")
-            {
-                std::string bhStr, bmStr, elemStr, elemDmgStr;
-                std::getline(ss, bhStr, '|');
-                std::getline(ss, bmStr, '|');
-                ElementType elem = ElementType::Physical;
-                int elemDmg = 0;
-                if (std::getline(ss, elemStr, '|') && !elemStr.empty())
-                {
-                    elem = static_cast<ElementType>(std::stoi(elemStr));
-                    if (std::getline(ss, elemDmgStr, '|') && !elemDmgStr.empty())
-                        elemDmg = std::stoi(elemDmgStr);
-                }
-                auto ac = std::make_shared<Accessory>(iname, std::stoi(bhStr), std::stoi(bmStr), rarity, elem, elemDmg);
-                ac->sellValue = sellVal;
-                ac->setId = setId; ac->passive1 = passive1; ac->passive2 = passive2;
-                if (i == 7) player->GetEquipment().ring1 = ac;
-                else if (i == 8) player->GetEquipment().ring2 = ac;
-                else if (i == 9) player->GetEquipment().amulet = ac;
+                // Assign to equipment slot based on index with proper casting
+                if (i == 0) player->GetEquipment().weapon = std::dynamic_pointer_cast<Weapon>(item);
+                else if (i == 1) player->GetEquipment().offhand = std::dynamic_pointer_cast<Offhand>(item);
+                else if (i == 2) player->GetEquipment().helmet = std::dynamic_pointer_cast<Armor>(item);
+                else if (i == 3) player->GetEquipment().chest = std::dynamic_pointer_cast<Armor>(item);
+                else if (i == 4) player->GetEquipment().gloves = std::dynamic_pointer_cast<Armor>(item);
+                else if (i == 5) player->GetEquipment().pants = std::dynamic_pointer_cast<Armor>(item);
+                else if (i == 6) player->GetEquipment().boots = std::dynamic_pointer_cast<Armor>(item);
+                else if (i == 7) player->GetEquipment().ring1 = std::dynamic_pointer_cast<Accessory>(item);
+                else if (i == 8) player->GetEquipment().ring2 = std::dynamic_pointer_cast<Accessory>(item);
+                else if (i == 9) player->GetEquipment().amulet = std::dynamic_pointer_cast<Accessory>(item);
             }
         }
 
@@ -537,19 +506,19 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
             std::getline(ss, skcd, '|');
             std::getline(ss, skdmg, '|');
             sd.name = skname;
-            sd.level = std::stoi(sklvl);
-            sd.xp = std::stoi(skxp);
-            sd.cd = std::stoi(skcd);
-            sd.dmg = std::stoi(skdmg);
+            sd.level = SafeStoi(sklvl);
+            sd.xp = SafeStoi(skxp);
+            sd.cd = SafeStoi(skcd);
+            sd.dmg = SafeStoi(skdmg);
 
             std::string ptsStr;
             if (std::getline(ss, ptsStr, '|') && !ptsStr.empty())
             {
-                sd.pts = std::stoi(ptsStr);
+                sd.pts = SafeStoi(ptsStr);
                 std::string upgCountStr;
                 if (std::getline(ss, upgCountStr, '|') && !upgCountStr.empty())
                 {
-                    int upgCount = std::stoi(upgCountStr);
+                    int upgCount = SafeStoi(upgCountStr);
                     for (int u = 0; u < upgCount; ++u)
                     {
                         std::string ustr;
@@ -604,6 +573,14 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
             player->SetSkillLoadout(loadoutIndices);
         }
 
+        // Attack skill index (v11+)
+        if (saveVersion >= 11 && file.peek() != std::char_traits<char>::eof())
+        {
+            int atkIdx = 0;
+            file >> atkIdx; file.ignore();
+            player->SetAttackSkillIndex(atkIdx);
+        }
+
         size_t jobCount;
         file >> jobCount; file.ignore();
         auto& jobs = player->GetJobSystem().GetJobs();
@@ -622,8 +599,17 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
             {
                 int specInt;
                 file >> specInt;
-                jobs[i].specialization = static_cast<SpecializationType>(specInt);
+                jobs[i].specialization = SafeCastEnum<SpecializationType>(specInt, 8, SpecializationType::None);
             }
+
+            // Read fatigue (v13+ saves have this field)
+            if (saveVersion >= 13)
+            {
+                int fatigueVal;
+                file >> fatigueVal;
+                jobs[i].fatigue = std::max(0, std::min(fatigueVal, Job::MAX_FATIGUE));
+            }
+
             file.ignore();
 
             for (size_t p = 0; p < jobs[i].perks.size(); ++p)
@@ -655,7 +641,7 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
             file >> godInt; file.ignore();
             int devotion, donated;
             file >> devotion >> donated; file.ignore();
-            outReligion.RestoreState(static_cast<GodType>(godInt), devotion, donated);
+            outReligion.RestoreState(SafeCastEnum<GodType>(godInt, 4, GodType::None), devotion, donated);
             // Read extended religion quest data
             if (file.peek() != std::char_traits<char>::eof())
             {
@@ -663,8 +649,28 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 file >> qc >> ac; file.ignore();
                 if (outReligion.GetGod() != GodType::None)
                 {
-                    // Restore quest progress (quest structure is regenerated on SetGod)
-                    // We store the progress and apply it
+                    outReligion.EnsureQuest();
+                    outReligion.RestoreQuest("", "", 0, qc, 0, ac == 1);
+                }
+            }
+            // v12: full religion quest details
+            if (saveVersion >= 12 && file.peek() != std::char_traits<char>::eof())
+            {
+                std::string rqLine;
+                std::getline(file, rqLine);
+                if (!rqLine.empty() && outReligion.GetGod() != GodType::None)
+                {
+                    std::istringstream rqss(rqLine);
+                    std::string rqTarget, rqDesc;
+                    std::string rqTC, rqRD;
+                    std::getline(rqss, rqTarget, '|');
+                    std::getline(rqss, rqTC, '|');
+                    std::getline(rqss, rqRD, '|');
+                    std::getline(rqss, rqDesc, '|');
+                    outReligion.EnsureQuest();
+                    outReligion.RestoreQuest(rqDesc, rqTarget, SafeStoi(rqTC),
+                        outReligion.GetActiveQuest().currentCount, SafeStoi(rqRD),
+                        outReligion.GetActiveQuest().completed);
                 }
             }
 
@@ -676,7 +682,7 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 std::getline(file, line);
                 if (line.empty() || line == "|") continue;
                 std::istringstream ss(line);
-                std::string title, typeStr, desc, target, tgtCount, curCount, rXP, rGold, statusStr, rewardedStr;
+                std::string title, typeStr, desc, target, tgtCount, curCount, rXP, rGold, statusStr, rewardedStr, gatherItem;
                 std::getline(ss, title, '|');
                 std::getline(ss, typeStr, '|');
                 std::getline(ss, desc, '|');
@@ -687,11 +693,13 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 std::getline(ss, rGold, '|');
                 std::getline(ss, statusStr, '|');
                 std::getline(ss, rewardedStr, '|');
+                if (saveVersion >= 12)
+                    std::getline(ss, gatherItem, '|');
                 if (title.empty()) continue;
-                Quest q(title, static_cast<QuestType>(std::stoi(typeStr)), desc, target,
-                         std::stoi(tgtCount), std::stoi(rXP), std::stoi(rGold));
-                q.currentCount = std::stoi(curCount);
-                q.status = static_cast<QuestStatus>(std::stoi(statusStr));
+                Quest q(title, SafeCastEnum<QuestType>(SafeStoi(typeStr), 3, QuestType::Kill), desc, target,
+                         SafeStoi(tgtCount), SafeStoi(rXP), SafeStoi(rGold), gatherItem);
+                q.currentCount = SafeStoi(curCount);
+                q.status = SafeCastEnum<QuestStatus>(SafeStoi(statusStr), 3, QuestStatus::NotStarted);
                 q.rewarded = (rewardedStr == "1");
                 player->GetQuestManager().AddQuest(q);
             }
@@ -774,7 +782,7 @@ SaveSlotInfo SaveGameManager::GetSlotInfo(int slot)
 
         int classInt;
         file >> classInt; file.ignore();
-        info.characterClass = static_cast<CharacterClass>(classInt);
+        info.characterClass = SafeCastEnum<CharacterClass>(classInt, 4, CharacterClass::Warrior);
 
         int raceDummy;
         file >> raceDummy; file.ignore();

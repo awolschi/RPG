@@ -1,11 +1,12 @@
 #include "Area.hpp"
 #include "../Enemies/Enemies.hpp"
-#include <cstdlib>
+#include "Engine/RNG.hpp"
 
 Area::Area(const std::string& name, const std::string& description,
-           int difficulty, const std::vector<Dungeon>& dungeons)
+           int difficulty, const std::vector<Dungeon>& dungeons,
+           const std::vector<int>& connections)
     : name(name), description(description),
-      difficulty(difficulty), dungeons(dungeons), explored(false)
+      difficulty(difficulty), dungeons(dungeons), connections(connections), explored(false)
 {
 }
 
@@ -16,7 +17,7 @@ std::vector<std::shared_ptr<Monster>> Area::spawnMonsters()
     if (pool.empty())
         return monsters;
 
-    int count = 1 + (rand() % 3);
+    int count = 1 + RNG::Next(3);
     for (int i = 0; i < count; ++i)
     {
         // Weighted random pick
@@ -24,7 +25,7 @@ std::vector<std::shared_ptr<Monster>> Area::spawnMonsters()
         for (const auto& e : pool)
             totalWeight += e.weight;
 
-        int roll = rand() % totalWeight;
+        int roll = RNG::Next(totalWeight);
         int cumulative = 0;
         for (const auto& e : pool)
         {

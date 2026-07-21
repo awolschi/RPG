@@ -75,7 +75,7 @@ struct Pet
     int GetScaledHealOnKill() const { return static_cast<int>(healOnKill * GetLevelMultiplier()); }
 
     // Evolution helpers
-    bool CanEvolve() const { return !obtained && false; }
+    bool CanEvolve() const { return CanEvolveNow(); }
     bool CanEvolveNow() const { return obtained && evolutionTier == 0 && level >= EVOLVE_LEVEL; }
     bool CanAscendNow() const { return obtained && evolutionTier == 1 && level >= ASCEND_LEVEL; }
 

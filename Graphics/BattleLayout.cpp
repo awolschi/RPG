@@ -15,8 +15,8 @@ void BattleLayout::Calculate(int screenW, int screenH)
     hpTextY = nameY + 28;
     messageY = hpTextY + 22;
 
-    playerBarY = screenH - 80;
-    abilityY = playerBarY - abilitySize - 15;
+    playerBarY = screenH - 90;
+    abilityY = playerBarY - abilitySize - 20;
 
     int totalAbilityW = 5 * abilitySize + 4 * abilitySpacing;
     int abilityStartX = (screenW - totalAbilityW) / 2;

@@ -1,8 +1,8 @@
 #include "Combat.hpp"
 #include "../Items/Passives.hpp"
 #include "../Characters/Character.hpp"
+#include "../Engine/RNG.hpp"
 #include <sstream>
-#include <cstdlib>
 
 namespace {
     // Roll a critical hit using the attacker's pet bonus crit chance.
@@ -11,7 +11,7 @@ namespace {
     {
         float chance = attacker.GetPetBonusCritChance();
         if (chance <= 0.0f) return 1.0f;
-        int rolled = rand() % 1000;
+        int rolled = RNG::Next(1000);
         if (rolled < static_cast<int>(chance * 1000.0f))
             return 1.5f + attacker.GetPetBonusCritDamage();
         return 1.0f;
@@ -77,7 +77,7 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
                 break;
             }
 
-            auto attackSkill = attacker->GetSkills().GetSkill(0);
+            auto attackSkill = attacker->GetSkills().GetSkill(skillIndex);
             if (attackSkill)
             {
                 int hpBefore = defender->GetCurrentHealth();
@@ -226,7 +226,7 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
         }
 
         case CombatAction::Defend:
-            attacker->IncreaseTempDefense(5);
+            attacker->IncreaseTempDefense(5 + attacker->GetLevel() / 2 + attacker->GetStats().defense / 4);
             attacker->GetSkills().UpdateCooldowns();
             actionMsg = attacker->GetName() + " takes a defensive stance!";
             break;

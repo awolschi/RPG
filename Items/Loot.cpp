@@ -1,11 +1,26 @@
 #include "Loot.hpp"
 #include "Uniques/UniqueItems.hpp"
-#include <cstdlib>
 #include "Consumable.hpp"
+#include "../Engine/RNG.hpp"
+
+static int RequiredLevelForDifficulty(int d)
+{
+    return std::max(1, (d - 1) * 5 + 1);
+}
+
+static bool WeaponAllowedForClass(const std::shared_ptr<Item>& item, CharacterClass cc)
+{
+    auto w = std::dynamic_pointer_cast<Weapon>(item);
+    if (!w) return true;
+    ClassData classData = ClassDatabase::Get(cc);
+    for (auto wt : classData.allowedWeaponTypes)
+        if (wt == w->weaponType) return true;
+    return false;
+}
 
 static ElementType RandomElement()
 {
-    int roll = rand() % 5;
+    int roll = RNG::Next(5);
     switch (roll)
     {
         case 0: return ElementType::Fire;
@@ -20,17 +35,17 @@ static ElementType RandomElement()
 static std::map<ElementType, int> RandomElementalResist(int difficulty)
 {
     std::map<ElementType, int> resist;
-    if (rand() % 100 < 25 + difficulty * 5)
+    if (RNG::Percent() < 25 + difficulty * 5)
     {
         ElementType elem = RandomElement();
-        resist[elem] = 1 + difficulty + rand() % (difficulty + 1);
+        resist[elem] = 1 + difficulty + RNG::Next(difficulty + 1);
     }
     return resist;
 }
 
 static int RollRarity(int commonPct, int uncommonPct, int rarePct, int epicPct, int /*legendaryPct*/)
 {
-    int roll = rand() % 100;
+    int roll = RNG::Percent();
     if (roll < commonPct)    return 1;
     if (roll < commonPct + uncommonPct)  return 2;
     if (roll < commonPct + uncommonPct + rarePct)  return 3;
@@ -90,47 +105,79 @@ static std::shared_ptr<Item> CreateArmorOfRarity(int rarity, int difficulty)
     }
 }
 
-std::vector<std::shared_ptr<Item>> LootTable::GenerateLoot(int difficulty, int dropTier, int roll)
+static bool ArmorAllowedForClass(const std::shared_ptr<Item>& item, CharacterClass cc)
+{
+    auto a = std::dynamic_pointer_cast<Armor>(item);
+    if (!a) return true;
+    ClassData classData = ClassDatabase::Get(cc);
+    for (auto at : classData.allowedArmorTypes)
+        if (at == a->armorType) return true;
+    return false;
+}
+
+static std::shared_ptr<Item> CreateClassAppropriateWeapon(int rarity, int difficulty, CharacterClass cc)
+{
+    for (int attempt = 0; attempt < 8; ++attempt)
+    {
+        auto item = CreateWeaponOfRarity(rarity, difficulty);
+        if (WeaponAllowedForClass(item, cc))
+            return item;
+    }
+    return CreateWeaponOfRarity(rarity, difficulty);
+}
+
+static std::shared_ptr<Item> CreateClassAppropriateArmor(int rarity, int difficulty, CharacterClass cc)
+{
+    for (int attempt = 0; attempt < 8; ++attempt)
+    {
+        auto item = CreateArmorOfRarity(rarity, difficulty);
+        if (ArmorAllowedForClass(item, cc))
+            return item;
+    }
+    return CreateArmorOfRarity(rarity, difficulty);
+}
+
+std::vector<std::shared_ptr<Item>> LootTable::GenerateLoot(int difficulty, int dropTier, int roll, CharacterClass cc)
 {
     std::vector<std::shared_ptr<Item>> loot;
+    int reqLevel = RequiredLevelForDifficulty(difficulty);
 
-    if (roll == -1) roll = rand() % 100;
-    int baseDrop = 40 + (difficulty * 5);
+    if (roll == -1) roll = RNG::Percent();
+    int weaponDrop = 20 + (difficulty * 2);
 
-    if (roll < baseDrop)
+    // Slot 1: class-appropriate weapon
+    if (roll < weaponDrop)
     {
         int rarity = RollNormalRarity(dropTier);
-        loot.push_back(CreateWeaponOfRarity(rarity, difficulty));
-        roll = rand() % 100;
+        auto item = CreateClassAppropriateWeapon(rarity, difficulty, cc);
+        item->requiredLevel = reqLevel;
+        loot.push_back(item);
+        roll = RNG::Percent();
     }
-    if (roll < 35 + (difficulty * 2))
+    // Slot 2: class-appropriate armor
+    if (roll < 15 + difficulty)
     {
         int rarity = RollNormalRarity(dropTier);
-        loot.push_back(CreateArmorOfRarity(rarity, difficulty));
-        roll = rand() % 100;
+        auto item = CreateClassAppropriateArmor(rarity, difficulty, cc);
+        item->requiredLevel = reqLevel;
+        loot.push_back(item);
+        roll = RNG::Percent();
     }
-    if (roll < 15 + (difficulty * 2))
+    // Slot 3: potion
+    if (roll < 15 + difficulty)
     {
-        int rarity = RollNormalRarity(dropTier);
-        if (rand() % 2 == 0)
-            loot.push_back(CreateWeaponOfRarity(rarity, difficulty));
-        else
-            loot.push_back(CreateArmorOfRarity(rarity, difficulty));
+        auto item = CreatePotion(difficulty);
+        item->requiredLevel = reqLevel;
+        loot.push_back(item);
     }
-    if (rand() % 100 < 30 + (difficulty * 3))
-        loot.push_back(CreatePotion(difficulty));
     return loot;
 }
 
-std::vector<std::shared_ptr<Item>> LootTable::GenerateBossLoot(int difficulty, int dropTier, int /*roll*/)
+std::vector<std::shared_ptr<Item>> LootTable::GenerateBossLoot(int difficulty, int dropTier, int /*roll*/, CharacterClass cc)
 {
     std::vector<std::shared_ptr<Item>> loot;
+    int reqLevel = RequiredLevelForDifficulty(difficulty);
 
-    // Guaranteed minimum rarity per spec Section 11:
-    // Area 1-2 (dropTier 1-2): Uncommon guaranteed, 30% Rare
-    // Area 3-4 (dropTier 3-4): Rare guaranteed, 20-40% Epic
-    // Area 5-6 (dropTier 5-6): Rare guaranteed, 40-60% Epic
-    // Area 7+ (dropTier 7+): Epic guaranteed, up to Legendary
     int guaranteedMin = 2;
     if (dropTier >= 3) guaranteedMin = 3;
     if (dropTier >= 7) guaranteedMin = 4;
@@ -138,17 +185,25 @@ std::vector<std::shared_ptr<Item>> LootTable::GenerateBossLoot(int difficulty, i
 
     int rarity = RollBossRarity(dropTier);
     if (rarity < guaranteedMin) rarity = guaranteedMin;
-    loot.push_back(CreateWeaponOfRarity(rarity, difficulty));
+    auto weapon = CreateClassAppropriateWeapon(rarity, difficulty, cc);
+    weapon->requiredLevel = reqLevel;
+    loot.push_back(weapon);
 
-    if (rand() % 2 == 0)
+    if (RNG::Next(2) == 0)
     {
         int armorRarity = RollBossRarity(dropTier);
         if (armorRarity < guaranteedMin) armorRarity = guaranteedMin;
-        loot.push_back(CreateArmorOfRarity(armorRarity, difficulty));
+        auto armor = CreateClassAppropriateArmor(armorRarity, difficulty, cc);
+        armor->requiredLevel = reqLevel;
+        loot.push_back(armor);
     }
 
-    if (rand() % 100 < 60)
-        loot.push_back(CreateAccessory(difficulty));
+    if (RNG::Percent() < 60)
+    {
+        auto acc = CreateAccessory(difficulty);
+        acc->requiredLevel = reqLevel;
+        loot.push_back(acc);
+    }
 
     return loot;
 }
@@ -158,10 +213,10 @@ std::vector<std::shared_ptr<Item>> LootTable::GenerateBossLoot(int difficulty, i
 std::shared_ptr<Item> LootTable::CreateCommonWeapon(int difficulty)
 {
     int dmg = 10 + (difficulty * 4);
-    int mana = rand() % (difficulty * 2);
-    ElementType elem = (rand() % 3 == 0) ? RandomElement() : ElementType::Physical;
-    int elemDmg = (elem != ElementType::Physical) ? 2 + difficulty + rand() % (difficulty + 2) : 0;
-    switch (rand() % 8)
+    int mana = RNG::Next(difficulty * 2);
+    ElementType elem = (RNG::Next(3) == 0) ? RandomElement() : ElementType::Physical;
+    int elemDmg = (elem != ElementType::Physical) ? 2 + difficulty + RNG::Next(difficulty + 2) : 0;
+    switch (RNG::Next(8))
     {
         case 0: return std::make_shared<Weapon>("Iron Sword", dmg, mana, 1, elem, elemDmg, WeaponType::Sword);
         case 1: return std::make_shared<Weapon>("Steel Axe", dmg + 2, mana, 1, elem, elemDmg, WeaponType::Axe);
@@ -178,25 +233,25 @@ std::shared_ptr<Item> LootTable::CreateCommonWeapon(int difficulty)
 std::shared_ptr<Item> LootTable::CreateCommonArmor(int difficulty)
 {
     int def = 1 + difficulty;
-    ArmorType type = (rand() % 2 == 0) ? ArmorType::Leather : ArmorType::Cloth;
-    ArmorPiece piece = static_cast<ArmorPiece>(rand() % 5);
+    ArmorType type = (RNG::Next(2) == 0) ? ArmorType::Leather : ArmorType::Cloth;
+    ArmorPiece piece = static_cast<ArmorPiece>(RNG::Next(5));
     std::string name;
     switch (piece)
     {
         case ArmorPiece::Helmet:
-            name = (type == ArmorType::Leather) ? "Leather Helmet" : ((rand() % 2) ? "Cloth Cap" : "Apprentice Hood");
+            name = (type == ArmorType::Leather) ? "Leather Helmet" : ((RNG::Next(2)) ? "Cloth Cap" : "Apprentice Hood");
             break;
         case ArmorPiece::Chest:
-            name = (type == ArmorType::Leather) ? "Leather Chest" : ((rand() % 2) ? "Cloth Robe" : "Apprentice Robe");
+            name = (type == ArmorType::Leather) ? "Leather Chest" : ((RNG::Next(2)) ? "Cloth Robe" : "Apprentice Robe");
             break;
         case ArmorPiece::Gloves:
-            name = (type == ArmorType::Leather) ? "Leather Gloves" : ((rand() % 2) ? "Cloth Gloves" : "Apprentice Mitts");
+            name = (type == ArmorType::Leather) ? "Leather Gloves" : ((RNG::Next(2)) ? "Cloth Gloves" : "Apprentice Mitts");
             break;
         case ArmorPiece::Pants:
-            name = (type == ArmorType::Leather) ? "Leather Pants" : ((rand() % 2) ? "Cloth Pants" : "Apprentice Trousers");
+            name = (type == ArmorType::Leather) ? "Leather Pants" : ((RNG::Next(2)) ? "Cloth Pants" : "Apprentice Trousers");
             break;
         case ArmorPiece::Boots:
-            name = (type == ArmorType::Leather) ? "Leather Boots" : ((rand() % 2) ? "Cloth Boots" : "Apprentice Sandals");
+            name = (type == ArmorType::Leather) ? "Leather Boots" : ((RNG::Next(2)) ? "Cloth Boots" : "Apprentice Sandals");
             break;
     }
     return std::make_shared<Armor>(name, type, piece, def, 1, RandomElementalResist(difficulty));
@@ -209,8 +264,8 @@ std::shared_ptr<Item> LootTable::CreateRareWeapon(int difficulty)
     int dmg = 8 + (difficulty * 12);
     int mana = 3 + (difficulty * 2);
     ElementType elem = RandomElement();
-    int elemDmg = 3 + difficulty * 2 + rand() % (difficulty * 2 + 3);
-    switch (rand() % 16)
+    int elemDmg = 3 + difficulty * 2 + RNG::Next(difficulty * 2 + 3);
+    switch (RNG::Next(16))
     {
         case 0: return std::make_shared<Weapon>("Enchanted Blade", dmg, mana, 2, elem, elemDmg, WeaponType::Sword);
         case 1: return std::make_shared<Weapon>("Mithril Mace", dmg + 5, mana, 2, elem, elemDmg, WeaponType::Mace);
@@ -234,14 +289,14 @@ std::shared_ptr<Item> LootTable::CreateRareWeapon(int difficulty)
 std::shared_ptr<Item> LootTable::CreateRareArmor(int difficulty)
 {
     int def = 3 + (difficulty * 2);
-    int roll = rand() % 5;
+    int roll = RNG::Next(5);
     ArmorType type;
     if (roll == 0) type = ArmorType::Plate;
     else if (roll == 1) type = ArmorType::Leather;
     else if (roll == 2) type = ArmorType::Cloth;
     else if (roll == 3) type = ArmorType::Cloth;
     else type = ArmorType::Leather;
-    ArmorPiece piece = static_cast<ArmorPiece>(rand() % 5);
+    ArmorPiece piece = static_cast<ArmorPiece>(RNG::Next(5));
     std::string name;
     std::map<ElementType, int> resist;
     if (type == ArmorType::Cloth && roll == 2)
@@ -305,7 +360,7 @@ std::shared_ptr<Item> LootTable::CreateBossWeapon(int difficulty)
     int mana = 10 + (difficulty * 3);
     int rarity = 3;
     int elemDmg = 5 + difficulty * 4;
-    switch (rand() % 12)
+    switch (RNG::Next(12))
     {
         case 0: return std::make_shared<Weapon>("Flamebrand", dmg, mana, rarity, ElementType::Fire, elemDmg, WeaponType::Sword);
         case 1: return std::make_shared<Weapon>("Frostbite", dmg + 3, mana + 5, rarity, ElementType::Ice, elemDmg, WeaponType::Sword);
@@ -327,12 +382,12 @@ std::shared_ptr<Item> LootTable::CreateBossArmor(int difficulty)
 {
     int def = 6 + (difficulty * 3);
     int rarity = 3;
-    int roll = rand() % 3;
+    int roll = RNG::Next(3);
     ArmorType type;
     if (roll == 0) type = ArmorType::Plate;
     else if (roll == 1) type = ArmorType::Leather;
     else type = ArmorType::Cloth;
-    ArmorPiece piece = static_cast<ArmorPiece>(rand() % 5);
+    ArmorPiece piece = static_cast<ArmorPiece>(RNG::Next(5));
     std::string name;
     if (type == ArmorType::Cloth)
     {
@@ -367,7 +422,7 @@ std::shared_ptr<Item> LootTable::CreateEpicWeapon(int difficulty)
     int mana = 15 + (difficulty * 5);
     int rarity = 4;
     int elemDmg = 10 + difficulty * 6;
-    switch (rand() % 14)
+    switch (RNG::Next(14))
     {
         case 0: return std::make_shared<Weapon>("Inferno Greatsword", dmg + 10, mana, rarity, ElementType::Fire, elemDmg, WeaponType::Sword);
         case 1: return std::make_shared<Weapon>("Glacial Halberd", dmg + 8, mana + 10, rarity, ElementType::Ice, elemDmg, WeaponType::Sword);
@@ -390,12 +445,12 @@ std::shared_ptr<Item> LootTable::CreateEpicArmor(int difficulty)
 {
     int def = 8 + (difficulty * 4);
     int rarity = 4;
-    int roll = rand() % 3;
+    int roll = RNG::Next(3);
     ArmorType type;
     if (roll == 0) type = ArmorType::Plate;
     else if (roll == 1) type = ArmorType::Leather;
     else type = ArmorType::Cloth;
-    ArmorPiece piece = static_cast<ArmorPiece>(rand() % 5);
+    ArmorPiece piece = static_cast<ArmorPiece>(RNG::Next(5));
     std::string name;
     auto resist = RandomElementalResist(difficulty);
     resist[RandomElement()] += 3 + difficulty;
@@ -444,7 +499,7 @@ std::shared_ptr<Item> LootTable::CreateLegendaryWeapon(int difficulty)
     int mana = 25 + (difficulty * 8);
     int rarity = 5;
     int elemDmg = 15 + difficulty * 8;
-    switch (rand() % 12)
+    switch (RNG::Next(12))
     {
         case 0: return std::make_shared<Weapon>("Worldsplitter", dmg + 20, mana + 10, rarity, ElementType::Fire, elemDmg + 5, WeaponType::Sword);
         case 1: return std::make_shared<Weapon>("Frostmourne's Echo", dmg + 15, mana + 20, rarity, ElementType::Ice, elemDmg + 8, WeaponType::Sword);
@@ -466,12 +521,12 @@ std::shared_ptr<Item> LootTable::CreateLegendaryArmor(int difficulty)
 {
     int def = 12 + (difficulty * 6);
     int rarity = 5;
-    int roll = rand() % 3;
+    int roll = RNG::Next(3);
     ArmorType type;
     if (roll == 0) type = ArmorType::Plate;
     else if (roll == 1) type = ArmorType::Leather;
     else type = ArmorType::Cloth;
-    ArmorPiece piece = static_cast<ArmorPiece>(rand() % 5);
+    ArmorPiece piece = static_cast<ArmorPiece>(RNG::Next(5));
     std::string name;
     auto resist = RandomElementalResist(difficulty);
     resist[RandomElement()] += 5 + difficulty * 2;
@@ -517,8 +572,8 @@ std::shared_ptr<Item> LootTable::CreateAccessory(int difficulty)
     int hp = 20 + (difficulty * 10);
     int mana = 10 + (difficulty * 8);
     int rarity = 2 + (difficulty > 3 ? 1 : 0);
-    int elemDmg = 2 + difficulty + rand() % (difficulty + 3);
-    switch (rand() % 18)
+    int elemDmg = 2 + difficulty + RNG::Next(difficulty + 3);
+    switch (RNG::Next(18))
     {
         case 0: return std::make_shared<Accessory>("Ring of Health", hp, 0, rarity);
         case 1: return std::make_shared<Accessory>("Ring of Mana", 0, mana, rarity);
@@ -546,7 +601,7 @@ std::shared_ptr<Item> LootTable::CreateAccessory(int difficulty)
 
 std::shared_ptr<Item> LootTable::CreatePotion(int difficulty)
 {
-    switch (rand() % 5)
+    switch (RNG::Next(5))
     {
         case 0: return std::make_shared<Consumable>("Minor Health Potion", 30 + difficulty * 5, 0, 1);
         case 1: return std::make_shared<Consumable>("Health Potion", 60 + difficulty * 10, 0, 2);
@@ -637,24 +692,52 @@ std::shared_ptr<Item> LootTable::CreateLegendaryAccessory(CharacterClass charCla
 // ============================================================
 
 std::shared_ptr<Item> LootTable::GenerateUniqueDrop(
-    const std::string& enemyName, int difficulty, bool /*isBoss*/)
+    const std::string& enemyName, int difficulty, bool /*isBoss*/, CharacterClass cc)
 {
-    // Collect all uniques from this enemy's drop pool
+    // Collect uniques from this enemy's drop pool
     auto weapons = UniqueItemRegistry::GetWeaponsByDropSource(enemyName);
     auto armor = UniqueItemRegistry::GetArmorByDropSource(enemyName);
     auto accessories = UniqueItemRegistry::GetAccessoriesByDropSource(enemyName);
 
-    // Build a flat pool of unique names
-    std::vector<std::string> pool;
-    for (auto* w : weapons) pool.push_back(w->name);
-    for (auto* a : armor) pool.push_back(a->name);
-    for (auto* ac : accessories) pool.push_back(ac->name);
+    ClassData classData = ClassDatabase::Get(cc);
 
-    if (pool.empty()) return nullptr;
+    // Separate class-appropriate and other uniques
+    std::vector<std::string> classPool;
+    std::vector<std::string> otherPool;
 
-    // Pick one at random
-    std::string chosen = pool[rand() % pool.size()];
+    for (auto* w : weapons)
+    {
+        bool ok = false;
+        for (auto wt : classData.allowedWeaponTypes)
+            if (wt == w->weaponType) { ok = true; break; }
+        if (ok) classPool.push_back(w->name);
+        else otherPool.push_back(w->name);
+    }
+    for (auto* a : armor)
+    {
+        bool ok = false;
+        for (auto at : classData.allowedArmorTypes)
+            if (at == a->armorType) { ok = true; break; }
+        if (ok) classPool.push_back(a->name);
+        else otherPool.push_back(a->name);
+    }
+    // Accessories can be used by anyone — count as class-appropriate
+    for (auto* ac : accessories)
+        classPool.push_back(ac->name);
 
-    // Create it scaled to difficulty
-    return UniqueItemRegistry::Create(chosen, difficulty);
+    // Bias toward class-appropriate: 70% chance to pick from class pool
+    std::vector<std::string>& pickFrom = (!classPool.empty() && RNG::Percent() < 70)
+        ? classPool : otherPool;
+
+    if (pickFrom.empty())
+        pickFrom = classPool.empty() ? otherPool : classPool;
+
+    if (pickFrom.empty()) return nullptr;
+
+    std::string chosen = pickFrom[RNG::Next(static_cast<int>(pickFrom.size()))];
+
+    auto item = UniqueItemRegistry::Create(chosen, difficulty);
+    if (item)
+        item->requiredLevel = RequiredLevelForDifficulty(difficulty);
+    return item;
 }

@@ -26,12 +26,14 @@ class Area
 {
 public:
     Area(const std::string& name, const std::string& description, int difficulty,
-         const std::vector<Dungeon>& dungeons = {});
+         const std::vector<Dungeon>& dungeons = {},
+         const std::vector<int>& connections = {});
 
     std::string name;
     std::string description;
     int difficulty;
     std::vector<Dungeon> dungeons;
+    std::vector<int> connections; // indices of adjacent areas
 
     std::vector<std::shared_ptr<Monster>> spawnMonsters();
     std::shared_ptr<Monster> spawnBoss();

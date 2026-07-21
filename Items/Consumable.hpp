@@ -16,6 +16,7 @@ public:
     {
         auto c = std::make_shared<Consumable>(name, healAmount, manaAmount, rarity);
         c->count = 1;
+        c->requiredLevel = requiredLevel;
         return c;
     }
 

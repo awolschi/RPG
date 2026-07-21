@@ -73,6 +73,17 @@ struct QuestRewardNotification
         : questTitle(title), xpEarned(xp), goldEarned(gold), life(dur), maxLife(dur) {}
 };
 
+struct TutorialHint
+{
+    std::string title;
+    std::string message;
+    float life;
+    float maxLife;
+
+    TutorialHint(const std::string& t, const std::string& m, float dur = 6.0f)
+        : title(t), message(m), life(dur), maxLife(dur) {}
+};
+
 enum class GameState
 {
     MainMenu,
@@ -149,6 +160,7 @@ private:
     std::vector<AchievementNotification> achNotifications;
     std::vector<QuestRewardNotification> questRewardNotifications;
     std::vector<PetNotification> petNotifications;
+    std::vector<TutorialHint> tutorialHints;
     double enemyActionTime;
 
     // Combat animation state
@@ -185,6 +197,12 @@ private:
     // Skill overview pagination
     int skillOverviewPage;
     int skillLoadoutPage;
+    int selectedSkillIdx = -1;
+
+    // Skill loadout editing state (persist across frames)
+    std::vector<int> loadoutEditCopy;
+    int loadoutAttackSkillEdit = 0;
+    bool loadoutEditActive = false;
 
     // Job perks state
     int selectedJobIdx;
@@ -220,6 +238,7 @@ private:
 
     // Achievements UI state
     int achievementsPage = 0;
+    int selectedAchievementCategory = -1;
     static constexpr int ACHIEVEMENTS_PER_PAGE = 12;
 
     // Pet UI state
@@ -274,6 +293,7 @@ private:
     void SaveToSlot(int slot);
     void LoadFromSlot(int slot);
     void ApplyPetPassivesToPlayer();
+    int saveConfirmSlot = -1;
 
     // Drawing helpers
     void DrawTopBar();
@@ -287,6 +307,8 @@ private:
     void DrawQuestRewardNotifications();
     void DrawReputationNotifications();
     void DrawPetNotifications();
+    void DrawTutorialHints();
+    void AddTutorialHint(const std::string& title, const std::string& message);
     void CheckAchievementNotifications();
     void DrawMessagePage(const std::string& title,
                          const std::vector<std::string>& lines,
@@ -298,6 +320,22 @@ private:
     // Utility
     void InitializeAreas();
     void ClearLog();
+
+    // Death penalty tracking
+    bool deathPenaltyApplied = false;
+    int deathGoldLost = 0;
+    int deathXpLost = 0;
+
+    // Tutorial system (session-scoped)
+    bool tutorialEnabled = true;
+    bool tutorialExplored = false;
+    bool tutorialCombatEntered = false;
+    bool tutorialInventoryOpened = false;
+    bool tutorialTraveled = false;
+    bool tutorialQuestsChecked = false;
+    bool tutorialCraftingOpened = false;
+    bool tutorialSkillsOpened = false;
+    bool tutorialRestedAtInn = false;
 };
 
 #endif

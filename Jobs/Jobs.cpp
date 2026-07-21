@@ -1,5 +1,5 @@
 #include "Job.hpp"
-#include <cstdlib>
+#include "../Engine/RNG.hpp"
 
 Job::Job(JobType type) : type(type), level(1), experience(0), jobPoints(0)
 {
@@ -436,7 +436,7 @@ JobEvent Job::CreateEvent(JobEventType type)
 
 JobEvent Job::RollEvent() const
 {
-    int roll = rand() % 100;
+    int roll = RNG::Next(100);
 
     if (roll < 3)  return CreateEvent(JobEventType::LuckyFind);
     if (roll < 6)  return CreateEvent(JobEventType::ResourceSpill);

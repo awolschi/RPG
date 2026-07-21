@@ -88,6 +88,7 @@ set(SOURCES
     Graphics/BattleLayout.cpp
     Graphics/BattleRenderer.cpp
     Graphics/CreatureImageMapper.cpp
+    Graphics/SoundManager.cpp
 )
 
 # Executable

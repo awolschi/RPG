@@ -239,6 +239,7 @@ CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Engine/../Items/Crafting/../Item.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Engine/../Items/Crafting/../Resources/Resources.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Engine/../Items/Crafting/../../Inventory/Inventory.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Engine/../Items/Crafting/../../Jobs/Job.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Engine/../Jobs/JobQuest.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Engine/../Jobs/Job.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Factions/Pet.hpp \

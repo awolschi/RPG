@@ -8,7 +8,6 @@ class LevelUpManager
 public:
     LevelUpManager();
 
-    static int CalculateRequiredXP(int level);
     static void ApplyLevelUp(Character& character);
 };
 

@@ -67,7 +67,25 @@ void GRenderer::DrawRect(int x, int y, int w, int h, Color c)
 
 void GRenderer::DrawRectLines(int x, int y, int w, int h, Color c, int thick)
 {
-    DrawRectangleLines(x, y, w, h, c);
+    DrawRectangleLinesEx({(float)x, (float)y, (float)w, (float)h}, (float)thick, c);
+}
+
+void GRenderer::DrawCircle(int cx, int cy, float radius, Color c)
+{
+    ::DrawCircle(cx, cy, radius, c);
+}
+
+void GRenderer::DrawCircleLines(int cx, int cy, float radius, Color c, int thick)
+{
+    // raylib only has DrawCircleLines with fixed 1px thickness
+    // Draw multiple concentric circles for thicker appearance
+    for (int i = 0; i < thick; ++i)
+        ::DrawCircleLines(cx, cy, radius + (float)i, c);
+}
+
+void GRenderer::DrawLine(int x1, int y1, int x2, int y2, Color c, int thick)
+{
+    ::DrawLineEx({(float)x1, (float)y1}, {(float)x2, (float)y2}, (float)thick, c);
 }
 
 void GRenderer::DrawText(const std::string& text, int x, int y, int size, Color c)
@@ -211,9 +229,10 @@ void GRenderer::DrawBarLabeled(int val, int max, int x, int y, int w, int h,
                                 Color fg, Color bg, const std::string& label)
 {
     DrawBar(val, max, x, y, w, h, fg, bg);
+    int fontSize = (h >= 16) ? 14 : (h >= 14) ? 12 : 10;
     std::string txt = label + " " + std::to_string(val) + "/" + std::to_string(max);
-    int tw = MeasureText(txt.c_str(), 16);
-    DrawText(txt, x + (w - tw) / 2, y + (h - 16) / 2, 16, CQColors::TextLight);
+    int tw = MeasureText(txt.c_str(), fontSize);
+    DrawText(txt, x + (w - tw) / 2, y + (h - fontSize) / 2, fontSize, CQColors::TextLight);
 }
 
 void GRenderer::StartTransition(float duration)
@@ -330,7 +349,7 @@ bool GRenderer::IsMouseClickedOn(int x, int y, int w, int h) const
     return IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && IsMouseInRect(x, y, w, h);
 }
 
-bool GRenderer::Button(const std::string& text, int x, int y, int w, int h, int focusIndex)
+bool GRenderer::Button(const std::string& text, int x, int y, int w, int h, int focusIndex, int fontSize)
 {
     bool hover = IsMouseInRect(x, y, w, h);
     bool pressed = hover && IsMouseButtonDown(MOUSE_LEFT_BUTTON);
@@ -390,10 +409,10 @@ bool GRenderer::Button(const std::string& text, int x, int y, int w, int h, int 
     if (pos != std::string::npos)
         displayText = displayText.substr(0, pos);
 
-    int tw = MeasureText(displayText.c_str(), 18);
+    int tw = MeasureText(displayText.c_str(), fontSize);
     // Slight text offset when pressed
     int textOffY = pressed ? 1 : 0;
-    ::DrawText(displayText.c_str(), x + (w - tw) / 2, y + (h - 18) / 2 + textOffY, 18, CQColors::BtnText);
+    ::DrawText(displayText.c_str(), x + (w - tw) / 2, y + (h - fontSize) / 2 + textOffY, fontSize, CQColors::BtnText);
 
     return clicked;
 }

@@ -1,5 +1,6 @@
 #include "Passives.hpp"
 #include "../Characters/Character.hpp"
+#include "../Engine/RNG.hpp"
 #include <functional>
 
 static void CollectFromItem(std::vector<ItemPassive>& out, const std::shared_ptr<Item>& item)
@@ -255,7 +256,7 @@ bool Passives::RollProc(int percentChance)
 {
     if (percentChance <= 0) return false;
     if (percentChance >= 100) return true;
-    return (rand() % 100) < percentChance;
+    return RNG::Percent() < percentChance;
 }
 
 void Passives::ApplyPostCombatPassives(Character* attacker, Character* defender,

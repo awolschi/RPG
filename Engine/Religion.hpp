@@ -54,7 +54,7 @@ public:
     std::string GetGodName() const;
     std::string GetGodDescription() const;
     int GetNextDevotionCost() const;
-    void ApplyDevotionBonus(std::shared_ptr<Character> player) const;
+    std::string ApplyDevotionBonus(std::shared_ptr<Character> player) const;
     void RestoreState(GodType god, int devotion, int donated);
 
     // Prayer system
@@ -75,6 +75,9 @@ public:
     // God-specific quests
     const GodQuest& GetActiveQuest() const { return activeQuest; }
     void GenerateQuest();
+    void EnsureQuest();
+    void RestoreQuest(const std::string& desc, const std::string& target, int targetCount,
+                      int currentCount, int rewardDevotion, bool completed);
     bool ProgressQuest(const std::string& enemyName);
     bool IsQuestComplete() const { return activeQuest.completed; }
     void CompleteQuest();

@@ -24,6 +24,15 @@ void UniqueItemRegistry::Initialize()
     RegisterMageEpics();
     RegisterBossLegendaries();
     RegisterSetItems();
+    RegisterMerchantUniques();
+    RegisterWarriorLegendaries();
+    RegisterWarriorEpics();
+    RegisterMerchantEpics();
+    RegisterPriestLegendaries();
+    RegisterPriestEpics();
+    RegisterArcherLegendaries();
+    RegisterArcherEpics();
+    RegisterAchievementItems();
     s_initialized = true;
 }
 
@@ -1232,6 +1241,829 @@ void UniqueItemRegistry::RegisterSetItems()
         10, 2, {{ElementType::Fire, 3}}, 1,
         "Seraphim Council", 13,
         ItemPassive::None, ItemPassive::None
+    });
+}
+
+// ---- Merchant Unique Legendaries ----
+
+void UniqueItemRegistry::RegisterMerchantUniques()
+{
+    // Merchant-themed items spread across multiple bosses
+
+    // Coinlord's Cudgel — Mace (drops from Farm Overseer)
+    s_weapons.push_back({
+        "Coinlord's Cudgel", Rarity::Legendary, WeaponType::Mace,
+        60, 0, 15, ElementType::Physical, 10, 0,
+        "Farm Overseer", 17,
+        ItemPassive::GoldFind30, ItemPassive::None
+    });
+
+    // Auctioneer's Blade — Sword (drops from Aran Warlord)
+    s_weapons.push_back({
+        "Auctioneer's Blade", Rarity::Legendary, WeaponType::Sword,
+        160, 0, 25, ElementType::Physical, 20, 0,
+        "Aran Warlord", -1,
+        ItemPassive::CritChance20, ItemPassive::GoldFind30
+    });
+
+    // Ledger of Endless Wealth — Wand (drops from Arcane Construct)
+    s_weapons.push_back({
+        "Ledger of Endless Wealth", Rarity::Legendary, WeaponType::Wand,
+        180, 0, 140, ElementType::Arcane, 40, 0,
+        "Arcane Construct", -1,
+        ItemPassive::ManaRegen10, ItemPassive::ExpBoost20
+    });
+
+    // Merchant's Traveling Cloak — Cloth Chest (drops from Void Lord)
+    s_armor.push_back({
+        "Merchant's Traveling Cloak", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
+        22, 0, {{ElementType::Arcane, 8}}, 0,
+        "Void Lord", 17,
+        ItemPassive::Dodge15, ItemPassive::GoldFind30
+    });
+
+    // Bullion Greaves — Plate Boots (drops from Kraken)
+    s_armor.push_back({
+        "Bullion Greaves", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Boots,
+        14, 0, {{ElementType::Ice, 6}}, 0,
+        "Kraken", -1,
+        ItemPassive::HealOnKill10, ItemPassive::GoldFind30
+    });
+
+    // Gilded Bracers — Plate Gloves (drops from Elder Dragon)
+    s_armor.push_back({
+        "Gilded Bracers", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Gloves,
+        16, 0, {{ElementType::Fire, 5}}, 0,
+        "Elder Dragon", -1,
+        ItemPassive::CritChance20, ItemPassive::GoldFind30
+    });
+
+    // Ring of the Golden Touch — Ring (drops from Seraphim Council)
+    s_accessories.push_back({
+        "Ring of the Golden Touch", Rarity::Legendary,
+        50, 0, 30, 0, ElementType::Holy, 15, 0,
+        "Seraphim Council", 17,
+        ItemPassive::GoldFind30, ItemPassive::ExpBoost20
+    });
+
+    // Amulet of Prosperity — Amulet (drops from Chronos)
+    s_accessories.push_back({
+        "Amulet of Prosperity", Rarity::Legendary,
+        60, 0, 50, 0, ElementType::Arcane, 20, 0,
+        "Chronos, the Time Ender", 17,
+        ItemPassive::ExpBoost20, ItemPassive::ManaRegen5
+    });
+}
+
+// ---- Merchant Unique Epics ----
+
+void UniqueItemRegistry::RegisterMerchantEpics()
+{
+    // === EPIC WEAPONS (4) ===
+
+    // Gilded Longsword — Sword (drops from Orc)
+    s_weapons.push_back({
+        "Gilded Longsword", Rarity::Epic, WeaponType::Sword,
+        55, 2, 12, ElementType::Physical, 5, 1,
+        "Orc", -1,
+        ItemPassive::GoldFind30, ItemPassive::PhysDmgBoost15
+    });
+
+    // Profitkeeper's Staff — Staff (drops from Lich)
+    s_weapons.push_back({
+        "Profitkeeper's Staff", Rarity::Epic, WeaponType::Staff,
+        42, 2, 45, ElementType::Arcane, 12, 2,
+        "Lich", -1,
+        ItemPassive::GoldFind30, ItemPassive::SpellDmgBoost15
+    });
+
+    // Hoardseeker's Bow — Bow (drops from Drake)
+    s_weapons.push_back({
+        "Hoardseeker's Bow", Rarity::Epic, WeaponType::Bow,
+        50, 2, 18, ElementType::Physical, 4, 1,
+        "Drake", -1,
+        ItemPassive::GoldFind30, ItemPassive::CritChance20
+    });
+
+    // Bargainer's Mace — Mace (drops from Highland Warrior)
+    s_weapons.push_back({
+        "Bargainer's Mace", Rarity::Epic, WeaponType::Mace,
+        58, 2, 10, ElementType::Physical, 8, 1,
+        "Highland Warrior", -1,
+        ItemPassive::GoldFind30, ItemPassive::DamageReduce10
+    });
+
+    // === EPIC ARMOR (4) ===
+
+    // Merchant's Silk Robe — Cloth Chest (drops from Giant Spider)
+    s_armor.push_back({
+        "Merchant's Silk Robe", Rarity::Epic, ArmorType::Cloth, ArmorPiece::Chest,
+        8, 1, {{ElementType::Arcane, 4}}, 1,
+        "Giant Spider", -1,
+        ItemPassive::GoldFind30, ItemPassive::Dodge15
+    });
+
+    // Padded Coin Purse Helm — Leather Helmet (drops from Wolf)
+    s_armor.push_back({
+        "Padded Coin Purse Helm", Rarity::Epic, ArmorType::Leather, ArmorPiece::Helmet,
+        9, 1, {{ElementType::Physical, 3}}, 1,
+        "Wolf", -1,
+        ItemPassive::GoldFind30, ItemPassive::ExpBoost20
+    });
+
+    // Bullion-Plated Pauldrons — Plate Chest (drops from Fire Elemental)
+    s_armor.push_back({
+        "Bullion-Plated Pauldrons", Rarity::Epic, ArmorType::Plate, ArmorPiece::Chest,
+        12, 1, {{ElementType::Fire, 4}}, 1,
+        "Fire Elemental", -1,
+        ItemPassive::GoldFind30, ItemPassive::DamageReduce10
+    });
+
+    // Smuggler's Leather Boots — Leather Boots (drops from Dark Elf Scout)
+    s_armor.push_back({
+        "Smuggler's Leather Boots", Rarity::Epic, ArmorType::Leather, ArmorPiece::Boots,
+        7, 1, {{ElementType::Poison, 3}}, 1,
+        "Dark Elf Scout", -1,
+        ItemPassive::GoldFind30, ItemPassive::Dodge15
+    });
+
+    // === EPIC ACCESSORIES (3) ===
+
+    // Coin Purse Ring — Ring (drops from Shadow)
+    s_accessories.push_back({
+        "Coin Purse Ring", Rarity::Epic,
+        20, 1, 10, 1, ElementType::Physical, 0, 0,
+        "Shadow", -1,
+        ItemPassive::GoldFind30, ItemPassive::ExpBoost20
+    });
+
+    // Ledger Charm — Amulet (drops from Wraith)
+    s_accessories.push_back({
+        "Ledger Charm", Rarity::Epic,
+        15, 1, 25, 2, ElementType::Arcane, 6, 1,
+        "Wraith", -1,
+        ItemPassive::GoldFind30, ItemPassive::HealOnKill10
+    });
+
+    // Merchant's Seal — Ring (drops from Siren)
+    s_accessories.push_back({
+        "Merchant's Seal", Rarity::Epic,
+        25, 1, 15, 1, ElementType::Ice, 4, 1,
+        "Siren", -1,
+        ItemPassive::GoldFind30, ItemPassive::ManaRegen5
+    });
+}
+
+// ---- Achievement Reward Items ----
+
+void UniqueItemRegistry::RegisterAchievementItems()
+{
+    // Items awarded by specific achievements — no drop source
+
+    // Innkeeper's Key — "Inn Regular" (rest 100 times)
+    s_weapons.push_back({
+        "Innkeeper's Key", Rarity::Legendary, WeaponType::Dagger,
+        150, 0, 20, ElementType::Holy, 15, 0,
+        "", -1,
+        ItemPassive::HealOnKill15, ItemPassive::GoldFind30
+    });
+
+    // Gatherer's Pouch — "Gather Legend" (50 gather quests)
+    s_accessories.push_back({
+        "Gatherer's Pouch", Rarity::Legendary,
+        40, 0, 40, 0, ElementType::Physical, 0, 0,
+        "", -1,
+        ItemPassive::GoldFind30, ItemPassive::ExpBoost20
+    });
+
+    // Explorer's Compass — "World Walker" (15 explore quests)
+    s_accessories.push_back({
+        "Explorer's Compass", Rarity::Legendary,
+        50, 0, 30, 0, ElementType::Physical, 0, 0,
+        "", -1,
+        ItemPassive::Dodge20, ItemPassive::ExpBoost20
+    });
+
+    // World Map — "World Explorer" (visit all areas)
+    s_accessories.push_back({
+        "World Map", Rarity::Legendary,
+        60, 0, 60, 0, ElementType::Physical, 0, 0,
+        "", -1,
+        ItemPassive::AllResist10, ItemPassive::ManaRegen10
+    });
+
+    // Shadow Cloak — "Secret Master" (10 secret areas)
+    s_armor.push_back({
+        "Shadow Cloak", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
+        22, 0, {{ElementType::Arcane, 12}}, 0,
+        "", -1,
+        ItemPassive::Dodge20, ItemPassive::ManaRegen5
+    });
+
+    // Hero's Crown — "Legendary Hero" (level 50)
+    s_armor.push_back({
+        "Hero's Crown", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Helmet,
+        30, 0, {{ElementType::Holy, 10}}, 0,
+        "", -1,
+        ItemPassive::DamageReduce15, ItemPassive::ExpBoost20
+    });
+
+    // Tycoon's Ring — "Tycoon" (100k gold)
+    s_accessories.push_back({
+        "Tycoon's Ring", Rarity::Legendary,
+        70, 0, 40, 0, ElementType::Physical, 0, 0,
+        "", -1,
+        ItemPassive::GoldFind30, ItemPassive::GoldFind30
+    });
+
+    // Archivist's Satchel — "Archivist" (100 unique items)
+    s_accessories.push_back({
+        "Archivist's Satchel", Rarity::Legendary,
+        50, 0, 50, 0, ElementType::Arcane, 10, 0,
+        "", -1,
+        ItemPassive::ExpBoost20, ItemPassive::ManaRegen5
+    });
+
+    // Merchant's Crown — "Trade Lord" (sell 1000 items)
+    s_armor.push_back({
+        "Merchant's Crown", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Helmet,
+        20, 0, {{ElementType::Fire, 5}, {ElementType::Ice, 5}, {ElementType::Lightning, 5}, {ElementType::Arcane, 5}, {ElementType::Poison, 5}, {ElementType::Holy, 5}}, 0,
+        "", -1,
+        ItemPassive::GoldFind30, ItemPassive::ExpBoost20
+    });
+}
+
+// ---- Warrior Legendary Items ----
+
+void UniqueItemRegistry::RegisterWarriorLegendaries()
+{
+    // ================================================================
+    // WARRIOR LEGENDARIES (~10 items) — Boss drops
+    // Theme: high defense, thorns, damage reduction, stun, physical damage
+    // ================================================================
+
+    // === WEAPONS (4) ===
+
+    // Ironclad Warblade — Sword (drops from Aran Warlord)
+    s_weapons.push_back({
+        "Ironclad Warblade", Rarity::Legendary, WeaponType::Sword,
+        180, 0, 20, ElementType::Physical, 0, 0,
+        "Aran Warlord", 14,
+        ItemPassive::PhysDmgBoost20, ItemPassive::Thorns25
+    });
+
+    // Abyssal Cleaver — Axe (drops from Kraken)
+    s_weapons.push_back({
+        "Abyssal Cleaver", Rarity::Legendary, WeaponType::Axe,
+        165, 0, 15, ElementType::Ice, 20, 0,
+        "Kraken", -1,
+        ItemPassive::DamageReduce15, ItemPassive::PhysDmgBoost20
+    });
+
+    // Thunderstrike Mace — Mace (drops from Elder Dragon)
+    s_weapons.push_back({
+        "Thunderstrike Mace", Rarity::Legendary, WeaponType::Mace,
+        170, 0, 25, ElementType::Lightning, 15, 0,
+        "Elder Dragon", -1,
+        ItemPassive::StunImmune, ItemPassive::Thorns40
+    });
+
+    // Earthenbreaker — Hammer (drops from The Primordial One)
+    s_weapons.push_back({
+        "Earthenbreaker", Rarity::Legendary, WeaponType::Hammer,
+        200, 0, 30, ElementType::Physical, 10, 0,
+        "The Primordial One", -1,
+        ItemPassive::PhysDmgBoost20, ItemPassive::DamageReduce15
+    });
+
+    // === ARMOR (4) ===
+
+    // Bulwark Plate — Plate Chest (drops from Kraken)
+    s_armor.push_back({
+        "Bulwark Plate", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Chest,
+        30, 0, {{ElementType::Physical, 10}}, 0,
+        "Kraken", 14,
+        ItemPassive::DamageReduce15, ItemPassive::Thorns40
+    });
+
+    // Warlord's Casque — Plate Helmet (drops from Aran Warlord)
+    s_armor.push_back({
+        "Warlord's Casque", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Helmet,
+        28, 0, {{ElementType::Lightning, 8}}, 0,
+        "Aran Warlord", 14,
+        ItemPassive::TauntChance25, ItemPassive::DamageReduce15
+    });
+
+    // Drakeplate Gauntlets — Plate Gloves (drops from Elder Dragon)
+    s_armor.push_back({
+        "Drakeplate Gauntlets", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Gloves,
+        16, 0, {{ElementType::Fire, 6}}, 0,
+        "Elder Dragon", 14,
+        ItemPassive::Thorns25, ItemPassive::StunImmune
+    });
+
+    // Primordial Leather Vest — Leather Chest (drops from The Primordial One)
+    s_armor.push_back({
+        "Primordial Leather Vest", Rarity::Legendary, ArmorType::Leather, ArmorPiece::Chest,
+        22, 0, {{ElementType::Physical, 5}, {ElementType::Lightning, 5}}, 0,
+        "The Primordial One", -1,
+        ItemPassive::Dodge20, ItemPassive::PhysDmgBoost15
+    });
+
+    // === ACCESSORIES (2) ===
+
+    // Warlord's Signet — Ring (drops from Void Lord)
+    s_accessories.push_back({
+        "Warlord's Signet", Rarity::Legendary,
+        80, 0, 20, 0, ElementType::Physical, 0, 0,
+        "Void Lord", -1,
+        ItemPassive::Thorns40, ItemPassive::AllResist10
+    });
+
+    // Amulet of Iron Will — Amulet (drops from Seraphim Council)
+    s_accessories.push_back({
+        "Amulet of Iron Will", Rarity::Legendary,
+        60, 0, 30, 0, ElementType::Physical, 0, 0,
+        "Seraphim Council", -1,
+        ItemPassive::StunImmune, ItemPassive::DamageReduce10
+    });
+}
+
+// ---- Warrior Epic Items ----
+
+void UniqueItemRegistry::RegisterWarriorEpics()
+{
+    // ================================================================
+    // WARRIOR EPICS (~10 items) — Mid-game enemy drops
+    // Theme: sturdy defense, physical power, survivability
+    // ================================================================
+
+    // === WEAPONS (4) ===
+
+    // Wolfbane — Sword (drops from Wolf)
+    s_weapons.push_back({
+        "Wolfbane", Rarity::Epic, WeaponType::Sword,
+        50, 3, 10, ElementType::Physical, 5, 1,
+        "Wolf", -1,
+        ItemPassive::CritChance20, ItemPassive::None
+    });
+
+    // Orc-Cleaver — Axe (drops from Orc)
+    s_weapons.push_back({
+        "Orc-Cleaver", Rarity::Epic, WeaponType::Axe,
+        55, 3, 12, ElementType::Physical, 8, 1,
+        "Orc", -1,
+        ItemPassive::PhysDmgBoost15, ItemPassive::None
+    });
+
+    // Highland Mace — Mace (drops from Highland Warrior)
+    s_weapons.push_back({
+        "Highland Mace", Rarity::Epic, WeaponType::Mace,
+        48, 3, 15, ElementType::Physical, 6, 1,
+        "Highland Warrior", -1,
+        ItemPassive::Thorns25, ItemPassive::None
+    });
+
+    // Drakebone Hammer — Hammer (drops from Drake)
+    s_weapons.push_back({
+        "Drakebone Hammer", Rarity::Epic, WeaponType::Hammer,
+        52, 3, 20, ElementType::Fire, 10, 1,
+        "Drake", -1,
+        ItemPassive::DamageReduce10, ItemPassive::None
+    });
+
+    // === ARMOR (4) ===
+
+    // Shadow-Woven Plate — Plate Helmet (drops from Shadow)
+    s_armor.push_back({
+        "Shadow-Woven Plate", Rarity::Epic, ArmorType::Plate, ArmorPiece::Helmet,
+        14, 2, {{ElementType::Arcane, 4}}, 1,
+        "Shadow", -1,
+        ItemPassive::Dodge15, ItemPassive::None
+    });
+
+    // Spider-Silk Chestguard — Plate Chest (drops from Giant Spider)
+    s_armor.push_back({
+        "Spider-Silk Chestguard", Rarity::Epic, ArmorType::Plate, ArmorPiece::Chest,
+        18, 2, {{ElementType::Poison, 5}}, 1,
+        "Giant Spider", -1,
+        ItemPassive::HealOnKill10, ItemPassive::None
+    });
+
+    // Fireforged Gauntlets — Plate Gloves (drops from Fire Elemental)
+    s_armor.push_back({
+        "Fireforged Gauntlets", Rarity::Epic, ArmorType::Plate, ArmorPiece::Gloves,
+        12, 2, {{ElementType::Fire, 6}}, 1,
+        "Fire Elemental", -1,
+        ItemPassive::CritChance20, ItemPassive::None
+    });
+
+    // Dark Leather Boots — Leather Boots (drops from Dark Elf Scout)
+    s_armor.push_back({
+        "Dark Leather Boots", Rarity::Epic, ArmorType::Leather, ArmorPiece::Boots,
+        10, 2, {{ElementType::Poison, 3}}, 1,
+        "Dark Elf Scout", -1,
+        ItemPassive::HealOnKill10, ItemPassive::None
+    });
+
+    // === ACCESSORIES (2) ===
+
+    // Band of the Vanguard — Ring (drops from Highland Warrior)
+    s_accessories.push_back({
+        "Band of the Vanguard", Rarity::Epic,
+        30, 5, 15, 3, ElementType::Physical, 8, 1,
+        "Highland Warrior", -1,
+        ItemPassive::PhysDmgLowHp30, ItemPassive::None
+    });
+
+    // Emberheart Pendant — Amulet (drops from Fire Elemental)
+    s_accessories.push_back({
+        "Emberheart Pendant", Rarity::Epic,
+        35, 5, 20, 3, ElementType::Fire, 10, 1,
+        "Fire Elemental", -1,
+        ItemPassive::Lifesteal15, ItemPassive::None
+    });
+}
+
+// ---- Priest Class-Specific Legendaries ----
+
+void UniqueItemRegistry::RegisterPriestLegendaries()
+{
+    // ================================================================
+    // PRIEST LEGENDARIES — ~10 items, themed: healing, holy, mana, revive
+    // ================================================================
+
+    // === LEGENDARY WEAPONS (4) ===
+
+    // Arbiter's Mace — Mace (drops from Seraphim Council)
+    s_weapons.push_back({
+        "Arbiter's Mace", Rarity::Legendary, WeaponType::Mace,
+        140, 0, 35, ElementType::Holy, 30, 0,
+        "Seraphim Council", 15,
+        ItemPassive::HolyHealOnKill, ItemPassive::HealOnKill15
+    });
+
+    // Scepter of the Faithful — Scepter (drops from Elder Dragon)
+    s_weapons.push_back({
+        "Scepter of the Faithful", Rarity::Legendary, WeaponType::Scepter,
+        120, 0, 60, ElementType::Holy, 45, 0,
+        "Elder Dragon", -1,
+        ItemPassive::ManaRegen10, ItemPassive::Revive50
+    });
+
+    // Staff of Benediction — Staff (drops from Arcane Construct)
+    s_weapons.push_back({
+        "Staff of Benediction", Rarity::Legendary, WeaponType::Staff,
+        100, 0, 80, ElementType::Holy, 50, 0,
+        "Arcane Construct", -1,
+        ItemPassive::DoubleCast15, ItemPassive::SpellDmgBoost20
+    });
+
+    // Mace of the Penance — Mace (drops from Chronos, the Time Ender)
+    s_weapons.push_back({
+        "Mace of the Penance", Rarity::Legendary, WeaponType::Mace,
+        160, 0, 40, ElementType::Holy, 35, 0,
+        "Chronos, the Time Ender", -1,
+        ItemPassive::DamageReduce15, ItemPassive::Lifesteal15
+    });
+
+    // === LEGENDARY ARMOR (4) ===
+
+    // Vestments of the Martyr — Cloth Chest (drops from Arcane Construct)
+    s_armor.push_back({
+        "Vestments of the Martyr", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
+        18, 0, {{ElementType::Holy, 12}}, 0,
+        "Arcane Construct", 15,
+        ItemPassive::HealOnKill15, ItemPassive::Revive50
+    });
+
+    // Halo of the Redeemed — Cloth Helmet (drops from Seraphim Council)
+    s_armor.push_back({
+        "Halo of the Redeemed", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Helmet,
+        20, 0, {{ElementType::Holy, 14}}, 0,
+        "Seraphim Council", 15,
+        ItemPassive::DamageReduce10, ItemPassive::ManaRegen10
+    });
+
+    // Gauntlets of Grace — Cloth Gloves (drops from Void Lord)
+    s_armor.push_back({
+        "Gauntlets of Grace", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Gloves,
+        12, 0, {{ElementType::Holy, 8}}, 0,
+        "Void Lord", 15,
+        ItemPassive::HealOnKill10, ItemPassive::ManaCostReduce10
+    });
+
+    // Treads of the Pilgrim — Leather Boots (drops from Treant King)
+    s_armor.push_back({
+        "Treads of the Pilgrim", Rarity::Legendary, ArmorType::Leather, ArmorPiece::Boots,
+        14, 0, {{ElementType::Holy, 6}}, 0,
+        "Treant King", -1,
+        ItemPassive::AllResist10, ItemPassive::FreezeImmune
+    });
+
+    // === LEGENDARY ACCESSORIES (2) ===
+
+    // Pendant of Devotion — Amulet (drops from Chronos, the Time Ender)
+    s_accessories.push_back({
+        "Pendant of Devotion", Rarity::Legendary,
+        60, 0, 80, 0, ElementType::Holy, 20, 0,
+        "Chronos, the Time Ender", -1,
+        ItemPassive::Revive50, ItemPassive::ManaRegen10
+    });
+
+    // Band of the Oathkeeper — Ring (drops from Kraken)
+    s_accessories.push_back({
+        "Band of the Oathkeeper", Rarity::Legendary,
+        50, 0, 60, 0, ElementType::Holy, 15, 0,
+        "Kraken", -1,
+        ItemPassive::PhoenixRevive, ItemPassive::DamageReduce10
+    });
+}
+
+// ---- Priest Class-Specific Epics ----
+
+void UniqueItemRegistry::RegisterPriestEpics()
+{
+    // ================================================================
+    // PRIEST EPICS — ~10 items, mid-game enemy drops
+    // ================================================================
+
+    // === EPIC WEAPONS (4) ===
+
+    // Lightbringer's Mace — Mace (drops from Lich)
+    s_weapons.push_back({
+        "Lightbringer's Mace", Rarity::Epic, WeaponType::Mace,
+        50, 3, 25, ElementType::Holy, 12, 2,
+        "Lich", -1,
+        ItemPassive::HealOnKill10, ItemPassive::None
+    });
+
+    // Scepter of the Dawn — Scepter (drops from Fire Elemental)
+    s_weapons.push_back({
+        "Scepter of the Dawn", Rarity::Epic, WeaponType::Scepter,
+        40, 3, 40, ElementType::Holy, 15, 2,
+        "Fire Elemental", -1,
+        ItemPassive::ManaRegen5, ItemPassive::None
+    });
+
+    // Staff of Quiet Faith — Staff (drops from Giant Spider)
+    s_weapons.push_back({
+        "Staff of Quiet Faith", Rarity::Epic, WeaponType::Staff,
+        35, 3, 50, ElementType::Holy, 10, 2,
+        "Giant Spider", -1,
+        ItemPassive::ManaCostReduce10, ItemPassive::None
+    });
+
+    // Censer of the Lost — Scepter (drops from Wraith)
+    s_weapons.push_back({
+        "Censer of the Lost", Rarity::Epic, WeaponType::Scepter,
+        45, 3, 35, ElementType::Holy, 14, 2,
+        "Wraith", -1,
+        ItemPassive::HolyHealOnKill, ItemPassive::None
+    });
+
+    // === EPIC ARMOR (4) ===
+
+    // Cowl of the Whispering Light — Cloth Helmet (drops from Wolf)
+    s_armor.push_back({
+        "Cowl of the Whispering Light", Rarity::Epic, ArmorType::Cloth, ArmorPiece::Helmet,
+        10, 2, {{ElementType::Holy, 4}}, 1,
+        "Wolf", -1,
+        ItemPassive::DamageReduce10, ItemPassive::None
+    });
+
+    // Acolyte's Vestments — Cloth Chest (drops from Drake)
+    s_armor.push_back({
+        "Acolyte's Vestments", Rarity::Epic, ArmorType::Cloth, ArmorPiece::Chest,
+        14, 2, {{ElementType::Holy, 5}}, 1,
+        "Drake", -1,
+        ItemPassive::HealOnKill10, ItemPassive::None
+    });
+
+    // Handwraps of the Order — Cloth Gloves (drops from Shadow)
+    s_armor.push_back({
+        "Handwraps of the Order", Rarity::Epic, ArmorType::Cloth, ArmorPiece::Gloves,
+        8, 2, {{ElementType::Holy, 3}}, 1,
+        "Shadow", -1,
+        ItemPassive::ManaOnKill15, ItemPassive::None
+    });
+
+    // Sandpilgrim's Stride — Leather Boots (drops from Siren)
+    s_armor.push_back({
+        "Sandpilgrim's Stride", Rarity::Epic, ArmorType::Leather, ArmorPiece::Boots,
+        9, 2, {{ElementType::Holy, 3}}, 1,
+        "Siren", -1,
+        ItemPassive::AllResist5, ItemPassive::None
+    });
+
+    // === EPIC ACCESSORIES (2) ===
+
+    // Ring of the Penitent — Ring (drops from Sea Serpent)
+    s_accessories.push_back({
+        "Ring of the Penitent", Rarity::Epic,
+        25, 5, 40, 8, ElementType::Holy, 8, 2,
+        "Sea Serpent", -1,
+        ItemPassive::Revive50, ItemPassive::None
+    });
+
+    // Holyworn Charm — Amulet (drops from Lich)
+    s_accessories.push_back({
+        "Holyworn Charm", Rarity::Epic,
+        35, 5, 50, 8, ElementType::Holy, 10, 2,
+        "Lich", -1,
+        ItemPassive::HolyHealOnKill, ItemPassive::None
+    });
+}
+
+// ---- Archer Legendary Items ----
+
+void UniqueItemRegistry::RegisterArcherLegendaries()
+{
+    // ================================================================
+    // ARCHER LEGENDARIES (~10 items) — Boss drops
+    // Theme: crit chance, attack speed, dodge, poison, physical damage
+    // ================================================================
+
+    // === WEAPONS (4) ===
+
+    // Windrunner's Bow — Bow (drops from Elder Dragon)
+    s_weapons.push_back({
+        "Windrunner's Bow", Rarity::Legendary, WeaponType::Bow,
+        170, 0, 10, ElementType::Physical, 0, 0,
+        "Elder Dragon", 16,
+        ItemPassive::CritChance30, ItemPassive::AtkSpeed20
+    });
+
+    // Venomfang Recurve — Bow (drops from Kraken)
+    s_weapons.push_back({
+        "Venomfang Recurve", Rarity::Legendary, WeaponType::Bow,
+        155, 0, 15, ElementType::Poison, 30, 0,
+        "Kraken", -1,
+        ItemPassive::PoisonDmgPlus25, ItemPassive::AtkSpeed20
+    });
+
+    // Nightblade's Fang — Dagger (drops from Void Lord)
+    s_weapons.push_back({
+        "Nightblade's Fang", Rarity::Legendary, WeaponType::Dagger,
+        160, 0, 20, ElementType::Arcane, 20, 0,
+        "Void Lord", -1,
+        ItemPassive::CritChance30, ItemPassive::Dodge20
+    });
+
+    // Stormstring Longbow — Bow (drops from Aran Warlord)
+    s_weapons.push_back({
+        "Stormstring Longbow", Rarity::Legendary, WeaponType::Bow,
+        165, 0, 12, ElementType::Lightning, 20, 0,
+        "Aran Warlord", -1,
+        ItemPassive::PhysDmgBoost20, ItemPassive::AtkSpeed20
+    });
+
+    // === ARMOR (4) ===
+
+    // Pathfinder's Cap — Leather Helmet (drops from Treant King)
+    s_armor.push_back({
+        "Pathfinder's Cap", Rarity::Legendary, ArmorType::Leather, ArmorPiece::Helmet,
+        14, 0, {{ElementType::Poison, 8}}, 0,
+        "Treant King", 16,
+        ItemPassive::Dodge20, ItemPassive::CritChance20
+    });
+
+    // Wyrmhide Jerkin — Leather Chest (drops from Elder Dragon)
+    s_armor.push_back({
+        "Wyrmhide Jerkin", Rarity::Legendary, ArmorType::Leather, ArmorPiece::Chest,
+        20, 0, {{ElementType::Fire, 6}}, 0,
+        "Elder Dragon", 16,
+        ItemPassive::PhysDmgBoost15, ItemPassive::Dodge15
+    });
+
+    // Shadowstalker Grips — Leather Gloves (drops from Seraphim Council)
+    s_armor.push_back({
+        "Shadowstalker Grips", Rarity::Legendary, ArmorType::Leather, ArmorPiece::Gloves,
+        12, 0, {{ElementType::Physical, 5}}, 0,
+        "Seraphim Council", 16,
+        ItemPassive::CritChance20, ItemPassive::PoisonDmgPlus25
+    });
+
+    // Galewalkers — Leather Boots (drops from Chronos, the Time Ender)
+    s_armor.push_back({
+        "Galewalkers", Rarity::Legendary, ArmorType::Leather, ArmorPiece::Boots,
+        10, 0, {{ElementType::Lightning, 5}}, 0,
+        "Chronos, the Time Ender", -1,
+        ItemPassive::Dodge20, ItemPassive::AtkSpeed20
+    });
+
+    // === ACCESSORIES (2) ===
+
+    // Ranger's Focus — Ring (drops from Farm Overseer)
+    s_accessories.push_back({
+        "Ranger's Focus", Rarity::Legendary,
+        40, 0, 15, 0, ElementType::Physical, 10, 0,
+        "Farm Overseer", -1,
+        ItemPassive::CritChance30, ItemPassive::PhysDmgBoost20
+    });
+
+    // Pendant of the Hunt — Amulet (drops from Arcane Construct)
+    s_accessories.push_back({
+        "Pendant of the Hunt", Rarity::Legendary,
+        55, 0, 20, 0, ElementType::Poison, 15, 0,
+        "Arcane Construct", -1,
+        ItemPassive::AtkSpeed20, ItemPassive::CritChance20
+    });
+}
+
+// ---- Archer Epic Items ----
+
+void UniqueItemRegistry::RegisterArcherEpics()
+{
+    // ================================================================
+    // ARCHER EPICS (~10 items) — Mid-game enemy drops
+    // Theme: crit, speed, poison, physical damage, mobility
+    // ================================================================
+
+    // === WEAPONS (4) ===
+
+    // Gloomflight Bow — Bow (drops from Shadow)
+    s_weapons.push_back({
+        "Gloomflight Bow", Rarity::Epic, WeaponType::Bow,
+        48, 3, 12, ElementType::Arcane, 8, 1,
+        "Shadow", -1,
+        ItemPassive::CritChance20, ItemPassive::None
+    });
+
+    // Wolf's Bane — Dagger (drops from Wolf)
+    s_weapons.push_back({
+        "Wolf's Bane", Rarity::Epic, WeaponType::Dagger,
+        42, 3, 8, ElementType::Physical, 5, 1,
+        "Wolf", -1,
+        ItemPassive::PhysDmgBoost15, ItemPassive::None
+    });
+
+    // Spider Silk Longbow — Bow (drops from Giant Spider)
+    s_weapons.push_back({
+        "Spider Silk Longbow", Rarity::Epic, WeaponType::Bow,
+        50, 3, 15, ElementType::Poison, 10, 1,
+        "Giant Spider", -1,
+        ItemPassive::AtkSpeed20, ItemPassive::None
+    });
+
+    // Orc-Slayer Dagger — Dagger (drops from Orc)
+    s_weapons.push_back({
+        "Orc-Slayer Dagger", Rarity::Epic, WeaponType::Dagger,
+        45, 3, 10, ElementType::Physical, 6, 1,
+        "Orc", -1,
+        ItemPassive::PhysDmgLowHp30, ItemPassive::None
+    });
+
+    // === ARMOR (4) ===
+
+    // Shadowhide Cowl — Leather Helmet (drops from Dark Elf Scout)
+    s_armor.push_back({
+        "Shadowhide Cowl", Rarity::Epic, ArmorType::Leather, ArmorPiece::Helmet,
+        10, 2, {{ElementType::Poison, 4}}, 1,
+        "Dark Elf Scout", -1,
+        ItemPassive::Dodge15, ItemPassive::None
+    });
+
+    // Spiderweave Vest — Leather Chest (drops from Giant Spider)
+    s_armor.push_back({
+        "Spiderweave Vest", Rarity::Epic, ArmorType::Leather, ArmorPiece::Chest,
+        14, 2, {{ElementType::Poison, 5}}, 1,
+        "Giant Spider", -1,
+        ItemPassive::DamageReduce10, ItemPassive::None
+    });
+
+    // Wraith-Touched Grips — Leather Gloves (drops from Wraith)
+    s_armor.push_back({
+        "Wraith-Touched Grips", Rarity::Epic, ArmorType::Leather, ArmorPiece::Gloves,
+        9, 2, {{ElementType::Arcane, 4}}, 1,
+        "Wraith", -1,
+        ItemPassive::CritChance20, ItemPassive::None
+    });
+
+    // Siren's Whisper Boots — Leather Boots (drops from Siren)
+    s_armor.push_back({
+        "Siren's Whisper Boots", Rarity::Epic, ArmorType::Leather, ArmorPiece::Boots,
+        8, 2, {{ElementType::Ice, 3}}, 1,
+        "Siren", -1,
+        ItemPassive::HealOnKill10, ItemPassive::Dodge15
+    });
+
+    // === ACCESSORIES (2) ===
+
+    // Highland Hunter's Ring — Ring (drops from Highland Warrior)
+    s_accessories.push_back({
+        "Highland Hunter's Ring", Rarity::Epic,
+        25, 5, 10, 2, ElementType::Physical, 6, 1,
+        "Highland Warrior", -1,
+        ItemPassive::PhysDmgBoost15, ItemPassive::None
+    });
+
+    // Drake-Eye Pendant — Amulet (drops from Drake)
+    s_accessories.push_back({
+        "Drake-Eye Pendant", Rarity::Epic,
+        30, 5, 15, 2, ElementType::Fire, 8, 1,
+        "Drake", -1,
+        ItemPassive::CritChance20, ItemPassive::AtkSpeed20
     });
 }
 
