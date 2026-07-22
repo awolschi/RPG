@@ -278,6 +278,8 @@ CMakeFiles/rpg.dir/Engine/Game.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Resources/Resources.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Uniques/UniqueItems.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Uniques/../Item.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/SummoningItem.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/../Characters/Monster.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Enemies/Enemies.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../World/Enemies/../../Characters/Monster.hpp \
  /usr/include/c++/10/algorithm \

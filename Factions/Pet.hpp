@@ -12,8 +12,29 @@ enum class PetSource
 {
     FactionLegend,
     BossDrop,
+    CitadelDrop,
     PetCount
 };
+
+enum class PetRarity : int
+{
+    Common   = 0,
+    Rare     = 1,
+    Epic     = 2,
+    Legendary = 3
+};
+
+inline const char* PetRarityName(PetRarity r)
+{
+    switch (r)
+    {
+        case PetRarity::Common:    return "Common";
+        case PetRarity::Rare:      return "Rare";
+        case PetRarity::Epic:      return "Epic";
+        case PetRarity::Legendary: return "Legendary";
+    }
+    return "Unknown";
+}
 
 struct Pet
 {
@@ -23,6 +44,9 @@ struct Pet
     ElementType element;
     int baseAttack;
     int reqLevel;
+
+    // Rarity
+    PetRarity rarity = PetRarity::Common;
 
     // Passive bonuses (base values, scale with pet level)
     float xpBonus = 0.0f;
@@ -42,11 +66,13 @@ struct Pet
     static int CalculateRequiredXP(int level);
 
     // Evolution
-    int evolutionTier = 0;  // 0=base, 1=evolved, 2=ascended
+    int evolutionTier = 0;  // 0=base, 1=evolved, 2=ascended, 3=mythic
     std::string evolvedName;
     std::string ascendedName;
+    std::string mythicName;
     static constexpr int EVOLVE_LEVEL = 15;
     static constexpr int ASCEND_LEVEL = 30;
+    static constexpr int MYTHIC_LEVEL = 40;
 
     // Special ability (unlocked at evolution tier 1+)
     EffectType specialAbility = EffectType::None;
@@ -59,6 +85,7 @@ struct Pet
         float evoMult = 1.0f;
         if (evolutionTier == 1) evoMult = 1.4f;
         else if (evolutionTier == 2) evoMult = 2.0f;
+        else if (evolutionTier == 3) evoMult = 3.0f;
         return evoMult * (1.0f + (level - 1) * 0.03f);
     }
 
@@ -78,9 +105,11 @@ struct Pet
     bool CanEvolve() const { return CanEvolveNow(); }
     bool CanEvolveNow() const { return obtained && evolutionTier == 0 && level >= EVOLVE_LEVEL; }
     bool CanAscendNow() const { return obtained && evolutionTier == 1 && level >= ASCEND_LEVEL; }
+    bool CanMythicNow() const { return obtained && evolutionTier == 2 && level >= MYTHIC_LEVEL; }
 
     std::string GetCurrentName() const
     {
+        if (evolutionTier == 3 && !mythicName.empty()) return mythicName;
         if (evolutionTier == 2 && !ascendedName.empty()) return ascendedName;
         if (evolutionTier == 1 && !evolvedName.empty()) return evolvedName;
         return name;
@@ -88,6 +117,7 @@ struct Pet
 
     std::string GetEvolutionLabel() const
     {
+        if (evolutionTier == 3) return "Mythic";
         if (evolutionTier == 2) return "Ascended";
         if (evolutionTier == 1) return "Evolved";
         return "Base";
@@ -178,6 +208,9 @@ public:
 
     std::string GetFactionLegendPetID(FactionID faction) const;
     std::string RollBossDropPet(int bossLevel, const std::string& bossName) const;
+    int GetEquippedPetSlot() const;
+    float GetBossDamageReduction() const;
+    float GetBossXPBonus() const;
 
     std::string Serialize() const;
     void Deserialize(const std::string& data);
@@ -195,6 +228,7 @@ private:
                           const std::string& evolvedName,
                           const std::string& ascendedName,
                           EffectType ability, float potencyMult, int baseDuration);
+    void SetMythicEvolutionData(const std::string& id, const std::string& mythicName);
 
     void AddFactionPet(FactionID faction, const std::string& id, const std::string& name,
                        const std::string& desc, ElementType element, int baseAtk,
@@ -207,6 +241,12 @@ private:
                     float critDamage, float dmgBonus, float defBonus,
                     float hpBonus, float mpBonus, int healOnKill,
                     const std::string& bossName);
+    void AddCitadelPet(const std::string& id, const std::string& name,
+                       const std::string& desc, ElementType element, int baseAtk,
+                       int reqLevel, float xpBonus, float goldFind, float critChance,
+                       float critDamage, float dmgBonus, float defBonus,
+                       float hpBonus, float mpBonus, int healOnKill,
+                       const std::string& bossName, PetRarity rarity);
 };
 
 #endif

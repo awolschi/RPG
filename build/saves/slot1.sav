@@ -1,53 +1,83 @@
-SAVE_VERSION 13
+SAVE_VERSION 14
 Kowalle
 0
 0
-17 304
-520 97
-390 52 62 44 1 2 20 41
-18 137609
-1|1|Straw-Filled Vest|5|250|-1|17|0|A|0|1|15|1|2|3|6
+50 0
+1136 183
+885 118 161 110 1 2 53 107
+35 6892111
 1|2|Gilded Signet|5|10|12|0|0|AC|80|40|4|10|6
-2|2|Ring of the Harvest|5|250|-1|51|0|AC|40|20|0|0|6
+1|2|Ring of the Harvest|5|250|-1|51|0|AC|40|20|0|0|6
 5|5|Treant Heart|4|20|-1|0|0|R|4|0|0|0|1
-1|1|Mantle of the Wild|5|250|1|13|0|A|0|1|16|1|1|10|16
-6|5|Copper Ore|1|5|-1|0|0|R|1|0|0|0|1
-7|5|Wood|1|4|-1|0|0|R|1|0|0|0|1
-1|5|Rare Wood|2|12|-1|0|0|R|2|0|0|0|1
-6|5|Raw Fish|1|6|-1|0|0|R|1|0|20|0|1
-4|5|Rare Raw Fish|2|18|-1|0|0|R|2|0|0|0|1
-6|5|Simple Ingot|1|8|-1|0|0|R|1|0|0|0|1
-4|5|Rare Simple Ingot|2|24|-1|0|0|R|2|0|0|0|1
-1|5|Rare Copper Ore|2|15|-1|0|0|R|2|0|0|0|1
-1|5|Wolf Pelt|2|10|-1|0|0|R|2|0|0|0|1
-1|5|Ancient Bark|2|10|-1|0|0|R|2|0|0|0|1
-4|5|Elf Arrow|2|10|-1|0|0|R|2|0|0|0|1
-1|0|Frostbite|3|10|-1|0|0|W|87|27|2|21|16
-1|2|Amulet of Balance|3|10|-1|0|0|AC|30|21|0|0|16
-1|0|Overseer's Cleaver|5|10|-1|6|0|W|55|5|0|0|1
-none
-1|1|Dragon Helm|3|10|-1|0|0|A|1|0|12|0|6
-1|1|Titan Chestplate|3|10|-1|0|0|A|1|1|12|1|6|5|6
-1|1|Gauntlets of Power|3|10|-1|0|0|A|1|2|9|0|1
-1|1|Guardian Legplates|3|10|-1|0|0|A|1|3|12|1|3|3|6
-1|1|Smuggler's Leather Boots|4|10|-1|51|15|A|1|4|10|1|5|6|11
+1|2|Circlet of Withered Dreams|4|100|-1|0|0|AC|50|82|4|18|16
+1|2|Elemental Loop|4|10|-1|0|0|AC|70|60|1|15|21
+1|2|Arcane Core|4|10|-1|0|0|AC|23|85|0|0|21
+1|2|Elemental Loop|4|10|-1|0|0|AC|80|68|5|17|26
+22|5|Kraken Ink|5|25|-1|0|0|R|5|0|0|0|1
+1|2|Ring of the Penitent|4|100|-1|31|0|AC|55|88|6|20|26
+1|1|Barkheart Chestguard|5|10|1|18|0|A|2|1|25|1|2|6|16
+2|1|Bulwark Plate|5|250|14|18|20|A|2|1|30|1|0|10|26
+1|2|Elemental Loop|4|10|-1|0|0|AC|90|76|5|16|31
+16|5|Dragon Heart|6|30|-1|0|0|R|6|0|0|0|1
+10|5|Golem Core|4|20|-1|0|0|R|4|0|0|0|1
+4|5|Orc Tusk|4|20|-1|0|0|R|4|0|0|0|1
+7|5|Drake Scale|4|20|-1|0|0|R|4|0|0|0|1
+4|5|Fire Essence|4|20|-1|0|0|R|4|0|0|0|1
+4|5|Harpy Feather|4|20|-1|0|0|R|4|0|0|0|1
+1|0|Fang of the Elder|5|250|3|10|0|W|150|10|1|30|36
+1|2|Arcane Core|4|10|-1|0|0|AC|33|109|0|0|36
+1|1|Wyrmhide Jerkin|5|250|16|6|15|A|1|1|20|1|1|6|36
+1|2|Seal of Power|4|10|-1|0|0|AC|110|84|0|0|36
+2|1|Dragonhide Helm|5|250|3|18|0|A|2|0|28|1|1|15|36
+1|2|Ranger's Focus|5|10|-1|10|7|AC|40|15|0|10|6
+2|5|Phantom Shard|5|25|-1|0|0|R|5|0|0|0|1
+1|5|Earth Essence|5|25|-1|0|0|R|5|0|0|0|1
+1|5|Gryphon Plume|5|25|-1|0|0|R|5|0|0|0|1
+1|5|Warlord Crest|7|35|-1|0|0|R|7|0|0|0|1
+3|5|Arcane Crystal|9|45|-1|0|0|R|9|0|0|0|1
+2|5|Arcane Fragment|9|45|-1|0|0|R|9|0|0|0|1
+3|5|Mana Crystal|9|45|-1|0|0|R|9|0|0|0|1
+1|5|Seraphim Tear|7|35|-1|0|0|R|7|0|0|0|1
+1|5|Light Essence|7|35|-1|0|0|R|7|0|0|0|1
+1|5|Seraph Crown|9|45|-1|0|0|R|9|0|0|0|1
+1|1|Bullion Greaves|5|10|-1|21|51|A|2|4|14|1|2|6|31
+1|0|Plaguebringer's Scythe|4|10|-1|0|0|W|307|55|5|69|41
+1|0|Soulreaver|4|10|-1|0|0|W|340|55|1|73|46
+1|1|Titan's Helm|4|10|-1|0|0|A|2|0|48|1|6|13|46
+1|1|Scales of the Eternal|5|10|3|20|0|A|2|1|35|2|1|10|2|5|31
+1|1|Titan's Gauntlets|4|10|-1|0|0|A|2|2|40|2|1|11|6|11|36
+1|1|Shadow Stalker Leggings|4|10|-1|0|0|A|1|3|36|2|3|9|5|10|31
+1|1|Boots of Swiftness|3|10|-1|0|0|A|2|4|36|1|5|14|46
 1|2|Pendant of the Landlord|5|10|-1|50|0|AC|30|15|0|0|6
 1|2|Ranger's Focus|5|10|-1|10|7|AC|40|15|0|10|6
-1|2|Ranger's Focus|5|10|-1|10|7|AC|40|15|0|10|6
-13
-Attack|2|109|0|29|1|6|0|0|0|0|0|0
-Power Strike|1|4|0|60|0|6|0|0|0|0|0|0
-Whirlwind|1|0|0|50|0|6|0|0|0|0|0|0
-Defensive Stance|1|0|0|0|0|6|0|0|0|0|0|0
-War Cry|1|0|0|0|0|6|0|0|0|0|0|0
-Shield Bash|1|0|0|80|0|6|0|0|0|0|0|0
-Cleave|1|0|0|45|0|6|0|0|0|0|0|0
-Shield Wall|1|0|0|0|0|6|0|0|0|0|0|0
-Rallying Cry|1|0|0|0|0|6|0|0|0|0|0|0
-Hammer Slam|1|0|0|70|0|6|0|0|0|0|0|0
-Victory Rush|1|0|0|50|0|6|0|0|0|0|0|0
-Charge|1|0|0|65|0|6|0|0|0|0|0|0
-Cleave Strike|1|0|0|75|0|6|0|0|0|0|0|0
+1|2|Ring of the Broodmother|5|10|-1|49|0|AC|70|35|1|20|36
+26
+Attack|5|72|0|42|4|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Power Strike|1|15|0|60|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Whirlwind|1|0|0|50|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Defensive Stance|1|0|0|0|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+War Cry|1|0|0|0|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Shield Bash|1|0|0|80|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Battle Cry|1|0|0|0|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Cleave|1|0|0|45|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Shield Wall|1|0|0|0|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Rallying Cry|1|0|0|0|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Hammer Slam|1|0|0|70|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Victory Rush|1|0|0|50|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Charge|1|0|0|65|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Cleave Strike|1|0|0|75|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Intimidate|1|0|0|0|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Berserker Rage|1|0|0|90|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Intercept|1|0|0|80|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Fortress|1|0|0|0|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Shield Charge|1|0|0|95|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Execute|1|0|0|180|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Devastate|1|0|0|120|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Warbanner|1|0|0|0|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Colossus Strike|1|0|0|140|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Rampage|1|0|0|160|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+War Stomp|1|0|0|120|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+Titan's Grip|1|0|0|250|0|6|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
 4
 Power Strike
 Whirlwind
@@ -55,16 +85,16 @@ Cleave
 Defensive Stance
 0
 4
-0 1 72 0 0 0 12
+0 1 72 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-1 1 99 0 0 0 14
+1 1 99 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-2 1 72 0 0 0 12
+2 1 72 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-3 1 72 0 0 0 12
+3 1 72 0 0 0 0
 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-1
+6
 0
 0
 0
@@ -102,7 +132,10 @@ Citadel Siege|2|Storm The Citadel and face the corrupted knights within.|The Cit
 Abyssal Victory|2|The Abyssal Depths test even the strongest. Survive and emerge triumphant.|Abyssal Depths|1|0|1500|750|0|0|
 Heavenly Ascent|2|The Heavenly Ascent challenges body and spirit. Ascend to glory.|The Heavenly Ascent|1|0|3000|1500|0|0|
 Void Conqueror|2|The Endless Void consumes all who enter. Be the one who conquers it.|The Endless Void|1|0|5000|2500|0|0|
-24|combat_boss_1,1,1,1|combat_boss_10,10,1,1|combat_boss_5,5,1,1|combat_first_kill,1,1,1|combat_kills_10,10,1,1|combat_kills_100,100,1,1|combat_kills_1000,161,0,0|combat_kills_50,50,1,1|combat_kills_500,161,0,0|explore_3_areas,2,0,0|explore_6_areas,2,0,0|explore_all_areas,2,0,0|gold_1000,1000,1,1|gold_10000,10000,1,1|gold_100000,100000,1,1|job_hours_100,24,0,0|job_hours_1000,24,0,0|job_hours_500,24,0,0|level_10,0,0,0|level_25,0,0,0|level_50,0,0,0|social_sell_100,91,0,0|social_sell_1000,91,0,0|social_sell_500,91,0,0 0000
-0:1590:5:1590;1:460:2:460;2:0:0:0;3:0:0:0;4:0:0:0;5:0:0:0;6:0:0:0;7:0:0:0;8:0:0:0;9:0:0:0;
-ember_sentinel:1:0:1:0:0;frost_wisp:0:0:1:0:0;storm_tide:0:0:1:0:0;arcane_drake:0:0:1:0:0;venom_shard:0:0:1:0:0;inferno_guardian:0:0:1:0:0;celestial_spark:0:0:1:0:0;void_mote:0:0:1:0:0;mana_weaver:0:0:1:0:0;chrono_spark:0:0:1:0:0;goblin_familiar:1:1:16:308:1;treant_sapling:0:0:1:0:0;kraken_ink:0:0:1:0:0;dragon_whelp:0:0:1:0:0;warlord_banner:0:0:1:0:0;void_shard:0:0:1:0:0;seraph_feather:0:0:1:0:0;primordial_heart:0:0:1:0:0;construct_core:0:0:1:0:0;chrono_fragment:0:0:1:0:0;
-Angry Chicken,Bandit,Dark Elf Scout,Farm Overseer,Feral Boar,Giant Spider,Rat,Slime,Treant,Treant King,Wolf,Wraith;Ember Sentinel,Goblin Familiar,ember_sentinel,goblin_familiar;Amulet of Balance,Ancient Bark,Apprentice Wand,Arcane Signet,Band of Fortitude,Bandit Mask,Boar Tusk,Boots of Swiftness,Doomhammer,Dragon Helm,Ectoplasm,Elemental Loop,Elf Arrow,Ember Ring,Enchanted Blade,Farm Key,Feather,Flamebrand,Frost Pendant,Frostbite,Gauntlets of Power,Gilded Signet,Guardian Legplates,Inferno Axe,Iron Sword,Leather Chest,Leather Gloves,Leather Helmet,Leather Pants,Legendary Sword,Mantle of the Wild,Mithril Mace,Orb of Focus,Overseer's Cleaver,Pendant of Wisdom,Pendant of the Landlord,Ranger's Focus,Rat Tail,Refreshing Draft,Reinforced Chest,Ring of the Harvest,Runed Greatsword,Slime Gel,Smuggler's Leather Boots,Soul Reaper,Spider Silk,Steel Axe,Straw-Filled Vest,Tears of Eluna,Thunderstrike,Thunderstrike Hammer,Titan Chestplate,Treant Heart,Venom Band,Voidreaver,Wolf Pelt,Wooden Staff
+26|combat_boss_1,1,1,1|combat_boss_10,10,1,1|combat_boss_5,5,1,1|combat_first_kill,1,1,1|combat_kills_10,10,1,1|combat_kills_100,100,1,1|combat_kills_1000,637,0,0|combat_kills_50,50,1,1|combat_kills_500,500,1,1|explore_3_areas,3,1,1|explore_6_areas,6,1,1|explore_all_areas,10,1,1|gold_1000,1000,1,1|gold_10000,10000,1,1|gold_100000,100000,1,1|job_hours_100,24,0,0|job_hours_1000,24,0,0|job_hours_500,24,0,0|level_10,0,0,0|level_25,0,0,0|level_50,0,0,0|social_sell_100,100,1,1|social_sell_1000,317,0,0|social_sell_500,317,0,0|social_shop_200,1,0,0|social_shop_50,1,0,0 0000
+0:1590:5:1590;1:2649:5:2649;2:1911:5:1911;3:1633:5:1633;4:84:0:84;5:0:0:0;6:91:0:91;7:0:0:0;8:27:0:27;9:0:0:0;10:0:0:0;11:0:0:0;12:0:0:0;13:0:0:0;14:0:0:0;15:0:0:0;16:0:0:0;17:0:0:0;18:0:0:0;19:0:0:0;
+ember_sentinel:1:0:1:0:0:0;frost_wisp:1:0:1:0:0:0;storm_tide:1:0:1:0:0:0;arcane_drake:1:0:1:0:0:0;venom_shard:0:0:1:0:0:0;inferno_guardian:0:0:1:0:0:0;celestial_spark:0:0:1:0:0:0;void_mote:0:0:1:0:0:0;mana_weaver:0:0:1:0:0:0;chrono_spark:0:0:1:0:0:0;goblin_familiar:1:0:50:0:3:0;treant_sapling:1:0:50:0:3:0;kraken_ink:1:0:1:0:0:0;dragon_whelp:1:1:50:0:3:0;warlord_banner:0:0:1:0:0:0;void_shard:0:0:1:0:0:0;seraph_feather:0:0:1:0:0:0;primordial_heart:0:0:1:0:0:0;construct_core:0:0:1:0:0:0;chrono_fragment:0:0:1:0:0:0;shadowfang_relic:0:0:1:0:0:3;flamecrown_shard:0:0:1:0:0:3;abyssal_crown:0:0:1:0:0:3;tempest_core:0:0:1:0:0:3;rotbloom_heart:0:0:1:0:0:3;seraph_halo:0:0:1:0:0:3;verdant_serpent:0:0:1:0:0:3;warlords_bloodstone:0:0:1:0:0:3;voidheart_gem:0:0:1:0:0:3;chronos_hourglass:0:0:1:0:0:3;
+Angry Chicken,Aran Warlord,Arcane Guardian,Astral Mage,Bandit,Celestial Knight,Crystal Elemental,Dark Elf Scout,Drake,Earth Elemental,Elder Dragon,Farm Overseer,Feral Boar,Fire Elemental,Giant Crab,Giant Spider,Gryphon,Harpy,Highland Warrior,Kraken,Light Elemental,Mana Wisp,Orc,Phantom,Pirate,Rat,Sea Serpent,Seraphim,Seraphim Council,Siren,Slime,Spellblade,Stone Golem,Treant,Treant King,Wolf,Wraith;Arcane Drake,Dragon Whelp,Ember Sentinel,Frost Wisp,Goblin Familiar,Kraken Ink,Storm Tide,Treant Sapling,arcane_drake,dragon_whelp,ember_sentinel,frost_wisp,goblin_familiar,kraken_ink,storm_tide,treant_sapling;Amulet of Balance,Amulet of the Sage,Ancient Bark,Apprentice Wand,Arcane Core,Arcane Crystal,Arcane Fragment,Arcane Signet,Band of Fortitude,Bandit Mask,Barkheart Chestguard,Boar Tusk,Boots of Swiftness,Bullion Greaves,Bulwark Plate,Censer of the Lost,Circlet of Withered Dreams,Copper Ore,Crab Shell,Dagger,Doomhammer,Doubloon,Dragon Heart,Dragon Helm,Dragonhide Helm,Drake Scale,Drakebone Hammer,Earth Essence,Ectoplasm,Elemental Loop,Elf Arrow,Ember Ring,Enchanted Blade,Fang of the Elder,Farm Key,Feather,Fire Essence,Flamebrand,Frost Pendant,Frostbite,Gauntlets of Power,Gilded Signet,Glacial Halberd,Golem Core,Gryphon Plume,Guardian Legplates,Harpy Feather,Hoardseeker's Bow,Inferno Axe,Inferno Greatsword,Inkshot Longbow,Iron Sword,Kraken Ink,Leather Boots,Leather Chest,Leather Gloves,Leather Helmet,Leather Pants,Legendary Sword,Light Essence,Living Root Bow,Mana Crystal,Mana Potion,Mantle of the Wild,Minor Health Potion,Minor Mana Potion,Mithril Mace,Orb of Focus,Orc Tusk,Overseer's Cleaver,Pathfinder's Cap,Pendant of Wisdom,Pendant of the Landlord,Phantom Shard,Plaguebringer's Scythe,Plate Boots,Plate Leggings,Ranger's Focus,Rare Copper Ore,Rare Raw Fish,Rare Simple Ingot,Rare Wood,Rat Tail,Raw Fish,Refreshing Draft,Reinforced Boots,Reinforced Chest,Reinforced Helm,Reinforced Pants,Ring of Health,Ring of Living Wood,Ring of Mana,Ring of Spellpower,Ring of the Broodmother,Ring of the Harvest,Ring of the Penitent,Runed Greatsword,Scales of the Eternal,Seal of Power,Seedkeeper Boots,Seraph Crown,Seraphim Tear,Serpent Scale,Shadow Stalker Leggings,Simple Ingot,Siren Crystal,Slime Gel,Smuggler's Leather Boots,Soul Reaper,Soulreaver,Spellbook,Spider Silk,Steel Axe,Storm Amulet,Stormcaller's Hammer,Stormweaver's Focus,Straw-Filled Vest,Tears of Eluna,Thunderfury,Thunderstrike,Thunderstrike Hammer,Tide-Sworn Robes,Titan Chestplate,Titan's Gauntlets,Titan's Greaves,Titan's Helm,Titan's Plate,Treads of the Pilgrim,Treant Heart,Venom Band,Voidreaver,Warlord Crest,Wolf Pelt,Wood,Wooden Staff,Wraith-Touched Grips,Wyrmhide Jerkin
+0
+0 0 0 0 0 0 0 0 0 0 
+0

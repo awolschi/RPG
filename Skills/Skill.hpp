@@ -104,6 +104,26 @@ public:
     int requiredLevel;
     int skillPoints = 0;
     std::vector<SkillUpgrade> upgrades;
+
+    // Mastery system (unlocked at skill level 50)
+    static constexpr int MASTERY_LEVEL_CAP = 20;
+    static constexpr int MASTERY_TREE_BRANCHES = 3;
+    static constexpr int MASTERY_NODES_PER_BRANCH = 5;
+    int masteryXP = 0;
+    int masteryLevel = 0;
+    int masteryPoints = 0;
+    bool masteryNodes[MASTERY_TREE_BRANCHES][MASTERY_NODES_PER_BRANCH] = {};
+    int GetMasteryXPToLevel() const;
+    void GainMasteryXP(int xp);
+    void MasteryLevelUp();
+    bool CanUnlockMasteryNode(int branch, int node) const;
+    bool UnlockMasteryNode(int branch, int node);
+
+    // Mastery node bonuses
+    int GetMasteryDamageBonus() const;
+    int GetMasteryCooldownReduction() const;
+    int GetMasteryManaCostReduction() const;
+    int GetMasteryXPGainBonus() const;
 };
 
 #endif

@@ -14,7 +14,8 @@ enum class ItemType
     Consumable,
     QuestItem,
     Resource,
-    Offhand
+    Offhand,
+    Summoning
 };
 
 enum class Rarity : int

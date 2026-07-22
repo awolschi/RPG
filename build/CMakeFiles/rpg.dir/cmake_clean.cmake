@@ -61,6 +61,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.o.d"
   "CMakeFiles/rpg.dir/Items/SetBonuses.cpp.o"
   "CMakeFiles/rpg.dir/Items/SetBonuses.cpp.o.d"
+  "CMakeFiles/rpg.dir/Items/SummoningItems.cpp.o"
+  "CMakeFiles/rpg.dir/Items/SummoningItems.cpp.o.d"
   "CMakeFiles/rpg.dir/Items/Uniques/UniqueItems.cpp.o"
   "CMakeFiles/rpg.dir/Items/Uniques/UniqueItems.cpp.o.d"
   "CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.o"

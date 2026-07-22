@@ -45,6 +45,7 @@ set(SOURCES
     Items/Uniques/UniqueItems.cpp
     Items/Passives.cpp
     Items/SetBonuses.cpp
+    Items/SummoningItems.cpp
 
     # Engine
     Engine/Game.cpp

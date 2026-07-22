@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "../Skills/CommonSkills/CommonAttack.hpp"
 #include "../Items/Consumable.hpp"
+#include "../Items/SummoningItem.hpp"
 #include "../Items/Resources/Resources.hpp"
 
 static int SafeStoi(const std::string& s, int fallback = 0)
@@ -47,6 +48,8 @@ static void SerializeItem(std::ostream& file, const std::shared_ptr<Item>& item,
             file << "|C|" << c->healAmount << "|" << c->manaAmount;
         else if (auto r = std::dynamic_pointer_cast<Resource>(item))
             file << "|R|" << r->tier << "|" << static_cast<int>(r->quality) << "|" << r->healAmount << "|" << r->manaAmount;
+        else if (auto s = std::dynamic_pointer_cast<SummoningItem>(item))
+            file << "|S|" << s->bossName;
     }
     file << "|" << item->requiredLevel << "\n";
 }
@@ -151,6 +154,12 @@ static std::shared_ptr<Item> DeserializeItem(std::istringstream& ss, int saveVer
         r->sellValue = sellVal;
         item = r;
     }
+    else if (subType == "S")
+    {
+        std::string bossName;
+        std::getline(ss, bossName, '|');
+        item = SummoningRegistry::Create(iname);
+    }
     else if (static_cast<ItemType>(SafeStoi(typeStr)) == ItemType::Resource)
     {
         auto r = std::make_shared<Resource>(iname, SafeStoi(typeStr), sellVal);
@@ -193,7 +202,7 @@ std::string SaveGameManager::SlotPath(int slot) const
     return saveDirectory + "slot" + std::to_string(slot) + ".sav";
 }
 
-bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, int areaIndex, const ReligionSystem& religion, const AchievementSystem& achievements, const ReputationSystem& reputation, const PetManager& pets, const Wiki& wiki)
+bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, int areaIndex, const ReligionSystem& religion, const AchievementSystem& achievements, const ReputationSystem& reputation, const PetManager& pets, const Wiki& wiki, bool chronosDefeated, const int* citadelBossKillCounts, uint32_t legendaryRecipesUnlocked)
 {
     if (!player) return false;
     if (slot < 1 || slot > SLOT_COUNT) return false;
@@ -247,6 +256,10 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
                      << sk->skillPoints << "|" << sk->upgrades.size();
                 for (const auto& up : sk->upgrades)
                     file << "|" << (up.unlocked ? "1" : "0");
+                file << "|" << sk->masteryXP << "|" << sk->masteryLevel << "|" << sk->masteryPoints;
+                for (int b = 0; b < Skill::MASTERY_TREE_BRANCHES; ++b)
+                    for (int n = 0; n < Skill::MASTERY_NODES_PER_BRANCH; ++n)
+                        file << "|" << (sk->masteryNodes[b][n] ? "1" : "0");
                 file << "\n";
             }
         }
@@ -318,6 +331,17 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
         // Wiki discovery state (v10+)
         file << wiki.Serialize() << "\n";
 
+        // Endgame unlock (v14+)
+        file << (chronosDefeated ? "1" : "0") << "\n";
+
+        // Citadel boss kill counts (v14+)
+        for (int i = 0; i < 10; ++i)
+            file << citadelBossKillCounts[i] << " ";
+        file << "\n";
+
+        // Legendary recipes unlocked bitmask (v14+)
+        file << legendaryRecipesUnlocked << "\n";
+
         file.close();
         return true;
     }
@@ -328,7 +352,7 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
     }
 }
 
-std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, ReligionSystem& outReligion, AchievementSystem& outAchievements, ReputationSystem& outReputation, PetManager& outPets, Wiki& outWiki)
+std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, ReligionSystem& outReligion, AchievementSystem& outAchievements, ReputationSystem& outReputation, PetManager& outPets, Wiki& outWiki, bool& outChronosDefeated, int* outCitadelBossKillCounts, uint32_t& outLegendaryRecipesUnlocked)
 {
     if (slot < 1 || slot > SLOT_COUNT) return nullptr;
 
@@ -490,7 +514,10 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
         size_t skillCount;
         file >> skillCount; file.ignore();
 
-        struct SavedSkillData { std::string name; int level, xp, cd, dmg, pts; std::vector<bool> unlocked; };
+        struct SavedSkillData { std::string name; int level, xp, cd, dmg, pts; std::vector<bool> unlocked;
+            int masteryXP = 0, masteryLevel = 0, masteryPoints = 0;
+            bool masteryNodes[Skill::MASTERY_TREE_BRANCHES][Skill::MASTERY_NODES_PER_BRANCH] = {};
+        };
         std::vector<SavedSkillData> savedSkills;
         for (size_t i = 0; i < skillCount; ++i)
         {
@@ -531,6 +558,26 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
             {
                 sd.pts = 0;
             }
+
+            // Mastery data (v14+)
+            if (saveVersion >= 14)
+            {
+                std::string mxpStr, mlvStr, mptStr;
+                if (std::getline(ss, mxpStr, '|') && !mxpStr.empty())
+                    sd.masteryXP = SafeStoi(mxpStr);
+                if (std::getline(ss, mlvStr, '|') && !mlvStr.empty())
+                    sd.masteryLevel = SafeStoi(mlvStr);
+                if (std::getline(ss, mptStr, '|') && !mptStr.empty())
+                    sd.masteryPoints = SafeStoi(mptStr);
+                for (int b = 0; b < Skill::MASTERY_TREE_BRANCHES; ++b)
+                    for (int n = 0; n < Skill::MASTERY_NODES_PER_BRANCH; ++n)
+                    {
+                        std::string nstr;
+                        if (std::getline(ss, nstr, '|'))
+                            sd.masteryNodes[b][n] = (nstr == "1");
+                    }
+            }
+
             savedSkills.push_back(sd);
         }
 
@@ -546,6 +593,12 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 sk->skillPoints = sd.pts;
                 for (size_t u = 0; u < sd.unlocked.size() && u < sk->upgrades.size(); ++u)
                     sk->upgrades[u].unlocked = sd.unlocked[u];
+                sk->masteryXP = sd.masteryXP;
+                sk->masteryLevel = sd.masteryLevel;
+                sk->masteryPoints = sd.masteryPoints;
+                for (int b = 0; b < Skill::MASTERY_TREE_BRANCHES; ++b)
+                    for (int n = 0; n < Skill::MASTERY_NODES_PER_BRANCH; ++n)
+                        sk->masteryNodes[b][n] = sd.masteryNodes[b][n];
             }
         }
 
@@ -734,6 +787,30 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 std::string wikiData;
                 std::getline(file, wikiData);
                 outWiki.Deserialize(wikiData);
+            }
+
+            // Endgame unlock (v14+)
+            if (saveVersion >= 14)
+            {
+                std::string chronoData;
+                std::getline(file, chronoData);
+                outChronosDefeated = (chronoData == "1");
+
+                // Citadel boss kill counts
+                for (int i = 0; i < 10; ++i)
+                    file >> outCitadelBossKillCounts[i];
+                file.ignore();
+
+                // Legendary recipes unlocked bitmask
+                file >> outLegendaryRecipesUnlocked;
+                file.ignore();
+            }
+            else
+            {
+                outChronosDefeated = false;
+                for (int i = 0; i < 10; ++i)
+                    outCitadelBossKillCounts[i] = 0;
+                outLegendaryRecipesUnlocked = 0;
             }
         }
 

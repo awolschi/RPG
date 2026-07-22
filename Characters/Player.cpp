@@ -13,7 +13,6 @@ Player::Player(const std::string& name, CharacterClass characterClass, Character
       characterClass(characterClass), race(race),
       inventory()
 {
-    inventory.SetCapacity(20);
     skills.AddSkill(std::make_shared<CommonAttack>());
     InitializeClassSkills();
     RebuildLoadout();
@@ -437,8 +436,8 @@ void Player::ListEquipment() const
 void Player::SetSkillLoadout(const std::vector<int>& loadout)
 {
     skillLoadout = loadout;
-    if (skillLoadout.size() > MAX_LOADOUT_SKILLS)
-        skillLoadout.resize(MAX_LOADOUT_SKILLS);
+    if (skillLoadout.size() > static_cast<size_t>(GetMaxLoadoutSkills()))
+        skillLoadout.resize(GetMaxLoadoutSkills());
 }
 
 void Player::RebuildLoadout()
@@ -449,7 +448,7 @@ void Player::RebuildLoadout()
         auto sk = skills.GetSkill(i);
         if (!sk) continue;
         if (i == 0 && sk->name == "Attack") continue;
-        if (skillLoadout.size() >= MAX_LOADOUT_SKILLS) break;
+        if (skillLoadout.size() >= static_cast<size_t>(GetMaxLoadoutSkills())) break;
         skillLoadout.push_back(static_cast<int>(i));
     }
 }
@@ -462,7 +461,7 @@ void Player::AutoFillLoadout()
         if (!sk) continue;
         if (i == 0 && sk->name == "Attack") continue;
         if (IsInLoadout(static_cast<int>(i))) continue;
-        if (skillLoadout.size() >= MAX_LOADOUT_SKILLS) break;
+        if (skillLoadout.size() >= static_cast<size_t>(GetMaxLoadoutSkills())) break;
         skillLoadout.push_back(static_cast<int>(i));
     }
 }
@@ -643,4 +642,69 @@ void Player::CheckNewSkills()
         }
         AutoFillLoadout();
     }
+}
+
+void Player::EvolveClass()
+{
+    if (evolved) return;
+    evolved = true;
+
+    // +20% base stats
+    Stats s = GetStats();
+    s.health    = s.health    * 120 / 100;
+    s.mana      = s.mana      * 120 / 100;
+    s.strength  = s.strength  * 120 / 100;
+    s.vitality  = s.vitality  * 120 / 100;
+    s.intelligence = s.intelligence * 120 / 100;
+    s.wisdom    = s.wisdom    * 120 / 100;
+    s.dexterity = s.dexterity * 120 / 100;
+    s.defense   = s.defense   * 120 / 100;
+    SetStats(s);
+
+    // Restore HP/MP to new max
+    SetCurrentHealth(GetMaxHealth());
+    SetCurrentMana(GetMaxMana());
+}
+
+std::string Player::GetEvolvedClassName() const
+{
+    switch (characterClass)
+    {
+        case CharacterClass::Warrior:  return "Hero";
+        case CharacterClass::Priest:   return "Sage";
+        case CharacterClass::Mage:     return "Archmage";
+        case CharacterClass::Archer:   return "Ranger";
+        case CharacterClass::Merchant: return "Tycoon";
+        default: return "";
+    }
+}
+
+float Player::GetEvolvedDamageReduction() const
+{
+    if (!evolved || characterClass != CharacterClass::Warrior) return 0.0f;
+    return 0.10f;
+}
+
+float Player::GetEvolvedHealingBonus() const
+{
+    if (!evolved || characterClass != CharacterClass::Priest) return 0.0f;
+    return 0.15f;
+}
+
+float Player::GetEvolvedManaCostReduction() const
+{
+    if (!evolved || characterClass != CharacterClass::Mage) return 0.0f;
+    return 0.15f;
+}
+
+float Player::GetEvolvedCritBonus() const
+{
+    if (!evolved || characterClass != CharacterClass::Archer) return 0.0f;
+    return 0.10f;
+}
+
+float Player::GetEvolvedGoldFind() const
+{
+    if (!evolved || characterClass != CharacterClass::Merchant) return 0.0f;
+    return 0.25f;
 }

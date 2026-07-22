@@ -12,6 +12,7 @@
 #include "../Items/Consumable.hpp"
 #include "../Items/Resources/Resources.hpp"
 #include "../Items/Uniques/UniqueItems.hpp"
+#include "../Items/SummoningItem.hpp"
 #include "../World/Enemies/Enemies.hpp"
 #include "../World/NPCs/NPC.hpp"
 #include <algorithm>
@@ -53,6 +54,7 @@ Game::Game()
       previousState(GameState::MainMenu)
 {
     UniqueItemRegistry::Initialize();
+    SummoningRegistry::Initialize();
     InitializeAreas();
     wiki.SetAreas(areas);
 }
@@ -245,6 +247,14 @@ void Game::InitializeAreas()
             "The final frontier — a wound in reality where time itself has been broken.",
             10, std::vector<Dungeon>{ chronos }, std::vector<int>{8});
     }
+
+    // ---- Forbidden Citadel (Area 11) — Boss-only gauntlet, requires Chronos defeated ----
+    {
+        // No regular dungeons — the Citadel is a boss select screen
+        areas.emplace_back("Forbidden Citadel",
+            "A prison of god-like beings. Only the one who slew Chronos may enter.",
+            11, std::vector<Dungeon>{}, std::vector<int>{9});
+    }
 }
 
 void Game::Run()
@@ -294,6 +304,7 @@ void Game::Run()
                 case GameState::Wiki:
                 case GameState::Achievements:
                 case GameState::DungeonSelect:
+                case GameState::CitadelBossSelect:
                 case GameState::SavePrompt:
                     currentState = GameState::Exploring;
                     break;
@@ -340,6 +351,7 @@ void Game::Run()
             case GameState::NPCDialogue:        StateNPCDialogue(); break;
             case GameState::Achievements:       StateAchievements(); break;
             case GameState::Reputation:         StateReputation(); break;
+            case GameState::CitadelBossSelect:   StateCitadelBossSelect(); break;
             case GameState::Pets:              StatePets(); break;
             case GameState::Exit:              break;
             default:                           currentState = GameState::MainMenu;
@@ -855,7 +867,17 @@ void Game::StateExplore()
 
     // Dungeon button if available
     int extraButtons = 0;
-    if (!areas[currentAreaIndex].dungeons.empty())
+    if (currentAreaIndex == 10 && chronosDefeated)
+    {
+        // Forbidden Citadel — boss select
+        if (renderer.Button("Face the Citadel", GRenderer::W - 240, 60, 220, 38, 15))
+        {
+            citadelSelectedBoss = -1;
+            currentState = GameState::CitadelBossSelect;
+        }
+        extraButtons++;
+    }
+    else if (!areas[currentAreaIndex].dungeons.empty())
     {
         if (renderer.Button("Enter Dungeon", GRenderer::W - 240, 60, 220, 38, 15))
             currentState = GameState::DungeonSelect;
@@ -1220,6 +1242,88 @@ void Game::StateDungeonComplete()
 }
 
 // ============================================================
+//  FORBIDDEN CITADEL — BOSS SELECT
+// ============================================================
+
+void Game::StateCitadelBossSelect()
+{
+    if (!player) { currentState = GameState::Exploring; return; }
+    if (!chronosDefeated) { currentState = GameState::Exploring; return; }
+    keyboardNav.Update();
+    renderer.SetCurrentFocus(keyboardNav.GetFocus());
+
+    struct CitadelBossInfo
+    {
+        std::string name;
+        std::string element;
+        int hp;
+        int str;
+        std::function<std::shared_ptr<Monster>()> factory;
+    };
+
+    std::vector<CitadelBossInfo> bosses = {
+        { "Abyssal Sentinel",  "Physical",  8000, 120, []{ return EnemyDatabase::CreateAbyssalSentinel(); } },
+        { "Void Empress",      "Arcane",    9000, 110, []{ return EnemyDatabase::CreateVoidEmpress(); } },
+        { "Infernal Colossus", "Fire",     10000, 130, []{ return EnemyDatabase::CreateInfernalColossus(); } },
+        { "Glacial Wraith",    "Ice",       8500, 100, []{ return EnemyDatabase::CreateGlacialWraith(); } },
+        { "Storm Arbiter",     "Lightning", 9500, 125, []{ return EnemyDatabase::CreateStormArbiter(); } },
+        { "Plague Sovereign",  "Poison",   11000,  90, []{ return EnemyDatabase::CreatePlagueSovereign(); } },
+        { "Holy Arbiter",      "Holy",     12000, 115, []{ return EnemyDatabase::CreateCitadelHolyArbiter(); } },
+        { "Chrono Overlord",   "Arcane",   13000, 140, []{ return EnemyDatabase::CreateChronoOverlord(); } },
+        { "Void Monarch",      "Arcane",   15000, 150, []{ return EnemyDatabase::CreateVoidMonarch(); } },
+        { "The Unbroken",      "Physical", 20000, 170, []{ return EnemyDatabase::CreateTheUnbroken(); } },
+    };
+
+    Color bossColors[] = {
+        {180, 60, 60, 255}, {120, 40, 180, 255}, {220, 100, 20, 255}, {100, 180, 220, 255},
+        {180, 180, 40, 255}, {60, 140, 60, 255}, {240, 220, 140, 255}, {160, 80, 200, 255},
+        {40, 20, 80, 255}, {200, 200, 200, 255},
+    };
+
+    renderer.DrawPanel(50, 40, GRenderer::W - 100, GRenderer::H - 80, "Forbidden Citadel — Boss Gauntlet");
+    renderer.DrawText("Choose a boss to challenge. Each is a legendary being of immense power.", 70, 80, 13, CQColors::TextDim);
+
+    int y = 110;
+    int bossCount = static_cast<int>(bosses.size());
+    keyboardNav.SetFocusCount(bossCount + 1); // +1 for Back
+
+    for (int i = 0; i < bossCount; ++i)
+    {
+        const auto& b = bosses[i];
+        Color col = bossColors[i % 10];
+
+        // Boss card
+        Color cardBg = {25, 25, 35, 255};
+        renderer.DrawRect(70, y, GRenderer::W - 160, 50, cardBg);
+        renderer.DrawRectLines(70, y, GRenderer::W - 160, 50, col);
+
+        renderer.DrawText(b.name, 80, y + 4, 16, col);
+        renderer.DrawText(b.element, 340, y + 4, 13, CQColors::TextDim);
+        renderer.DrawText("HP: " + std::to_string(b.hp) + "  STR: " + std::to_string(b.str),
+                          440, y + 4, 13, CQColors::TextGold);
+
+        if (renderer.Button("Challenge##cb" + std::to_string(i), GRenderer::W - 220, y + 8, 140, 32, i))
+        {
+            auto boss = b.factory();
+            if (boss)
+            {
+                boss->GetSkills().AddSkill(std::make_shared<CommonAttack>());
+                boss->ScaleStats(areas[currentAreaIndex].difficulty);
+                citadelSelectedBoss = i;
+                StartCombatWithEnemy(boss, true);
+            }
+        }
+
+        y += 58;
+    }
+
+    if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 70, 120, 40, bossCount))
+    {
+        currentState = GameState::Exploring;
+    }
+}
+
+// ============================================================
 //  INVENTORY / STATS / JOBS / CRAFT / RELIGION / AREA / QUESTS
 // ============================================================
 
@@ -1462,7 +1566,7 @@ void Game::StateInventory()
             case 1: show = (item->type == ItemType::Weapon || item->type == ItemType::Offhand); break;
             case 2: show = (item->type == ItemType::Armor); break;
             case 3: show = (item->type == ItemType::Accessory); break;
-            case 4: show = (item->type == ItemType::Consumable); break;
+            case 4: show = (item->type == ItemType::Consumable || item->type == ItemType::Summoning); break;
             case 5: show = (item->type == ItemType::Resource || item->type == ItemType::QuestItem); break;
         }
         if (show) filteredIndices.push_back(i);
@@ -1558,6 +1662,10 @@ void Game::StateInventory()
         else if (item->type == ItemType::Consumable)
         {
             actionCountPerItem[idx] = 2; // Use + D
+        }
+        else if (item->type == ItemType::Summoning)
+        {
+            actionCountPerItem[idx] = 2; // Summon + D
         }
         else if (item->type == ItemType::Resource)
         {
@@ -1691,6 +1799,10 @@ void Game::StateInventory()
             {
                 stats = con->GetDescription();
             }
+            else if (auto sum = std::dynamic_pointer_cast<SummoningItem>(item))
+            {
+                stats = "Summon " + sum->bossName;
+            }
             else if (auto res = std::dynamic_pointer_cast<Resource>(item))
             {
                 stats = "Resource";
@@ -1751,6 +1863,11 @@ void Game::StateInventory()
                 {
                     tip += "\n" + con->GetDescription();
                 }
+                else if (auto sum = std::dynamic_pointer_cast<SummoningItem>(item))
+                {
+                    tip += "\n" + sum->GetDescription();
+                    tip += "\nUse from Explore to start the fight";
+                }
                 else if (auto res = std::dynamic_pointer_cast<Resource>(item))
                 {
                     if (res->healAmount > 0) tip += "\nHeals: " + std::to_string(res->healAmount) + " HP";
@@ -1807,6 +1924,23 @@ void Game::StateInventory()
                     }
                 }
                 btnX += 56;
+            }
+            else if (item->type == ItemType::Summoning)
+            {
+                auto sum = std::dynamic_pointer_cast<SummoningItem>(item);
+                if (sum && renderer.Button("Summon", btnX, btnY, 60, 22, itemFocusIdx++))
+                {
+                    auto boss = sum->bossFactory();
+                    inv.RemoveOneItem(i);
+                    if (selectedItemIndex == static_cast<int>(i))
+                    {
+                        selectedItemIndex = -1;
+                        selectedItem = nullptr;
+                    }
+                    StartCombatWithEnemy(boss, true);
+                    return;
+                }
+                btnX += 66;
             }
             else if (item->type == ItemType::Resource)
             {
@@ -2967,7 +3101,7 @@ void Game::StateSkillLoadout()
                 auto it = std::find(loadoutEditCopy.begin(), loadoutEditCopy.end(), i);
                 if (it != loadoutEditCopy.end()) loadoutEditCopy.erase(it);
             }
-            else if (loadoutEditCopy.size() < Player::MAX_LOADOUT_SKILLS)
+            else if (loadoutEditCopy.size() < static_cast<size_t>(player->GetMaxLoadoutSkills()))
             {
                 loadoutEditCopy.push_back(i);
             }
@@ -3019,7 +3153,7 @@ void Game::StateSkillLoadout()
 
     int bottomY = GRenderer::H - 100;
     renderer.DrawText("Selected: " + std::to_string(loadoutEditCopy.size())
-        + " / " + std::to_string(Player::MAX_LOADOUT_SKILLS),
+        + " / " + std::to_string(player->GetMaxLoadoutSkills()),
         70, bottomY - 50, 16, CQColors::TextGold);
 
     if (renderer.Button("Save", 70, bottomY - 20, 120, 36, focusIdx))
@@ -3135,6 +3269,55 @@ void Game::StateSkillUpgrade()
                 selectedSkillIdx = -1;
                 currentState = GameState::Exploring;
             }
+
+            // ---- Mastery Tree (shown for level 50 skills) ----
+            if (sk->level >= 50)
+            {
+                int my = GRenderer::H - 280;
+                renderer.DrawRect(60, my, GRenderer::W - 120, 160, CQColors::BgPanel);
+                renderer.DrawRectLines(60, my, GRenderer::W - 120, 160, CQColors::Gold, 1);
+                my += 8;
+
+                renderer.DrawText("--- MASTERY ---  Level " + std::to_string(sk->masteryLevel)
+                    + "/" + std::to_string(Skill::MASTERY_LEVEL_CAP)
+                    + "  Points: " + std::to_string(sk->masteryPoints)
+                    + "  XP: " + std::to_string(sk->masteryXP) + "/" + std::to_string(sk->GetMasteryXPToLevel()),
+                    75, my, 14, CQColors::Gold);
+                my += 22;
+
+                const char* branchNames[] = { "Damage", "Utility", "Special" };
+                const char* branchDescs[3][5] = {
+                    { "+5% dmg", "+5% dmg", "+5% dmg", "+5% dmg", "+5% dmg" },
+                    { "-1 CD", "-1 CD", "-2 MP", "-1 CD", "-3 MP" },
+                    { "+10% XP", "+10% XP", "+10% XP", "+10% XP", "+10% XP" },
+                };
+                int colW = (GRenderer::W - 160) / 3;
+
+                for (int b = 0; b < 3; ++b)
+                {
+                    int bx = 80 + b * colW;
+                    renderer.DrawText(branchNames[b], bx, my, 14, CQColors::TextGold);
+                    for (int n = 0; n < 5; ++n)
+                    {
+                        int ny = my + 22 + n * 24;
+                        bool unlocked = sk->masteryNodes[b][n];
+                        bool canUnlock = sk->CanUnlockMasteryNode(b, n);
+                        std::string nodeText = "Lv" + std::to_string((n + 1) * 2) + ": " + branchDescs[b][n];
+                        Color nodeColor = unlocked ? CQColors::TextGreen : (canUnlock ? CQColors::TextGold : CQColors::TextDim);
+                        renderer.DrawText((unlocked ? "[*] " : canUnlock ? "[o] " : "[ ] ") + nodeText, bx, ny, 12, nodeColor);
+
+                        if (canUnlock)
+                        {
+                            if (renderer.Button("Unlock##" + std::to_string(b) + std::to_string(n),
+                                                bx + 200, ny - 2, 60, 20, detailFocusIdx++))
+                            {
+                                sk->UnlockMasteryNode(b, n);
+                            }
+                        }
+                    }
+                }
+            }
+
             return;
         }
     }
@@ -3190,6 +3373,8 @@ void Game::StateSkillUpgrade()
             + "  Pts:" + std::to_string(sk->skillPoints);
         if (total > 0)
             label += "  [" + std::to_string(unlocked) + "/" + std::to_string(total) + " upgrades]";
+        if (sk->masteryLevel > 0)
+            label += "  M" + std::to_string(sk->masteryLevel);
 
         Color nameColor = (sk->skillPoints > 0) ? CQColors::TextGold : CQColors::TextLight;
 
@@ -3644,24 +3829,27 @@ void Game::StateAreaSelect()
     // Title
     renderer.DrawPanel(100, 30, GRenderer::W - 200, 50, "World Map of Eluna");
 
-    // Node positions — 4 rows
+    // Node positions — 5 rows (area 11 = Forbidden Citadel)
     struct NodePos { float x, y; };
-    std::vector<NodePos> positions(10);
+    std::vector<NodePos> positions(areas.size());
 
     // Row 0: nodes 0, 1, 2
-    positions[0] = { 200, 180 };
-    positions[1] = { 512, 180 };
-    positions[2] = { 824, 180 };
+    positions[0] = { 200, 160 };
+    positions[1] = { 512, 160 };
+    positions[2] = { 824, 160 };
     // Row 1: nodes 3, 4
-    positions[3] = { 356, 330 };
-    positions[4] = { 668, 330 };
+    positions[3] = { 356, 300 };
+    positions[4] = { 668, 300 };
     // Row 2: nodes 5, 6
-    positions[5] = { 356, 480 };
-    positions[6] = { 668, 480 };
+    positions[5] = { 356, 440 };
+    positions[6] = { 668, 440 };
     // Row 3: nodes 7, 8, 9
-    positions[7] = { 200, 630 };
-    positions[8] = { 512, 630 };
-    positions[9] = { 824, 630 };
+    positions[7] = { 200, 580 };
+    positions[8] = { 512, 580 };
+    positions[9] = { 824, 580 };
+    // Row 4: node 10 (Forbidden Citadel)
+    if (static_cast<int>(areas.size()) > 10)
+        positions[10] = { 512, 700 };
 
     float nodeRadius = 28.0f;
     int currentNode = currentAreaIndex;
@@ -3720,8 +3908,17 @@ void Game::StateAreaSelect()
         }
         else if (reachable[i])
         {
-            fillColor = CQColors::TextGreen;
-            outlineColor = CQColors::GoldDim;
+            // Citadel is locked until Chronos is defeated
+            if (i == 10 && !chronosDefeated)
+            {
+                fillColor = {80, 30, 30, 255};
+                outlineColor = CQColors::TextDim;
+            }
+            else
+            {
+                fillColor = CQColors::TextGreen;
+                outlineColor = CQColors::GoldDim;
+            }
         }
         else
         {
@@ -3739,6 +3936,9 @@ void Game::StateAreaSelect()
         // Clickable check
         if (reachable[i] && i != currentNode)
         {
+            // Gate Forbidden Citadel behind chronosDefeated
+            if (i == 10 && !chronosDefeated) continue;
+
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && i == hoveredNode)
             {
                 currentAreaIndex = i;
@@ -4093,9 +4293,9 @@ void Game::StateCombat()
                             if (!roomQueue.empty()) roomQueue.clear();
                             currentEnemy.reset();
                             currentState = GameState::Exploring;
-                        }
-                        else
-                        {
+    }
+    else if (repQuestTab == 1)
+    {
                             AddCombatLog("Couldn't escape! (" + std::to_string(chance) + "% chance)");
                             combatPhase = CombatPhase::EnemyTurn;
                             enemyActionTime = renderer.GetTime();
@@ -4276,6 +4476,19 @@ void Game::StateCombat()
                     dungeonCompleted = true;
                     currentState = GameState::DungeonComplete;
                 }
+            }
+        }
+        else if (currentAreaIndex == 10 && citadelSelectedBoss >= 0)
+        {
+            // Citadel boss defeated — return to boss select
+            keyboardNav.SetFocusCount(1);
+            if (renderer.Button("Return to Citadel", renderer.CenterX(160), 600, 200, 44, 0))
+            {
+                leveledUpThisCombat = false;
+                citadelSelectedBoss = -1;
+                currentEnemy.reset();
+                ClearLog();
+                currentState = GameState::CitadelBossSelect;
             }
         }
         else
@@ -5017,11 +5230,24 @@ void Game::ProcessVictory(std::shared_ptr<Monster> enemy)
             if (RNG::Percent() < sd.chance)
             {
                 int qty = sd.minQty + (RNG::Next(sd.maxQty - sd.minQty + 1));
-                auto drop = std::make_shared<Resource>(sd.itemName, dropTier, dropTier * 5);
-                drop->count = qty;
+                auto sumItem = SummoningRegistry::Create(sd.itemName);
+                std::shared_ptr<Item> drop;
+                if (sumItem)
+                {
+                    drop = sumItem;
+                }
+                else
+                {
+                    auto res = std::make_shared<Resource>(sd.itemName, dropTier, dropTier * 5);
+                    res->count = qty;
+                    drop = res;
+                }
+                if (drop->type == ItemType::Summoning)
+                    drop->count = 1;
                 player->GetInventory().AddItem(drop);
                 wiki.MarkItemDiscovered(sd.itemName);
-                AddCombatLog("Special Drop: " + sd.itemName + " x" + std::to_string(qty));
+                std::string prefix = (sumItem) ? "*** ESSENCE DROP *** " : "";
+                AddCombatLog(prefix + "Special Drop: " + sd.itemName + " x" + std::to_string(drop->count));
             }
         }
 
@@ -5039,6 +5265,20 @@ void Game::ProcessVictory(std::shared_ptr<Monster> enemy)
                     petManager.AddNotification(dropped->name, "New companion obtained!");
                 }
             }
+        }
+
+        // Endgame unlock — first Chronos kill
+        if (!chronosDefeated && enemy->GetName() == "Chronos, the Time Ender")
+        {
+            chronosDefeated = true;
+            AddCombatLog("*** ENDGAME UNLOCKED *** The Forbidden Citadel awaits!");
+            achNotifications.emplace_back("Endgame Unlocked!", "New area and systems available.");
+        }
+
+        // Citadel boss kill tracking
+        if (currentAreaIndex == 10 && citadelSelectedBoss >= 0 && citadelSelectedBoss < 10)
+        {
+            citadelBossKillCounts[citadelSelectedBoss]++;
         }
     }
 }
@@ -5235,17 +5475,19 @@ void Game::LoadGamePrompt()
 void Game::SaveToSlot(int slot)
 {
     if (!player) { currentState = GameState::Exploring; return; }
-    if (saveManager.SaveGame(player, slot, currentAreaIndex, religion, achievementSystem, reputationSystem, petManager, wiki))
+    if (saveManager.SaveGame(player, slot, currentAreaIndex, religion, achievementSystem, reputationSystem, petManager, wiki, chronosDefeated, citadelBossKillCounts, legendaryRecipesUnlocked))
         renderer.DrawCenteredText("Game saved to Slot " + std::to_string(slot) + "!", 350, 24, CQColors::TextGreen);
     currentState = GameState::Exploring;
 }
 
 void Game::LoadFromSlot(int slot)
 {
-    auto loaded = saveManager.LoadGame(slot, currentAreaIndex, religion, achievementSystem, reputationSystem, petManager, wiki);
+    bool loadedChronos = false;
+    auto loaded = saveManager.LoadGame(slot, currentAreaIndex, religion, achievementSystem, reputationSystem, petManager, wiki, loadedChronos, citadelBossKillCounts, legendaryRecipesUnlocked);
     if (loaded)
     {
         player = loaded;
+        chronosDefeated = loadedChronos;
         if (currentAreaIndex < 0 || currentAreaIndex >= static_cast<int>(areas.size()))
             currentAreaIndex = 0;
         selectedSkillIdx = -1;
@@ -5759,7 +6001,7 @@ void Game::StateReputation()
                           70, y, 14, CQColors::TextGold);
         y += 24;
 
-        // Faction colors
+        // Faction colors — all 20 factions
         Color factionColors[] = {
             {200, 180, 100, 255},  // Guardians - gold
             {60, 160, 60, 255},    // Shadow Wardens - green
@@ -5771,16 +6013,36 @@ void Game::StateReputation()
             {80, 40, 120, 255},    // Void Exarchs - dark purple
             {40, 160, 200, 255},   // Arcane Conclave - cyan
             {100, 200, 160, 255},  // Chronos Wardens - teal
+            // Forbidden Citadel bosses
+            {180, 60, 60, 255},    // Abyssal Sentinel - crimson
+            {120, 40, 180, 255},   // Void Empress - violet
+            {220, 100, 20, 255},   // Infernal Colossus - orange
+            {100, 180, 220, 255},  // Glacial Wraith - ice blue
+            {180, 180, 40, 255},   // Storm Arbiter - yellow
+            {60, 140, 60, 255},    // Plague Sovereign - sickly green
+            {240, 220, 140, 255},  // Holy Arbiter - holy gold
+            {160, 80, 200, 255},   // Chrono Overlord - purple
+            {40, 20, 80, 255},     // Void Monarch - void dark
+            {200, 200, 200, 255},  // The Unbroken - silver
         };
 
-        int focusCount = reputationSystem.GetFactionCount() + 1;
+        int totalFactions = reputationSystem.GetFactionCount();
+        int totalPages = (totalFactions + FACTIONS_PER_PAGE - 1) / FACTIONS_PER_PAGE;
+        if (totalPages < 1) totalPages = 1;
+        if (repFactionPage >= totalPages) repFactionPage = totalPages - 1;
+        if (repFactionPage < 0) repFactionPage = 0;
+
+        int startIdx = repFactionPage * FACTIONS_PER_PAGE;
+        int endIdx = std::min(startIdx + FACTIONS_PER_PAGE, totalFactions);
+
+        int focusCount = (endIdx - startIdx) + 1; // factions + back button
         keyboardNav.SetFocusCount(focusCount);
 
-        for (int i = 0; i < reputationSystem.GetFactionCount(); ++i)
+        for (int i = startIdx; i < endIdx; ++i)
         {
             auto fid = static_cast<FactionID>(i);
             const auto& fData = reputationSystem.GetFactionData(fid);
-            Color col = factionColors[i % 10];
+            Color col = factionColors[i % 20];
 
             // Faction card
             Color cardBg = {25, 25, 35, 255};
@@ -5844,7 +6106,24 @@ void Game::StateReputation()
             y += 58;
         }
 
-        if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 80, 120, 40, reputationSystem.GetFactionCount()))
+        // Faction list pagination
+        if (totalPages > 1)
+        {
+            y += 4;
+            if (renderer.Button("< Prev", 90, y, 100, 28, focusCount++))
+            {
+                if (repFactionPage > 0) repFactionPage--;
+            }
+            std::string pageText = "Page " + std::to_string(repFactionPage + 1) + " / " + std::to_string(totalPages);
+            renderer.DrawText(pageText, GRenderer::W / 2 - 60, y + 6, 14, CQColors::TextGold);
+            if (renderer.Button("Next >", 90 + 100 + 200, y, 100, 28, focusCount++))
+            {
+                if (repFactionPage < totalPages - 1) repFactionPage++;
+            }
+            y += 36;
+        }
+
+        if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 80, 120, 40, focusCount))
         {
             currentState = GameState::Exploring;
             renderer.StartTransition();
@@ -5860,8 +6139,12 @@ void Game::StateReputation()
         {200, 180, 100, 255}, {60, 160, 60, 255}, {60, 120, 200, 255}, {200, 80, 40, 255},
         {160, 120, 200, 255}, {100, 60, 140, 255}, {220, 200, 100, 255}, {80, 40, 120, 255},
         {40, 160, 200, 255}, {100, 200, 160, 255},
+        // Forbidden Citadel bosses
+        {180, 60, 60, 255}, {120, 40, 180, 255}, {220, 100, 20, 255}, {100, 180, 220, 255},
+        {180, 180, 40, 255}, {60, 140, 60, 255}, {240, 220, 140, 255}, {160, 80, 200, 255},
+        {40, 20, 80, 255}, {200, 200, 200, 255},
     };
-    Color col = factionColors[selectedFactionIdx % 10];
+    Color col = factionColors[selectedFactionIdx % 20];
 
     std::string title = fData.name + " — " + reputationSystem.GetRankName(fData.rank);
     renderer.DrawPanel(50, 60, GRenderer::W - 100, GRenderer::H - 120, title);
@@ -5873,17 +6156,25 @@ void Game::StateReputation()
                       70, y, 14, col);
     y += 24;
 
-    // Tabs: Overview | Repeatable Quests
+    // Tabs: Overview | Repeatable Quests | Shop
     int tabFocusBase = 0;
     if (renderer.Button("Overview", 70, y, 160, 28, tabFocusBase))
     {
         repQuestTab = 0;
         repQuestPage = 0;
+        repVendorPage = 0;
     }
     if (renderer.Button("Repeatable Quests", 240, y, 200, 28, tabFocusBase + 1))
     {
         repQuestTab = 1;
         repQuestPage = 0;
+        repVendorPage = 0;
+    }
+    if (renderer.Button("Shop", 450, y, 120, 28, tabFocusBase + 2))
+    {
+        repQuestTab = 2;
+        repQuestPage = 0;
+        repVendorPage = 0;
     }
     y += 38;
 
@@ -5934,7 +6225,7 @@ void Game::StateReputation()
         else
             renderer.DrawText("Combat Stats: None", 90, y, 13, CQColors::TextDim);
     }
-    else
+    else if (repQuestTab == 1)
     {
         // Repeatable quests
         const auto& quests = reputationSystem.GetRepeatableQuests(fid);
@@ -6030,6 +6321,80 @@ void Game::StateReputation()
             y += 36;
         }
     }
+    else if (repQuestTab == 2)
+    {
+        const auto& stock = reputationSystem.GetVendorStock(fid);
+        renderer.DrawText("Faction Shop — Spend your gold on exclusive gear!", 70, y, 13, CQColors::TextDim);
+        y += 10;
+        renderer.DrawText("Gold: " + std::to_string(player->GetInventory().GetGold()), 70, y, 14, CQColors::TextGold);
+        y += 22;
+
+        int totalItems = static_cast<int>(stock.size());
+        int totalPages = (totalItems + VENDOR_ITEMS_PER_PAGE - 1) / VENDOR_ITEMS_PER_PAGE;
+        if (totalPages < 1) totalPages = 1;
+        if (repVendorPage >= totalPages) repVendorPage = totalPages - 1;
+        if (repVendorPage < 0) repVendorPage = 0;
+
+        int startIdx = repVendorPage * VENDOR_ITEMS_PER_PAGE;
+        int endIdx = std::min(startIdx + VENDOR_ITEMS_PER_PAGE, totalItems);
+
+        for (int i = startIdx; i < endIdx; ++i)
+        {
+            const auto& item = stock[i];
+            bool rankMet = static_cast<int>(fData.rank) >= static_cast<int>(item.requiredRank);
+            bool canAfford = player->GetInventory().GetGold() >= item.goldCost;
+            bool canBuy = rankMet && canAfford;
+
+            Color itemCol = canBuy ? CQColors::TextLight : CQColors::TextDim;
+
+            std::string rankLabel = "[" + reputationSystem.GetRankName(item.requiredRank) + "]";
+            renderer.DrawText(item.name + "  " + rankLabel, 90, y, 14, itemCol);
+            y += 16;
+            renderer.DrawText(item.description, 110, y, 12, CQColors::TextDim);
+            y += 16;
+            std::string priceStr = std::to_string(item.goldCost) + " Gold";
+            Color priceCol = canAfford ? CQColors::TextGold : CQColors::TextRed;
+            renderer.DrawText(priceStr, 110, y, 13, priceCol);
+            y += 18;
+
+            if (!rankMet)
+            {
+                std::string lockText = "Requires " + reputationSystem.GetRankName(item.requiredRank);
+                renderer.DrawText(lockText, 110, y, 12, CQColors::TextRed);
+                y += 16;
+            }
+
+            if (canBuy && renderer.Button("Buy##vi" + std::to_string(i), 110, y, 100, 24, focusIdx++))
+            {
+                if (reputationSystem.CanBuyVendorItem(fid, i, player->GetInventory().GetGold()))
+                {
+                    player->GetInventory().RemoveGold(item.goldCost);
+                    auto newItem = item.createItem();
+                    if (newItem)
+                    {
+                        player->GetInventory().AddItem(newItem);
+                    }
+                }
+            }
+            y += 30;
+        }
+
+        if (totalPages > 1)
+        {
+            y += 4;
+            if (renderer.Button("< Prev", 90, y, 100, 28, focusIdx++))
+            {
+                if (repVendorPage > 0) repVendorPage--;
+            }
+            std::string pageText = "Page " + std::to_string(repVendorPage + 1) + " / " + std::to_string(totalPages);
+            renderer.DrawText(pageText, GRenderer::W / 2 - 60, y + 6, 14, CQColors::TextGold);
+            if (renderer.Button("Next >", 90 + 100 + 200, y, 100, 28, focusIdx++))
+            {
+                if (repVendorPage < totalPages - 1) repVendorPage++;
+            }
+            y += 36;
+        }
+    }
 
     keyboardNav.SetFocusCount(focusIdx + 1);
     if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 80, 120, 40, focusIdx))
@@ -6095,17 +6460,19 @@ void Game::StatePets()
 
     // Collection summary
     const auto& allPets = petManager.GetPets();
-    int ownedCount = 0, evolvedCount = 0, ascendedCount = 0;
+    int ownedCount = 0, evolvedCount = 0, ascendedCount = 0, mythicCount = 0;
     for (const auto& p : allPets)
     {
         if (p.obtained) ownedCount++;
         if (p.obtained && p.evolutionTier >= 1) evolvedCount++;
         if (p.obtained && p.evolutionTier >= 2) ascendedCount++;
+        if (p.obtained && p.evolutionTier >= 3) mythicCount++;
     }
 
     renderer.DrawText("Obtained: " + std::to_string(ownedCount) + " / " + std::to_string(allPets.size())
                       + "   Evolved: " + std::to_string(evolvedCount)
-                      + "   Ascended: " + std::to_string(ascendedCount),
+                      + "   Ascended: " + std::to_string(ascendedCount)
+                      + "   Mythic: " + std::to_string(mythicCount),
                       70, y, 13, CQColors::TextDim);
     y += 20;
 
@@ -6164,6 +6531,10 @@ void Game::StatePets()
             borderCol = {100, 255, 180, 255};  // green glow for evolved
         else if (p.obtained && p.evolutionTier == 2)
             borderCol = {255, 215, 0, 255};    // gold glow for ascended
+        else if (p.obtained && p.evolutionTier == 3)
+            borderCol = {255, 100, 255, 255};  // purple glow for mythic
+        if (p.obtained && p.rarity == PetRarity::Legendary)
+            borderCol = {255, 180, 50, 255};   // legendary orange-gold
         renderer.DrawRectLines(70, y, GRenderer::W - 160, 48, borderCol);
 
         if (p.obtained)
@@ -6173,7 +6544,12 @@ void Game::StatePets()
             if (isEquipped) nameStr += " [EQUIPPED]";
             if (p.evolutionTier > 0)
                 nameStr += "  (" + p.GetEvolutionLabel() + ")";
-            renderer.DrawText(nameStr, 80, y + 3, 14, elemCol);
+            if (p.rarity == PetRarity::Legendary)
+                nameStr += "  [LEGENDARY]";
+            Color nameCol = elemCol;
+            if (p.rarity == PetRarity::Legendary)
+                nameCol = {255, 180, 50, 255};
+            renderer.DrawText(nameStr, 80, y + 3, 14, nameCol);
 
             std::string statsLine = std::string(ElementName(p.element))
                                   + "  ATK:" + std::to_string(p.GetScaledAttack())
@@ -6202,7 +6578,8 @@ void Game::StatePets()
             }
 
             // Source
-            std::string sourceLabel = (p.source == PetSource::FactionLegend) ? "Faction" : "Boss";
+            std::string sourceLabel = (p.source == PetSource::FactionLegend) ? "Faction"
+                                    : (p.source == PetSource::CitadelDrop) ? "Citadel" : "Boss";
             renderer.DrawText(sourceLabel, GRenderer::W - 250, y + 3, 10, CQColors::TextDim);
 
             // Equip/Unequip button
@@ -6230,6 +6607,8 @@ void Game::StatePets()
             std::string hint = std::string(ElementName(p.element));
             if (p.source == PetSource::FactionLegend)
                 hint += "  (Faction Legend reward)";
+            else if (p.source == PetSource::CitadelDrop)
+                hint += "  (Citadel boss: " + p.bossName + ")";
             else
                 hint += "  (Boss drop: " + p.bossName + ")";
             renderer.DrawText(hint, 80, y + 18, 11, Color{60, 60, 70, 255});

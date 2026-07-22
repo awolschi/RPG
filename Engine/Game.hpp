@@ -112,6 +112,7 @@ enum class GameState
     Achievements,
     Reputation,
     Pets,
+    CitadelBossSelect,
     JobSkillTree,
     JobUpgrades,
     Exit
@@ -219,9 +220,13 @@ private:
 
     // Reputation UI state
     int selectedFactionIdx = -1;
-    int repQuestTab = 0;  // 0=Overview, 1=Repeatable Quests
+    int repQuestTab = 0;  // 0=Overview, 1=Repeatable Quests, 2=Shop
     int repQuestPage = 0;
+    int repVendorPage = 0;
+    int repFactionPage = 0;
     static constexpr int REPEATABLE_QUESTS_PER_PAGE = 5;
+    static constexpr int VENDOR_ITEMS_PER_PAGE = 6;
+    static constexpr int FACTIONS_PER_PAGE = 8;
 
     // Inventory UI state
     int inventoryTab;
@@ -265,6 +270,7 @@ private:
     void StateWiki();
     void StateAchievements();
     void StateReputation();
+    void StateCitadelBossSelect();
     void StatePets();
     void StateCombat();
     void StateDungeonSelect();
@@ -325,6 +331,16 @@ private:
     bool deathPenaltyApplied = false;
     int deathGoldLost = 0;
     int deathXpLost = 0;
+
+    // Endgame unlock
+    bool chronosDefeated = false;
+
+    // Citadel boss tracking
+    int citadelBossKillCounts[10] = {};
+    uint32_t legendaryRecipesUnlocked = 0;
+
+    // Citadel boss state
+    int citadelSelectedBoss = -1;
 
     // Tutorial system (session-scoped)
     bool tutorialEnabled = true;

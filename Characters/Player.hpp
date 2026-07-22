@@ -34,8 +34,10 @@ public:
     void ListEquipment() const;
     bool CanEquip(const std::shared_ptr<Item>& item) const;
 
-    // Skill loadout (max 4 skills carried into combat)
+    // Skill loadout (max 4 skills carried into combat, 6 when evolved)
     static constexpr int MAX_LOADOUT_SKILLS = 4;
+    static constexpr int EVOLVED_LOADOUT_SKILLS = 6;
+    int GetMaxLoadoutSkills() const { return evolved ? EVOLVED_LOADOUT_SKILLS : MAX_LOADOUT_SKILLS; }
     const std::vector<int>& GetSkillLoadout() const { return skillLoadout; }
     void SetSkillLoadout(const std::vector<int>& loadout);
     void RebuildLoadout();
@@ -46,6 +48,19 @@ public:
     int GetAttackSkillIndex() const { return attackSkillIndex; }
     void SetAttackSkillIndex(int idx) { attackSkillIndex = idx; }
 
+    // Class Evolution
+    bool HasClassEvolved() const { return evolved; }
+    void EvolveClass();
+    std::string GetEvolvedClassName() const;
+    int GetEvolvedLoadoutSize() const { return evolved ? 6 : 4; }
+
+    // Evolution passives (class-specific)
+    float GetEvolvedDamageReduction() const;  // Warrior Hero: 10% DR
+    float GetEvolvedHealingBonus() const;     // Priest Sage: +15% healing
+    float GetEvolvedManaCostReduction() const; // Mage Archmage: -15% mana cost
+    float GetEvolvedCritBonus() const;        // Archer Ranger: +10% crit
+    float GetEvolvedGoldFind() const;         // Merchant Tycoon: +25% gold find
+
 private:
     CharacterClass characterClass;
     CharacterRace race;
@@ -54,6 +69,7 @@ private:
     QuestManager questManager;
     std::vector<int> skillLoadout;
     int attackSkillIndex = 0;
+    bool evolved = false;
 };
 
 #endif

@@ -154,9 +154,43 @@ CMakeFiles/rpg.dir/Factions/FactionReputation.cpp.o: \
  /usr/include/c++/10/bits/algorithmfwd.h \
  /usr/include/c++/10/bits/stl_heap.h \
  /usr/include/c++/10/bits/stl_tempbuf.h \
- /usr/include/c++/10/bits/uniform_int_dist.h /usr/include/c++/10/sstream \
- /usr/include/c++/10/istream /usr/include/c++/10/ios \
- /usr/include/c++/10/bits/ios_base.h \
+ /usr/include/c++/10/bits/uniform_int_dist.h /usr/include/c++/10/memory \
+ /usr/include/c++/10/bits/stl_raw_storage_iter.h \
+ /usr/include/c++/10/bits/ranges_uninitialized.h \
+ /usr/include/c++/10/ext/concurrence.h \
+ /usr/include/c++/10/bits/unique_ptr.h \
+ /usr/include/c++/10/bits/shared_ptr.h \
+ /usr/include/c++/10/bits/shared_ptr_base.h \
+ /usr/include/c++/10/bits/allocated_ptr.h \
+ /usr/include/c++/10/bits/shared_ptr_atomic.h \
+ /usr/include/c++/10/bits/atomic_base.h \
+ /usr/include/c++/10/bits/atomic_lockfree_defines.h \
+ /usr/include/c++/10/backward/auto_ptr.h \
+ /usr/include/c++/10/pstl/glue_memory_defs.h \
+ /usr/include/c++/10/pstl/execution_defs.h \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/Loot.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/Item.hpp \
+ /usr/include/c++/10/map /usr/include/c++/10/bits/stl_tree.h \
+ /usr/include/c++/10/bits/stl_map.h \
+ /usr/include/c++/10/bits/stl_multimap.h \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/../Skills/Skill.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/../Skills/../Characters/Stats/Stats.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/Consumable.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/../Characters/Character.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/../Characters/Stats/Stats.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/../Characters/../Items/Equipment/Equipment.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/../Characters/../Items/Equipment/../Item.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/../Characters/../Skills/Skills.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/../Characters/../Skills/Skill.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/../Characters/Classes/Classes.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/../Characters/Classes/../Stats/Stats.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/../Characters/Classes/../../Items/Item.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/Consumable.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/SummoningItem.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/../Characters/Monster.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Factions/../Items/../Characters/Character.hpp \
+ /usr/include/c++/10/sstream /usr/include/c++/10/istream \
+ /usr/include/c++/10/ios /usr/include/c++/10/bits/ios_base.h \
  /usr/include/c++/10/bits/locale_classes.h \
  /usr/include/c++/10/bits/locale_classes.tcc \
  /usr/include/c++/10/system_error \
@@ -174,8 +208,7 @@ CMakeFiles/rpg.dir/Factions/FactionReputation.cpp.o: \
  /usr/include/c++/10/bits/ostream.tcc \
  /usr/include/c++/10/bits/istream.tcc \
  /usr/include/c++/10/bits/sstream.tcc /usr/include/c++/10/algorithm \
- /usr/include/c++/10/pstl/glue_algorithm_defs.h \
- /usr/include/c++/10/pstl/execution_defs.h /usr/include/c++/10/cmath \
+ /usr/include/c++/10/pstl/glue_algorithm_defs.h /usr/include/c++/10/cmath \
  /usr/include/math.h /usr/include/x86_64-linux-gnu/bits/math-vector.h \
  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
  /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \

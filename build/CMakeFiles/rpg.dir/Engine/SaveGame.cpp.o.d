@@ -257,4 +257,6 @@ CMakeFiles/rpg.dir/Engine/SaveGame.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Consumable.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Item.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/../Characters/Character.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/SummoningItem.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/../Characters/Monster.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Engine/../Items/Resources/Resources.hpp

@@ -132,6 +132,66 @@ void PetManager::Initialize()
         0.04f, 0.06f, 0.08f, 0.15f, 0.07f, 0.02f, 0.0f, 10.0f, 6,
         "Chronos");
 
+    AddCitadelPet("shadowfang_relic", "Shadowfang Relic",
+        "A fang of pure darkness, still dripping with cursed ichor.",
+        ElementType::Arcane, 35, 55,
+        0.06f, 0.05f, 0.08f, 0.20f, 0.10f, 0.05f, 30.0f, 25.0f, 12,
+        "Umbraxis, the Void Warden", PetRarity::Legendary);
+
+    AddCitadelPet("flamecrown_shard", "Flamecrown Shard",
+        "A shard of crown-fire, burning with the fury of a dead dynasty.",
+        ElementType::Fire, 38, 55,
+        0.05f, 0.06f, 0.09f, 0.22f, 0.12f, 0.03f, 25.0f, 0.0f, 15,
+        "Ignaroth, the Ashborn King", PetRarity::Legendary);
+
+    AddCitadelPet("abyssal_crown", "Abyssal Crown",
+        "A crown of liquid shadow that whispers of dominion over the deep.",
+        ElementType::Ice, 32, 55,
+        0.07f, 0.04f, 0.06f, 0.18f, 0.08f, 0.10f, 40.0f, 30.0f, 10,
+        "Thalassion, the Abyssal Sovereign", PetRarity::Legendary);
+
+    AddCitadelPet("tempest_core", "Tempest Core",
+        "A crackling heart of storm, alive with unending fury.",
+        ElementType::Lightning, 36, 55,
+        0.05f, 0.07f, 0.10f, 0.20f, 0.10f, 0.04f, 20.0f, 15.0f, 8,
+        "Voltarath, the Storm Titan", PetRarity::Legendary);
+
+    AddCitadelPet("rotbloom_heart", "Rotbloom Heart",
+        "A pulsing flower of decay, beautiful and utterly lethal.",
+        ElementType::Poison, 34, 55,
+        0.06f, 0.05f, 0.07f, 0.20f, 0.11f, 0.03f, 15.0f, 0.0f, 14,
+        "Nethys, the Rotweaver", PetRarity::Legendary);
+
+    AddCitadelPet("seraph_halo", "Seraph Halo",
+        "A radiant ring of celestial fire that purifies all it touches.",
+        ElementType::Holy, 30, 55,
+        0.09f, 0.04f, 0.05f, 0.15f, 0.07f, 0.12f, 50.0f, 35.0f, 8,
+        "Zariel, the Celestial Arbiter", PetRarity::Legendary);
+
+    AddCitadelPet("verdant_serpent", "Verdant Serpent",
+        "A coiled serpent of living jade, its scales shimmering with ancient power.",
+        ElementType::Poison, 37, 55,
+        0.05f, 0.06f, 0.08f, 0.22f, 0.12f, 0.05f, 25.0f, 10.0f, 12,
+        "Ouroboros, the Emerald Wyrm", PetRarity::Legendary);
+
+    AddCitadelPet("warlords_bloodstone", "Warlord's Bloodstone",
+        "A blood-red gemstone that pulses with the rage of a thousand battles.",
+        ElementType::Physical, 40, 55,
+        0.04f, 0.05f, 0.10f, 0.25f, 0.14f, 0.03f, 30.0f, 0.0f, 18,
+        "Dravok, the Conqueror", PetRarity::Legendary);
+
+    AddCitadelPet("voidheart_gem", "Voidheart Gem",
+        "A gem of compressed nothingness that bends reality around it.",
+        ElementType::Arcane, 36, 55,
+        0.06f, 0.05f, 0.09f, 0.22f, 0.10f, 0.06f, 20.0f, 30.0f, 10,
+        "Malachar, the Dimensional Rift", PetRarity::Legendary);
+
+    AddCitadelPet("chronos_hourglass", "Chronos Hourglass",
+        "A tiny hourglass filled with crystallized moments of eternity.",
+        ElementType::Lightning, 33, 55,
+        0.07f, 0.08f, 0.08f, 0.18f, 0.08f, 0.05f, 15.0f, 25.0f, 10,
+        "Aeonis, the Timeless One", PetRarity::Legendary);
+
     // Evolution names and special abilities
     SetEvolutionData("ember_sentinel", "Inferno Sentinel", "Ember Lord",
                      EffectType::Burn, 0.35f, 3);
@@ -174,6 +234,49 @@ void PetManager::Initialize()
                      EffectType::Burn, 0.35f, 2);
     SetEvolutionData("chrono_fragment", "Chrono Shard", "Chrono Crystal",
                      EffectType::Stun, 0.0f, 1);
+
+    SetMythicEvolutionData("ember_sentinel", "Ember God");
+    SetMythicEvolutionData("frost_wisp", "Frost Eternal");
+    SetMythicEvolutionData("storm_tide", "Storm God");
+    SetMythicEvolutionData("arcane_drake", "Arcane Overlord");
+    SetMythicEvolutionData("venom_shard", "Venom God");
+    SetMythicEvolutionData("inferno_guardian", "Inferno God");
+    SetMythicEvolutionData("celestial_spark", "Celestial God");
+    SetMythicEvolutionData("void_mote", "Void God");
+    SetMythicEvolutionData("mana_weaver", "Mana God");
+    SetMythicEvolutionData("chrono_spark", "Chrono God");
+
+    SetEvolutionData("shadowfang_relic", "Shadowfang Totem", "Shadowfang Icon",
+                     EffectType::Burn, 0.45f, 4);
+    SetEvolutionData("flamecrown_shard", "Flamecrown Gem", "Flamecrown Heart",
+                     EffectType::Burn, 0.50f, 4);
+    SetEvolutionData("abyssal_crown", "Abyssal Diadem", "Abyssal Regalia",
+                     EffectType::Freeze, 0.0f, 3);
+    SetEvolutionData("tempest_core", "Tempest Heart", "Tempest Core Ascendant",
+                     EffectType::Stun, 0.0f, 2);
+    SetEvolutionData("rotbloom_heart", "Rotbloom Bloom", "Rotbloom Eternal",
+                     EffectType::Poison, 0.45f, 4);
+    SetEvolutionData("seraph_halo", "Seraph Radiance", "Seraph Divinity",
+                     EffectType::Burn, 0.40f, 3);
+    SetEvolutionData("verdant_serpent", "Verdant Wyrm", "Verdant Ascendant",
+                     EffectType::Poison, 0.45f, 4);
+    SetEvolutionData("warlords_bloodstone", "Warlord's Wrath", "Warlord's Fury",
+                     EffectType::Stun, 0.0f, 2);
+    SetEvolutionData("voidheart_gem", "Voidheart Crystal", "Voidheart Singularity",
+                     EffectType::Burn, 0.50f, 4);
+    SetEvolutionData("chronos_hourglass", "Chronos Eternal", "Chronos Infinite",
+                     EffectType::Stun, 0.0f, 2);
+
+    SetMythicEvolutionData("shadowfang_relic", "Shadowfang God");
+    SetMythicEvolutionData("flamecrown_shard", "Flamecrown God");
+    SetMythicEvolutionData("abyssal_crown", "Abyssal God");
+    SetMythicEvolutionData("tempest_core", "Tempest God");
+    SetMythicEvolutionData("rotbloom_heart", "Rotbloom God");
+    SetMythicEvolutionData("seraph_halo", "Seraph God");
+    SetMythicEvolutionData("verdant_serpent", "Verdant God");
+    SetMythicEvolutionData("warlords_bloodstone", "Warlord God");
+    SetMythicEvolutionData("voidheart_gem", "Voidheart God");
+    SetMythicEvolutionData("chronos_hourglass", "Chronos God");
 }
 
 void PetManager::SetEvolutionData(const std::string& id,
@@ -187,6 +290,13 @@ void PetManager::SetEvolutionData(const std::string& id,
     p->specialAbility = ability;
     p->abilityPotencyMult = potencyMult;
     p->baseAbilityDuration = baseDuration;
+}
+
+void PetManager::SetMythicEvolutionData(const std::string& id, const std::string& mythicName)
+{
+    Pet* p = GetPet(id);
+    if (!p) return;
+    p->mythicName = mythicName;
 }
 
 void PetManager::AddFactionPet(FactionID faction, const std::string& id,
@@ -242,6 +352,36 @@ void PetManager::AddBossPet(const std::string& id, const std::string& name,
     p.healOnKill = healOnKill;
     p.source = PetSource::BossDrop;
     p.bossName = bossName;
+    p.obtained = false;
+    p.equipped = false;
+    pets.push_back(p);
+}
+
+void PetManager::AddCitadelPet(const std::string& id, const std::string& name,
+    const std::string& desc, ElementType element, int baseAtk, int reqLevel,
+    float xpBonus, float goldFind, float critChance, float critDamage,
+    float dmgBonus, float defBonus, float hpBonus, float mpBonus, int healOnKill,
+    const std::string& bossName, PetRarity rarity)
+{
+    Pet p;
+    p.id = id;
+    p.name = name;
+    p.description = desc;
+    p.element = element;
+    p.baseAttack = baseAtk;
+    p.reqLevel = reqLevel;
+    p.xpBonus = xpBonus;
+    p.goldFind = goldFind;
+    p.critChance = critChance;
+    p.critDamage = critDamage;
+    p.damageBonus = dmgBonus;
+    p.defenseBonus = defBonus;
+    p.healthBonus = hpBonus;
+    p.manaBonus = mpBonus;
+    p.healOnKill = healOnKill;
+    p.source = PetSource::CitadelDrop;
+    p.bossName = bossName;
+    p.rarity = rarity;
     p.obtained = false;
     p.equipped = false;
     pets.push_back(p);
@@ -310,6 +450,19 @@ std::string PetManager::GetFactionLegendPetID(FactionID faction) const
 
 std::string PetManager::RollBossDropPet(int bossLevel, const std::string& bossName) const
 {
+    // Check for Citadel boss drops first (2% rate)
+    std::vector<std::string> citadelCandidates;
+    for (const auto& p : pets)
+    {
+        if (p.source == PetSource::CitadelDrop && p.bossName == bossName && !p.obtained)
+            citadelCandidates.push_back(p.id);
+    }
+    if (!citadelCandidates.empty() && RNG::Percent() < 2)
+    {
+        return citadelCandidates[RNG::Next(static_cast<int>(citadelCandidates.size()))];
+    }
+
+    // Regular boss drops (8% rate)
     if (RNG::Percent() >= 8) return "";
 
     std::vector<std::string> candidates;
@@ -359,13 +512,13 @@ PetAbilityResult PetManager::TryProcPetAbility(int playerLevel) const
     if (!pet || pet->evolutionTier == 0) return result;
     if (pet->specialAbility == EffectType::None) return result;
 
-    int procChance = (pet->evolutionTier == 1) ? 30 : 50;
+    int procChance = (pet->evolutionTier == 1) ? 30 : (pet->evolutionTier == 2) ? 50 : 70;
     if (RNG::Percent() >= procChance) return result;
 
     result.procced = true;
     result.effect = pet->specialAbility;
     result.potency = pet->GetAbilityPotency();
-    result.duration = pet->baseAbilityDuration + (pet->evolutionTier == 2 ? 1 : 0);
+    result.duration = pet->baseAbilityDuration + (pet->evolutionTier >= 2 ? 1 : 0) + (pet->evolutionTier == 3 ? 1 : 0);
     result.abilityName = pet->GetAbilityName();
     result.message = pet->GetCurrentName() + " uses " + result.abilityName + "!";
 
@@ -426,6 +579,39 @@ int PetManager::GetHealOnKill() const
     return pet ? pet->GetScaledHealOnKill() : 0;
 }
 
+int PetManager::GetEquippedPetSlot() const
+{
+    const Pet* pet = GetEquippedPet();
+    if (!pet) return -1;
+    for (int i = 0; i < static_cast<int>(pets.size()); ++i)
+    {
+        if (pets[i].equipped) return i;
+    }
+    return -1;
+}
+
+float PetManager::GetBossDamageReduction() const
+{
+    const Pet* pet = GetEquippedPet();
+    if (!pet) return 0.0f;
+    if (pet->source != PetSource::CitadelDrop) return 0.0f;
+    if (pet->evolutionTier == 0) return 0.0f;
+    if (pet->evolutionTier == 1) return 0.05f;
+    if (pet->evolutionTier == 2) return 0.10f;
+    return 0.15f; // tier 3
+}
+
+float PetManager::GetBossXPBonus() const
+{
+    const Pet* pet = GetEquippedPet();
+    if (!pet) return 0.0f;
+    if (pet->source != PetSource::CitadelDrop) return 0.0f;
+    if (pet->evolutionTier == 0) return 0.0f;
+    if (pet->evolutionTier == 1) return 0.10f;
+    if (pet->evolutionTier == 2) return 0.25f;
+    return 0.50f; // tier 3
+}
+
 int Pet::CalculateRequiredXP(int level)
 {
     return level * 100;
@@ -453,6 +639,11 @@ void PetManager::GainPetXP(int xp)
         else if (pet->CanAscendNow())
         {
             pet->evolutionTier = 2;
+            evolvedFlag = true;
+        }
+        else if (pet->CanMythicNow())
+        {
+            pet->evolutionTier = 3;
             evolvedFlag = true;
         }
     }
@@ -508,8 +699,8 @@ std::string Pet::GetAbilityDescription() const
         case EffectType::Stun:    target = "stun"; break;
         default: break;
     }
-    int procChance = (evolutionTier == 1) ? 30 : 50;
-    int dur = baseAbilityDuration + (evolutionTier == 2 ? 1 : 0);
+    int procChance = (evolutionTier == 1) ? 30 : (evolutionTier == 2) ? 50 : 70;
+    int dur = baseAbilityDuration + (evolutionTier >= 2 ? 1 : 0) + (evolutionTier == 3 ? 1 : 0);
     std::string desc = std::to_string(procChance) + "% chance to " + target
                      + " for " + std::to_string(dur) + " turns";
     if (specialAbility == EffectType::Burn || specialAbility == EffectType::Poison)
@@ -540,7 +731,7 @@ std::string PetManager::Serialize() const
         ss << p.id << ":" << (p.obtained ? "1" : "0")
            << ":" << (p.equipped ? "1" : "0")
            << ":" << p.level << ":" << p.experience
-           << ":" << p.evolutionTier << ";";
+           << ":" << p.evolutionTier << ":" << static_cast<int>(p.rarity) << ";";
     }
     return ss.str();
 }
@@ -566,7 +757,7 @@ void PetManager::Deserialize(const std::string& data)
         {
             p->obtained = (obtStr == "1");
 
-            // Parse: equipped:level:experience:evolutionTier
+            // Parse: equipped:level:experience:evolutionTier:rarity
             size_t c3 = rest.find(':');
             if (c3 != std::string::npos)
             {
@@ -584,8 +775,20 @@ void PetManager::Deserialize(const std::string& data)
                     if (c5 != std::string::npos)
                     {
                         p->experience = std::stoi(remainder2.substr(0, c5));
-                        std::string evoStr = remainder2.substr(c5 + 1);
-                        p->evolutionTier = std::stoi(evoStr);
+                        std::string remainder3 = remainder2.substr(c5 + 1);
+
+                        size_t c6 = remainder3.find(':');
+                        if (c6 != std::string::npos)
+                        {
+                            p->evolutionTier = std::stoi(remainder3.substr(0, c6));
+                            std::string rarityStr = remainder3.substr(c6 + 1);
+                            if (!rarityStr.empty())
+                                p->rarity = static_cast<PetRarity>(std::stoi(rarityStr));
+                        }
+                        else
+                        {
+                            p->evolutionTier = std::stoi(remainder3);
+                        }
                     }
                     else
                     {

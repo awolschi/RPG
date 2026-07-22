@@ -1,4 +1,5 @@
 #include "Crafting.hpp"
+#include "../SummoningItem.hpp"
 #include <algorithm>
 #include <iostream>
 
@@ -451,5 +452,220 @@ void CraftingManager::InitializeRecipes()
             return item;
         },
         JobType::Smithing, 9
+    });
+
+    // === LEGENDARY RECIPES (job level 12) — uses boss materials from all areas ===
+
+    recipes.push_back({
+        "Dragonslayer Greatsword",
+        "A colossal blade forged from dragon heart, temporal shard, and colossus core. Tears through reality.",
+        {{"Dragon Heart", 1}, {"Chronos Eye", 1}, {"Colossus Core", 1}},
+        []() {
+            auto item = std::make_shared<Weapon>("Dragonslayer Greatsword", 180, 25, 5,
+                ElementType::Physical, 30, WeaponType::Sword,
+                ItemPassive::PhysDmgBoost20, ItemPassive::CritChance30);
+            item->requiredLevel = 50;
+            return item;
+        },
+        JobType::Smithing, 12
+    });
+
+    recipes.push_back({
+        "Voidrender Staff",
+        "A staff woven from void energy, monarch's will, and arcane heart. Spells cost less and hit harder.",
+        {{"Void Core", 1}, {"Monarch's Scepter", 1}, {"Arcane Core", 1}},
+        []() {
+            auto item = std::make_shared<Weapon>("Voidrender Staff", 100, 40, 5,
+                ElementType::Arcane, 60, WeaponType::Staff,
+                ItemPassive::SpellDmgBoost20, ItemPassive::ManaCostReduce15);
+            item->requiredLevel = 50;
+            return item;
+        },
+        JobType::Smithing, 12
+    });
+
+    recipes.push_back({
+        "Sentinel's Bulwark",
+        "An impenetrable shield forged from the sentinel's helm, warlord's crest, and seraph crown.",
+        {{"Sentinel's Helm", 1}, {"Warlord Crest", 1}, {"Seraph Crown", 1}},
+        []() {
+            auto item = std::make_shared<Offhand>("Sentinel's Bulwark", OffhandType::Shield,
+                50, 0, 0, 5, ItemPassive::DamageReduce15, ItemPassive::StunImmune);
+            item->requiredLevel = 50;
+            return item;
+        },
+        JobType::Smithing, 12
+    });
+
+    recipes.push_back({
+        "Empress's Diadem",
+        "A crown of void majesty woven from empress's will, chrono shards, and kraken ink.",
+        {{"Empress's Crown", 1}, {"Overlord's Chronoshard", 1}, {"Kraken Ink", 1}},
+        []() {
+            auto item = std::make_shared<Armor>("Empress's Diadem", ArmorType::Cloth, ArmorPiece::Helmet,
+                25, 5, std::map<ElementType, int>{{ElementType::Arcane, 15}}, ItemPassive::SpellDmgBoost20, ItemPassive::ManaRegen10);
+            item->requiredLevel = 50;
+            return item;
+        },
+        JobType::Smithing, 12
+    });
+
+    recipes.push_back({
+        "Stormweaver's Ring",
+        "A ring crackling with arbiter's power, treant vitality, and sentinel's resolve.",
+        {{"Arbiter's Scales", 1}, {"Treant Heart", 1}, {"Warlord Crest", 1}},
+        []() {
+            auto item = std::make_shared<Accessory>("Stormweaver's Ring",
+                800, 200, 5, ElementType::Physical, 0,
+                ItemPassive::CritChance30, ItemPassive::AtkSpeed20);
+            item->requiredLevel = 50;
+            return item;
+        },
+        JobType::Smithing, 12
+    });
+
+    recipes.push_back({
+        "Plaguebane Plate",
+        "Cursed armor forged from arbiter's halo, wraith shroud, and sovereign filigree. Heals on kill.",
+        {{"Arbiter's Halo", 1}, {"Wraith's Shroud", 1}, {"Sovereign's Filigree", 1}},
+        []() {
+            auto item = std::make_shared<Armor>("Plaguebane Plate", ArmorType::Plate, ArmorPiece::Chest,
+                60, 5, std::map<ElementType, int>{{ElementType::Poison, 15}, {ElementType::Holy, 10}},
+                ItemPassive::HealOnKill15, ItemPassive::DamageReduce10);
+            item->requiredLevel = 50;
+            return item;
+        },
+        JobType::Smithing, 12
+    });
+
+    recipes.push_back({
+        "Heart of the Unbroken",
+        "A talisman containing the Unbroken's essence, void core, and chronos eye. Massive life steal.",
+        {{"Unbroken's Heart", 1}, {"Void Core", 1}, {"Chronos Eye", 1}},
+        []() {
+            auto item = std::make_shared<Accessory>("Heart of the Unbroken",
+                1200, 300, 5, ElementType::Physical, 0,
+                ItemPassive::Lifesteal25, ItemPassive::AllResist10);
+            item->requiredLevel = 50;
+            return item;
+        },
+        JobType::Smithing, 12
+    });
+
+    recipes.push_back({
+        "Chronoweave Shroud",
+        "A cloak woven from wraith essence, dragon fire, and arcane crystal. Grants ethereal dodge.",
+        {{"Wraith's Shroud", 1}, {"Dragon Heart", 1}, {"Arcane Core", 1}},
+        []() {
+            auto item = std::make_shared<Armor>("Chronoweave Shroud", ArmorType::Leather, ArmorPiece::Chest,
+                40, 5, std::map<ElementType, int>{{ElementType::Ice, 12}, {ElementType::Fire, 12}},
+                ItemPassive::Dodge20, ItemPassive::FreezeImmune);
+            item->requiredLevel = 50;
+            return item;
+        },
+        JobType::Smithing, 12
+    });
+
+    // === SUMMONING ESSENCE RECIPES (Smithing 12) ===
+    // Each uses the boss's unique material drop + gold to craft a summoning item
+
+    recipes.push_back({
+        "Sentinel's Essence",
+        "Crystallized essence of the Abyssal Sentinel. Use in the field to summon it for battle.",
+        {{"Sentinel's Helm", 2}, {"Unbroken's Heart", 1}},
+        []() {
+            return SummoningRegistry::Create("Sentinel's Essence");
+        },
+        JobType::Smithing, 12
+    });
+
+    recipes.push_back({
+        "Empress's Essence",
+        "Crystallized essence of the Void Empress. Use in the field to summon it for battle.",
+        {{"Empress's Crown", 2}, {"Monarch's Scepter", 1}},
+        []() {
+            return SummoningRegistry::Create("Empress's Essence");
+        },
+        JobType::Smithing, 12
+    });
+
+    recipes.push_back({
+        "Colossus Essence",
+        "Crystallized essence of the Infernal Colossus. Use in the field to summon it for battle.",
+        {{"Colossus Core", 2}, {"Overlord's Chronoshard", 1}},
+        []() {
+            return SummoningRegistry::Create("Colossus Essence");
+        },
+        JobType::Smithing, 12
+    });
+
+    recipes.push_back({
+        "Wraith's Essence",
+        "Crystallized essence of the Glacial Wraith. Use in the field to summon it for battle.",
+        {{"Wraith's Shroud", 2}, {"Empress's Crown", 1}},
+        []() {
+            return SummoningRegistry::Create("Wraith's Essence");
+        },
+        JobType::Smithing, 12
+    });
+
+    recipes.push_back({
+        "Arbiter's Essence",
+        "Crystallized essence of the Storm Arbiter. Use in the field to summon it for battle.",
+        {{"Arbiter's Scales", 2}, {"Sentinel's Helm", 1}},
+        []() {
+            return SummoningRegistry::Create("Arbiter's Essence");
+        },
+        JobType::Smithing, 12
+    });
+
+    recipes.push_back({
+        "Sovereign Essence",
+        "Crystallized essence of the Plague Sovereign. Use in the field to summon it for battle.",
+        {{"Sovereign's Filigree", 2}, {"Wraith's Shroud", 1}},
+        []() {
+            return SummoningRegistry::Create("Sovereign Essence");
+        },
+        JobType::Smithing, 12
+    });
+
+    recipes.push_back({
+        "Holy Essence",
+        "Crystallized essence of the Holy Arbiter. Use in the field to summon it for battle.",
+        {{"Arbiter's Halo", 2}, {"Arbiter's Scales", 1}},
+        []() {
+            return SummoningRegistry::Create("Holy Essence");
+        },
+        JobType::Smithing, 12
+    });
+
+    recipes.push_back({
+        "Overlord's Essence",
+        "Crystallized essence of the Chrono Overlord. Use in the field to summon it for battle.",
+        {{"Overlord's Chronoshard", 2}, {"Colossus Core", 1}},
+        []() {
+            return SummoningRegistry::Create("Overlord's Essence");
+        },
+        JobType::Smithing, 12
+    });
+
+    recipes.push_back({
+        "Monarch's Essence",
+        "Crystallized essence of the Void Monarch. Use in the field to summon it for battle.",
+        {{"Monarch's Scepter", 2}, {"Arbiter's Halo", 1}},
+        []() {
+            return SummoningRegistry::Create("Monarch's Essence");
+        },
+        JobType::Smithing, 12
+    });
+
+    recipes.push_back({
+        "Unbroken Essence",
+        "Crystallized essence of The Unbroken. Use in the field to summon it for battle.",
+        {{"Unbroken's Heart", 2}, {"Overlord's Chronoshard", 1}},
+        []() {
+            return SummoningRegistry::Create("Unbroken Essence");
+        },
+        JobType::Smithing, 12
     });
 }

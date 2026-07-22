@@ -39,6 +39,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/awolschi/Desktop/OwnProjects/RPG/Items/Passives.cpp" "CMakeFiles/rpg.dir/Items/Passives.cpp.o" "gcc" "CMakeFiles/rpg.dir/Items/Passives.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Items/Resources/Resources.cpp" "CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.o" "gcc" "CMakeFiles/rpg.dir/Items/Resources/Resources.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Items/SetBonuses.cpp" "CMakeFiles/rpg.dir/Items/SetBonuses.cpp.o" "gcc" "CMakeFiles/rpg.dir/Items/SetBonuses.cpp.o.d"
+  "/home/awolschi/Desktop/OwnProjects/RPG/Items/SummoningItems.cpp" "CMakeFiles/rpg.dir/Items/SummoningItems.cpp.o" "gcc" "CMakeFiles/rpg.dir/Items/SummoningItems.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Items/Uniques/UniqueItems.cpp" "CMakeFiles/rpg.dir/Items/Uniques/UniqueItems.cpp.o" "gcc" "CMakeFiles/rpg.dir/Items/Uniques/UniqueItems.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Jobs/JobEnvironment.cpp" "CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.o" "gcc" "CMakeFiles/rpg.dir/Jobs/JobEnvironment.cpp.o.d"
   "/home/awolschi/Desktop/OwnProjects/RPG/Jobs/JobQuest.cpp" "CMakeFiles/rpg.dir/Jobs/JobQuest.cpp.o" "gcc" "CMakeFiles/rpg.dir/Jobs/JobQuest.cpp.o.d"

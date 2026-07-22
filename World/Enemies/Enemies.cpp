@@ -698,6 +698,142 @@ std::shared_ptr<Monster> EnemyDatabase::CreateChronos()
     return m;
 }
 
+// ============================================================
+//  FORBIDDEN CITADEL (difficulty 11)
+// ============================================================
+
+std::shared_ptr<Monster> EnemyDatabase::CreateAbyssalSentinel()
+{
+    Stats s(8000, 800, 120, 110, 60, 60, 50, 130);
+    auto m = std::make_shared<Monster>("Abyssal Sentinel", s, 75000, 20000, true);
+    m->SetAIType(EnemyAIType::Boss);
+    m->SetResistance(ElementType::Physical, 0.25f);    // Abyssal armor
+    m->SetResistance(ElementType::Arcane, 1.25f);     // Weak to arcane
+    m->SetDropTier(13);
+    m->AddSpecialDrop("Sentinel's Helm", 100, 1, 1);
+    m->AddSpecialDrop("Sentinel's Essence", 5, 1, 1);
+    return m;
+}
+
+std::shared_ptr<Monster> EnemyDatabase::CreateVoidEmpress()
+{
+    Stats s(9000, 2000, 110, 90, 160, 120, 100, 80);
+    auto m = std::make_shared<Monster>("Void Empress", s, 80000, 22000, true);
+    m->SetAIType(EnemyAIType::Caster);
+    m->SetResistance(ElementType::Arcane, 0.25f);      // Void queen resists arcane
+    m->SetResistance(ElementType::Holy, 1.5f);         // Weak to holy
+    m->SetDropTier(13);
+    m->AddSpecialDrop("Empress's Crown", 100, 1, 1);
+    m->AddSpecialDrop("Empress's Essence", 5, 1, 1);
+    return m;
+}
+
+std::shared_ptr<Monster> EnemyDatabase::CreateInfernalColossus()
+{
+    Stats s(10000, 600, 130, 120, 50, 40, 40, 140);
+    auto m = std::make_shared<Monster>("Infernal Colossus", s, 90000, 25000, true);
+    m->SetAIType(EnemyAIType::Aggressive);
+    m->SetResistance(ElementType::Fire, 0.25f);        // Made of fire
+    m->SetResistance(ElementType::Ice, 1.5f);          // Weak to ice
+    m->SetDropTier(13);
+    m->AddSpecialDrop("Colossus Core", 100, 1, 1);
+    m->AddSpecialDrop("Colossus Essence", 5, 1, 1);
+    return m;
+}
+
+std::shared_ptr<Monster> EnemyDatabase::CreateGlacialWraith()
+{
+    Stats s(8500, 1500, 100, 80, 130, 110, 90, 70);
+    auto m = std::make_shared<Monster>("Glacial Wraith", s, 70000, 18000, true);
+    m->SetAIType(EnemyAIType::Caster);
+    m->SetResistance(ElementType::Ice, 0.25f);         // Frozen entity
+    m->SetResistance(ElementType::Fire, 1.5f);         // Weak to fire
+    m->SetDropTier(13);
+    m->AddSpecialDrop("Wraith's Shroud", 100, 1, 1);
+    m->AddSpecialDrop("Wraith's Essence", 5, 1, 1);
+    return m;
+}
+
+std::shared_ptr<Monster> EnemyDatabase::CreateStormArbiter()
+{
+    Stats s(9500, 1200, 125, 95, 110, 80, 130, 90);
+    auto m = std::make_shared<Monster>("Storm Arbiter", s, 85000, 23000, true);
+    m->SetAIType(EnemyAIType::Balanced);
+    m->SetResistance(ElementType::Lightning, 0.25f);   // Born of storms
+    m->SetResistance(ElementType::Physical, 1.25f);    // Weak to physical
+    m->SetDropTier(13);
+    m->AddSpecialDrop("Arbiter's Scales", 100, 1, 1);
+    m->AddSpecialDrop("Arbiter's Essence", 5, 1, 1);
+    return m;
+}
+
+std::shared_ptr<Monster> EnemyDatabase::CreatePlagueSovereign()
+{
+    Stats s(11000, 1000, 90, 100, 120, 90, 70, 110);
+    auto m = std::make_shared<Monster>("Plague Sovereign", s, 82000, 21000, true);
+    m->SetAIType(EnemyAIType::Defensive);
+    m->SetResistance(ElementType::Poison, 0.25f);      // Immune to poison
+    m->SetResistance(ElementType::Holy, 1.5f);         // Weak to holy
+    m->SetDropTier(13);
+    m->AddSpecialDrop("Sovereign's Filigree", 100, 1, 1);
+    m->AddSpecialDrop("Sovereign Essence", 5, 1, 1);
+    return m;
+}
+
+std::shared_ptr<Monster> EnemyDatabase::CreateCitadelHolyArbiter()
+{
+    Stats s(12000, 1800, 115, 100, 140, 150, 80, 100);
+    auto m = std::make_shared<Monster>("Holy Arbiter", s, 95000, 28000, true);
+    m->SetAIType(EnemyAIType::Boss);
+    m->SetResistance(ElementType::Holy, 0.25f);        // Divine entity
+    m->SetResistance(ElementType::Poison, 1.5f);       // Weak to poison
+    m->SetDropTier(13);
+    m->AddSpecialDrop("Arbiter's Halo", 100, 1, 1);
+    m->AddSpecialDrop("Holy Essence", 5, 1, 1);
+    return m;
+}
+
+std::shared_ptr<Monster> EnemyDatabase::CreateChronoOverlord()
+{
+    Stats s(13000, 2500, 140, 110, 150, 100, 120, 90);
+    auto m = std::make_shared<Monster>("Chrono Overlord", s, 100000, 30000, true);
+    m->SetAIType(EnemyAIType::Boss);
+    m->SetResistance(ElementType::Arcane, 0.25f);      // Time master resists arcane
+    m->SetResistance(ElementType::Physical, 0.5f);     // Resists physical
+    m->SetDropTier(13);
+    m->AddSpecialDrop("Overlord's Chronoshard", 100, 1, 1);
+    m->AddSpecialDrop("Overlord's Essence", 5, 1, 1);
+    return m;
+}
+
+std::shared_ptr<Monster> EnemyDatabase::CreateVoidMonarch()
+{
+    Stats s(15000, 3000, 150, 130, 160, 120, 100, 120);
+    auto m = std::make_shared<Monster>("Void Monarch", s, 120000, 35000, true);
+    m->SetAIType(EnemyAIType::Boss);
+    m->SetResistance(ElementType::Arcane, 0.25f);      // Supreme void entity
+    m->SetResistance(ElementType::Holy, 1.5f);         // Weak to holy
+    m->SetDropTier(13);
+    m->AddSpecialDrop("Monarch's Scepter", 100, 1, 1);
+    m->AddSpecialDrop("Monarch's Essence", 5, 1, 1);
+    return m;
+}
+
+std::shared_ptr<Monster> EnemyDatabase::CreateTheUnbroken()
+{
+    Stats s(20000, 1500, 170, 160, 80, 60, 90, 180);
+    auto m = std::make_shared<Monster>("The Unbroken", s, 150000, 50000, true);
+    m->SetAIType(EnemyAIType::Boss);
+    m->SetResistance(ElementType::Physical, 0.25f);    // Unbreakable armor
+    m->SetResistance(ElementType::Arcane, 0.5f);       // Resists arcane
+    m->SetResistance(ElementType::Fire, 1.25f);        // Weak to fire
+    m->SetResistance(ElementType::Ice, 1.25f);         // Weak to ice
+    m->SetDropTier(14);
+    m->AddSpecialDrop("Unbroken's Heart", 100, 1, 1);
+    m->AddSpecialDrop("Unbroken Essence", 5, 1, 1);
+    return m;
+}
+
 // Keep original for backwards compat
 std::shared_ptr<Monster> EnemyDatabase::CreateDragon()
 {

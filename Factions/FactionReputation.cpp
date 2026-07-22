@@ -1,4 +1,7 @@
 #include "FactionReputation.hpp"
+#include "../Items/Loot.hpp"
+#include "../Items/Consumable.hpp"
+#include "../Items/SummoningItem.hpp"
 #include <sstream>
 #include <algorithm>
 #include <cmath>
@@ -72,10 +75,43 @@ void ReputationSystem::Initialize()
         "Time keepers who protect the flow of causality in the Chronos Depths from those who would break reality.",
         "Chronos Depths", 9);
 
+    // Forbidden Citadel boss factions
+    InitializeFaction(FactionID::AbyssalSentinel, "Abyssal Sentinel",
+        "The first guardian of the Forbidden Citadel. Its armor of abyssal stone is said to be impervious.",
+        "Forbidden Citadel", 10);
+    InitializeFaction(FactionID::VoidEmpress, "Void Empress",
+        "She commands the void itself, summoning darkness from between the stars.",
+        "Forbidden Citadel", 10);
+    InitializeFaction(FactionID::InfernalColossus, "Infernal Colossus",
+        "A towering giant forged from living flame and volcanic stone.",
+        "Forbidden Citadel", 10);
+    InitializeFaction(FactionID::GlacialWraith, "Glacial Wraith",
+        "A spirit of eternal winter that freezes the souls of the living.",
+        "Forbidden Citadel", 10);
+    InitializeFaction(FactionID::StormArbiter, "Storm Arbiter",
+        "Judge and executioner of the Citadel, wielding the fury of the tempest.",
+        "Forbidden Citadel", 10);
+    InitializeFaction(FactionID::PlagueSovereign, "Plague Sovereign",
+        "Lord of pestilence. Its mere presence withers the land and sickens the strong.",
+        "Forbidden Citadel", 10);
+    InitializeFaction(FactionID::HolyArbiter, "Holy Arbiter",
+        "A fallen angel of devastating power, wielding sacred fire against the unworthy.",
+        "Forbidden Citadel", 10);
+    InitializeFaction(FactionID::ChronoOverlord, "Chrono Overlord",
+        "Master of time within the Citadel. It bends causality to strike twice before you can react.",
+        "Forbidden Citadel", 10);
+    InitializeFaction(FactionID::VoidMonarch, "Void Monarch",
+        "The supreme ruler of the void dimension, surpassing even the Primordial One.",
+        "Forbidden Citadel", 10);
+    InitializeFaction(FactionID::TheUnbroken, "The Unbroken",
+        "An ancient warrior who has never been defeated. It grows stronger with every passing moment.",
+        "Forbidden Citadel", 10);
+
     for (int i = 0; i < static_cast<int>(FactionID::FactionCount); ++i)
     {
         InitializeRewards(static_cast<FactionID>(i));
         InitializeRepeatableQuests(static_cast<FactionID>(i));
+        InitializeVendorStock(static_cast<FactionID>(i));
     }
 }
 
@@ -131,71 +167,208 @@ void ReputationSystem::InitializeRepeatableQuests(FactionID id)
         case FactionID::VoidExarchs:        enemy = "Void Walker";      boss = "The Primordial One";     break;
         case FactionID::ArcaneConclave:     enemy = "Arcane Guardian";  boss = "Arcane Construct";       break;
         case FactionID::ChronosWardens:     enemy = "Time Weaver";      boss = "Chronos, the Time Ender"; break;
-        default: enemy = "Enemy"; boss = "Boss"; break;
+        // Forbidden Citadel factions: boss-only area, all quests target the boss
+    case FactionID::AbyssalSentinel:  enemy = ""; boss = "Abyssal Sentinel";  break;
+    case FactionID::VoidEmpress:      enemy = ""; boss = "Void Empress";      break;
+    case FactionID::InfernalColossus: enemy = ""; boss = "Infernal Colossus"; break;
+    case FactionID::GlacialWraith:    enemy = ""; boss = "Glacial Wraith";    break;
+    case FactionID::StormArbiter:     enemy = ""; boss = "Storm Arbiter";     break;
+    case FactionID::PlagueSovereign:  enemy = ""; boss = "Plague Sovereign";  break;
+    case FactionID::HolyArbiter:      enemy = ""; boss = "Holy Arbiter";      break;
+    case FactionID::ChronoOverlord:   enemy = ""; boss = "Chrono Overlord";   break;
+    case FactionID::VoidMonarch:      enemy = ""; boss = "Void Monarch";      break;
+    case FactionID::TheUnbroken:      enemy = ""; boss = "The Unbroken";      break;
+    default: enemy = "Enemy"; boss = "Boss"; break;
     }
 
-    std::string enemyPl = Plural(enemy);
+    std::string enemyPl = enemy.empty() ? "" : Plural(enemy);
     std::string bossPh  = BossPhrase(boss);
 
-    // Rank 0 (Stranger) — small enemy kill quests
-    f.repeatableQuests.push_back({
-        "Patrol " + f.areaName,
-        "Defeat 5 " + enemyPl + " to prove your worth.",
-        id, 0, 5, 0, 15, 50, 30, false, false, enemy, boss, false
-    });
-    f.repeatableQuests.push_back({
-        "Gather Intelligence",
-        "Defeat 8 " + enemyPl + " and report back.",
-        id, 0, 8, 0, 25, 75, 50, false, false, enemy, boss, false
-    });
+    bool citadel = enemy.empty(); // Citadel factions have no regular enemies
 
-    // Rank 1 (Acquaintance) — larger enemy kill quests
-    f.repeatableQuests.push_back({
-        "Clear the Perimeter",
-        "Defeat 12 " + enemyPl + " threatening the area.",
-        id, 1, 12, 0, 35, 100, 75, false, false, enemy, boss, false
-    });
-    f.repeatableQuests.push_back({
-        "Strike at the Heart",
-        "Defeat 15 " + enemyPl + " to cripple the enemy's forces.",
-        id, 1, 15, 0, 50, 150, 100, false, false, enemy, boss, false
-    });
+    if (!citadel)
+    {
+        // Normal factions: mix of enemy-kill and boss-kill quests
+        // Rank 0 (Stranger) — small enemy kill quests
+        f.repeatableQuests.push_back({
+            "Patrol " + f.areaName,
+            "Defeat 5 " + enemyPl + " to prove your worth.",
+            id, 0, 5, 0, 15, 50, 30, false, false, enemy, boss, false
+        });
+        f.repeatableQuests.push_back({
+            "Gather Intelligence",
+            "Defeat 8 " + enemyPl + " and report back.",
+            id, 0, 8, 0, 25, 75, 50, false, false, enemy, boss, false
+        });
 
-    // Rank 2 (Friend) — one enemy hunt and one boss hunt
-    f.repeatableQuests.push_back({
-        "Heavy Assault",
-        "Defeat 20 " + enemyPl + " in a coordinated strike.",
-        id, 2, 20, 0, 60, 200, 125, false, false, enemy, boss, false
-    });
-    f.repeatableQuests.push_back({
-        "Boss Bounty",
-        "Defeat " + bossPh + " 3 times to earn the faction's respect.",
-        id, 2, 3, 0, 80, 300, 150, false, false, enemy, boss, true
-    });
+        // Rank 1 (Acquaintance) — larger enemy kill quests
+        f.repeatableQuests.push_back({
+            "Clear the Perimeter",
+            "Defeat 12 " + enemyPl + " threatening the area.",
+            id, 1, 12, 0, 35, 100, 75, false, false, enemy, boss, false
+        });
+        f.repeatableQuests.push_back({
+            "Strike at the Heart",
+            "Defeat 15 " + enemyPl + " to cripple the enemy's forces.",
+            id, 1, 15, 0, 50, 150, 100, false, false, enemy, boss, false
+        });
 
-    // Rank 3 (Ally)
-    f.repeatableQuests.push_back({
-        "War Effort",
-        "Defeat 30 " + enemyPl + ". The faction needs its allies now more than ever.",
-        id, 3, 30, 0, 100, 400, 200, false, false, enemy, boss, false
-    });
-    f.repeatableQuests.push_back({
-        "Elite Hunting",
-        "Defeat " + bossPh + " 5 times. Prove you are a true warrior.",
-        id, 3, 5, 0, 120, 500, 250, false, false, enemy, boss, true
-    });
+        // Rank 2 (Friend) — one enemy hunt and one boss hunt
+        f.repeatableQuests.push_back({
+            "Heavy Assault",
+            "Defeat 20 " + enemyPl + " in a coordinated strike.",
+            id, 2, 20, 0, 60, 200, 125, false, false, enemy, boss, false
+        });
+        f.repeatableQuests.push_back({
+            "Boss Bounty",
+            "Defeat " + bossPh + " 3 times to earn the faction's respect.",
+            id, 2, 3, 0, 80, 300, 150, false, false, enemy, boss, true
+        });
 
-    // Rank 4 (Champion)
-    f.repeatableQuests.push_back({
-        "The Great Campaign",
-        "Defeat 50 " + enemyPl + ". Lead the charge for your faction.",
-        id, 4, 50, 0, 150, 600, 300, false, false, enemy, boss, false
-    });
-    f.repeatableQuests.push_back({
-        "Legendary Hunt",
-        "Defeat " + bossPh + " 8 times. Become a legend among legends.",
-        id, 4, 8, 0, 200, 800, 400, false, false, enemy, boss, true
-    });
+        // Rank 3 (Ally)
+        f.repeatableQuests.push_back({
+            "War Effort",
+            "Defeat 30 " + enemyPl + ". The faction needs its allies now more than ever.",
+            id, 3, 30, 0, 100, 400, 200, false, false, enemy, boss, false
+        });
+        f.repeatableQuests.push_back({
+            "Elite Hunting",
+            "Defeat " + bossPh + " 5 times. Prove you are a true warrior.",
+            id, 3, 5, 0, 120, 500, 250, false, false, enemy, boss, true
+        });
+
+        // Rank 4 (Champion)
+        f.repeatableQuests.push_back({
+            "The Great Campaign",
+            "Defeat 50 " + enemyPl + ". Lead the charge for your faction.",
+            id, 4, 50, 0, 150, 600, 300, false, false, enemy, boss, false
+        });
+        f.repeatableQuests.push_back({
+            "Legendary Hunt",
+            "Defeat " + bossPh + " 8 times. Become a legend among legends.",
+            id, 4, 8, 0, 200, 800, 400, false, false, enemy, boss, true
+        });
+    }
+    else
+    {
+        // Citadel factions: boss-only quests, escalating counts
+        f.repeatableQuests.push_back({
+            "Prove Your Strength",
+            "Defeat " + bossPh + " once to prove you belong here.",
+            id, 0, 1, 0, 30, 100, 60, false, false, enemy, boss, true
+        });
+        f.repeatableQuests.push_back({
+            "Trial of the Citadel",
+            "Defeat " + bossPh + " 2 times. The Citadel demands respect.",
+            id, 1, 2, 0, 50, 200, 100, false, false, enemy, boss, true
+        });
+        f.repeatableQuests.push_back({
+            "Champion's Challenge",
+            "Defeat " + bossPh + " 3 times to earn the faction's trust.",
+            id, 2, 3, 0, 80, 350, 175, false, false, enemy, boss, true
+        });
+        f.repeatableQuests.push_back({
+            "Elite Hunt",
+            "Defeat " + bossPh + " 5 times. Only the strongest survive.",
+            id, 3, 5, 0, 120, 500, 250, false, false, enemy, boss, true
+        });
+        f.repeatableQuests.push_back({
+            "The Great Campaign",
+            "Defeat " + bossPh + " 8 times. Lead the charge into legend.",
+            id, 4, 8, 0, 200, 800, 400, false, false, enemy, boss, true
+        });
+    }
+}
+
+void ReputationSystem::InitializeVendorStock(FactionID id)
+{
+    auto& f = GetFaction(id);
+    int diff = f.areaIndex + 1;
+    f.vendorStock.clear();
+
+    // Citadel factions sell endgame-tier gear (diff 11)
+    if (id >= FactionID::AbyssalSentinel && id <= FactionID::TheUnbroken)
+    {
+        f.vendorStock.push_back({"Health Potion x5", "Restores 50 HP each", 100, RepRank::Stranger,
+            [diff]() { return LootTable::CreatePotion(diff); }});
+        f.vendorStock.push_back({"Mana Potion x5", "Restores 30 MP each", 100, RepRank::Stranger,
+            [diff]() { return LootTable::CreatePotion(diff); }});
+
+        f.vendorStock.push_back({"Epic Weapon", "A weapon of immense power", 3000, RepRank::Friend,
+            [diff]() { return LootTable::CreateEpicWeapon(diff); }});
+        f.vendorStock.push_back({"Epic Armor", "Armor forged in citadel fire", 2500, RepRank::Friend,
+            [diff]() { return LootTable::CreateEpicArmor(diff); }});
+        f.vendorStock.push_back({"Epic Accessory", "Channels arcane citadel energy", 2000, RepRank::Friend,
+            [diff]() { return LootTable::CreateAccessory(diff); }});
+
+        f.vendorStock.push_back({"Legendary Weapon", "A weapon of unrivaled power", 8000, RepRank::Champion,
+            [diff]() { return LootTable::CreateLegendaryWeapon(diff); }});
+        f.vendorStock.push_back({"Legendary Armor", "Armor blessed by citadel forces", 6000, RepRank::Champion,
+            [diff]() { return LootTable::CreateLegendaryArmor(diff); }});
+
+        f.vendorStock.push_back({"Citadel Elixir", "A potent elixir from the Citadel depths", 500, RepRank::Ally,
+            [diff]() { return LootTable::CreatePotion(diff); }});
+        f.vendorStock.push_back({"Boss Trophy", "Proof of vanquishing a Citadel guardian", 1500, RepRank::Ally,
+            [diff]() { return LootTable::CreateAccessory(diff); }});
+
+        // Summoning essences at Ally rank
+        std::string essenceName;
+        std::string bossTarget;
+        if (id == FactionID::AbyssalSentinel) { essenceName = "Sentinel's Essence"; bossTarget = "Abyssal Sentinel"; }
+        else if (id == FactionID::VoidEmpress) { essenceName = "Empress's Essence"; bossTarget = "Void Empress"; }
+        else if (id == FactionID::InfernalColossus) { essenceName = "Colossus Essence"; bossTarget = "Infernal Colossus"; }
+        else if (id == FactionID::GlacialWraith) { essenceName = "Wraith's Essence"; bossTarget = "Glacial Wraith"; }
+        else if (id == FactionID::StormArbiter) { essenceName = "Arbiter's Essence"; bossTarget = "Storm Arbiter"; }
+        else if (id == FactionID::PlagueSovereign) { essenceName = "Sovereign Essence"; bossTarget = "Plague Sovereign"; }
+        else if (id == FactionID::HolyArbiter) { essenceName = "Holy Essence"; bossTarget = "Holy Arbiter"; }
+        else if (id == FactionID::ChronoOverlord) { essenceName = "Overlord's Essence"; bossTarget = "Chrono Overlord"; }
+        else if (id == FactionID::VoidMonarch) { essenceName = "Monarch's Essence"; bossTarget = "Void Monarch"; }
+        else if (id == FactionID::TheUnbroken) { essenceName = "Unbroken Essence"; bossTarget = "The Unbroken"; }
+        if (!essenceName.empty())
+        {
+            f.vendorStock.push_back({essenceName, "Summon " + bossTarget, 5000, RepRank::Ally,
+                [essenceName]() { return SummoningRegistry::Create(essenceName); }});
+        }
+        return;
+    }
+
+    f.vendorStock.push_back({"Health Potion x5", "Restores 50 HP each", 50, RepRank::Stranger,
+        [diff]() { return LootTable::CreatePotion(diff); }});
+    f.vendorStock.push_back({"Mana Potion x5", "Restores 30 MP each", 50, RepRank::Stranger,
+        [diff]() { return LootTable::CreatePotion(diff); }});
+
+    f.vendorStock.push_back({"Reinforced Shield", "A sturdy wooden shield", 200, RepRank::Acquaintance,
+        [diff]() { return LootTable::CreateCommonArmor(diff); }});
+    f.vendorStock.push_back({"Leather Armor", "Light protective gear", 150, RepRank::Acquaintance,
+        [diff]() { return LootTable::CreateCommonArmor(diff); }});
+    f.vendorStock.push_back({"Silver Ring", "A modest magical ring", 150, RepRank::Acquaintance,
+        [diff]() { return LootTable::CreateAccessory(diff); }});
+
+    f.vendorStock.push_back({"Steel Blade", "A well-forged sword", 500, RepRank::Friend,
+        [diff]() { return LootTable::CreateRareWeapon(diff); }});
+    f.vendorStock.push_back({"Chainmail", "Interlocking steel rings", 400, RepRank::Friend,
+        [diff]() { return LootTable::CreateRareArmor(diff); }});
+    f.vendorStock.push_back({"Arcane Circlet", "Enhances magical power", 400, RepRank::Friend,
+        [diff]() { return LootTable::CreateAccessory(diff); }});
+
+    f.vendorStock.push_back({"Gold Longsword", "A gleaming blade of gold", 1200, RepRank::Ally,
+        [diff]() { return LootTable::CreateBossWeapon(diff); }});
+    f.vendorStock.push_back({"Plate Armor", "Heavy full-body protection", 1000, RepRank::Ally,
+        [diff]() { return LootTable::CreateBossArmor(diff); }});
+    f.vendorStock.push_back({"Gold Amulet", "Radiates divine warmth", 800, RepRank::Ally,
+        [diff]() { return LootTable::CreateAccessory(diff); }});
+
+    f.vendorStock.push_back({"Mythril Greatsword", "Forged from rare mythril", 3000, RepRank::Champion,
+        [diff]() { return LootTable::CreateEpicWeapon(diff); }});
+    f.vendorStock.push_back({"Mythril Armor", "Light yet incredibly strong", 2500, RepRank::Champion,
+        [diff]() { return LootTable::CreateEpicArmor(diff); }});
+    f.vendorStock.push_back({"Mythril Focus", "Channels immense arcane energy", 2000, RepRank::Champion,
+        [diff]() { return LootTable::CreateAccessory(diff); }});
+
+    f.vendorStock.push_back({"Legendary Weapon", "A weapon of unrivaled power", 8000, RepRank::Legend,
+        [diff]() { return LootTable::CreateLegendaryWeapon(diff); }});
+    f.vendorStock.push_back({"Legendary Armor", "Armor blessed by the gods", 6000, RepRank::Legend,
+        [diff]() { return LootTable::CreateLegendaryArmor(diff); }});
 }
 
 // ---- Reputation gains ----
@@ -426,6 +599,35 @@ void ReputationSystem::ClaimRepeatableQuestReward(FactionID faction, int questIn
     q.active = false;
     q.completed = false;
     q.currentCount = 0;
+}
+
+// ---- Vendor ----
+
+const std::vector<VendorItem>& ReputationSystem::GetVendorStock(FactionID faction) const
+{
+    return GetFaction(faction).vendorStock;
+}
+
+bool ReputationSystem::CanBuyVendorItem(FactionID faction, int itemIndex, int playerGold) const
+{
+    const auto& stock = GetVendorStock(faction);
+    if (itemIndex < 0 || itemIndex >= static_cast<int>(stock.size()))
+        return false;
+    const auto& item = stock[itemIndex];
+    if (playerGold < item.goldCost)
+        return false;
+    if (static_cast<int>(GetFaction(faction).rank) < static_cast<int>(item.requiredRank))
+        return false;
+    return true;
+}
+
+bool ReputationSystem::BuyVendorItem(FactionID faction, int itemIndex, int& playerGold)
+{
+    if (!CanBuyVendorItem(faction, itemIndex, playerGold))
+        return false;
+    auto& stock = GetFaction(faction).vendorStock;
+    playerGold -= stock[itemIndex].goldCost;
+    return true;
 }
 
 // ---- Rank update ----

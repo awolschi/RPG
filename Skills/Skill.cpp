@@ -29,6 +29,13 @@ int Skill::GetXPToLevel(int currentLevel)
 
 void Skill::GainXP(int xp)
 {
+    if (level >= 50)
+    {
+        int bonus = GetMasteryXPGainBonus();
+        if (bonus > 0) xp = xp * (100 + bonus) / 100;
+        GainMasteryXP(xp);
+        return;
+    }
     experience += xp;
     int needed = GetXPToLevel(level);
     while (experience >= needed)
@@ -36,7 +43,12 @@ void Skill::GainXP(int xp)
         experience -= needed;
         LevelUp();
         needed = GetXPToLevel(level);
-        if (level >= 50) { experience = 0; break; }
+        if (level >= 50)
+        {
+            GainMasteryXP(experience);
+            experience = 0;
+            break;
+        }
     }
 }
 
@@ -158,19 +170,19 @@ int Skill::GetTotalDefenseBonus() const
 
 int Skill::ApplyDamageBonus(int damage) const
 {
-    int bonus = GetTotalDamagePercentBonus();
+    int bonus = GetTotalDamagePercentBonus() + GetMasteryDamageBonus();
     if (bonus == 0) return damage;
     return damage * (100 + bonus) / 100;
 }
 
 int Skill::GetEffectiveManaCost() const
 {
-    return std::max(0, manaCost - GetTotalManaCostReduction());
+    return std::max(0, manaCost - GetTotalManaCostReduction() - GetMasteryManaCostReduction());
 }
 
 int Skill::GetEffectiveCooldown() const
 {
-    return std::max(0, cooldown - GetTotalCooldownReduction());
+    return std::max(0, cooldown - GetTotalCooldownReduction() - GetMasteryCooldownReduction());
 }
 
 std::string Skill::GetDamageFormula() const
@@ -184,4 +196,82 @@ int Skill::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBon
     int damage = (baseDamage / 4) + weaponDamage + elementalBonus;
     damage = ApplyDamageBonus(damage);
     return damage;
+}
+
+// ---- Mastery System ----
+
+int Skill::GetMasteryXPToLevel() const
+{
+    return std::max(200, masteryLevel * 200);
+}
+
+void Skill::GainMasteryXP(int xp)
+{
+    masteryXP += xp;
+    while (masteryLevel < MASTERY_LEVEL_CAP && masteryXP >= GetMasteryXPToLevel())
+    {
+        masteryXP -= GetMasteryXPToLevel();
+        MasteryLevelUp();
+    }
+    if (masteryLevel >= MASTERY_LEVEL_CAP)
+        masteryXP = 0;
+}
+
+void Skill::MasteryLevelUp()
+{
+    masteryLevel++;
+    masteryPoints++;
+}
+
+bool Skill::CanUnlockMasteryNode(int branch, int node) const
+{
+    if (branch < 0 || branch >= MASTERY_TREE_BRANCHES) return false;
+    if (node < 0 || node >= MASTERY_NODES_PER_BRANCH) return false;
+    if (masteryNodes[branch][node]) return false;
+    if (masteryPoints <= 0) return false;
+    if (masteryLevel < (node + 1) * 2) return false;
+    if (node > 0 && !masteryNodes[branch][node - 1]) return false;
+    return true;
+}
+
+bool Skill::UnlockMasteryNode(int branch, int node)
+{
+    if (!CanUnlockMasteryNode(branch, node)) return false;
+    masteryNodes[branch][node] = true;
+    masteryPoints--;
+    return true;
+}
+
+static const char* MASTERY_BRANCH_NAMES[] = { "Damage", "Utility", "Special" };
+
+int Skill::GetMasteryDamageBonus() const
+{
+    int total = 0;
+    for (int n = 0; n < MASTERY_NODES_PER_BRANCH; ++n)
+        if (masteryNodes[0][n]) total += 5;
+    return total;
+}
+
+int Skill::GetMasteryCooldownReduction() const
+{
+    int total = 0;
+    for (int n = 0; n < MASTERY_NODES_PER_BRANCH; ++n)
+        if (masteryNodes[1][n]) total += 1;
+    return total;
+}
+
+int Skill::GetMasteryManaCostReduction() const
+{
+    int total = 0;
+    if (masteryNodes[1][2]) total += 2;
+    if (masteryNodes[1][4]) total += 3;
+    return total;
+}
+
+int Skill::GetMasteryXPGainBonus() const
+{
+    int total = 0;
+    for (int n = 0; n < MASTERY_NODES_PER_BRANCH; ++n)
+        if (masteryNodes[2][n]) total += 10;
+    return total;
 }

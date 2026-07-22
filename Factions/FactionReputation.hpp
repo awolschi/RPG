@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <memory>
+
+class Item;
 
 enum class FactionID
 {
@@ -17,6 +20,17 @@ enum class FactionID
     VoidExarchs,          // Area 7 - Warriors against the primordial
     ArcaneConclave,       // Area 8 - Mage scholars
     ChronosWardens,       // Area 9 - Time keepers
+    // Forbidden Citadel boss factions (Area 11)
+    AbyssalSentinel,      // Citadel boss 1
+    VoidEmpress,          // Citadel boss 2
+    InfernalColossus,     // Citadel boss 3
+    GlacialWraith,        // Citadel boss 4
+    StormArbiter,         // Citadel boss 5
+    PlagueSovereign,      // Citadel boss 6
+    HolyArbiter,          // Citadel boss 7
+    ChronoOverlord,       // Citadel boss 8
+    VoidMonarch,          // Citadel boss 9
+    TheUnbroken,          // Citadel boss 10
     FactionCount
 };
 
@@ -29,6 +43,15 @@ enum class RepRank
     Champion,      // 1000
     Legend,         // 1500
     RankCount
+};
+
+struct VendorItem
+{
+    std::string name;
+    std::string description;
+    int goldCost;
+    RepRank requiredRank;
+    std::function<std::shared_ptr<Item>()> createItem;
 };
 
 struct FactionReward
@@ -73,6 +96,7 @@ struct FactionData
     RepRank rank = RepRank::Stranger;
     std::vector<FactionReward> rewards;
     std::vector<RepeatableQuest> repeatableQuests;
+    std::vector<VendorItem> vendorStock;
     int totalReputationEarned = 0;  // Lifetime tracking (never resets)
 };
 
@@ -116,6 +140,11 @@ public:
     bool IsRepeatableQuestComplete(FactionID faction, int questIndex) const;
     void ClaimRepeatableQuestReward(FactionID faction, int questIndex);
 
+    // Vendor
+    const std::vector<VendorItem>& GetVendorStock(FactionID faction) const;
+    bool CanBuyVendorItem(FactionID faction, int itemIndex, int playerGold) const;
+    bool BuyVendorItem(FactionID faction, int itemIndex, int& playerGold);
+
     // Total tracking
     int GetTotalReputationEarned() const;
 
@@ -143,6 +172,7 @@ private:
                            const std::string& areaName, int areaIndex);
     void InitializeRewards(FactionID id);
     void InitializeRepeatableQuests(FactionID id);
+    void InitializeVendorStock(FactionID id);
     void UpdateRank(FactionID id);
     FactionData& GetFaction(FactionID id);
     const FactionData& GetFaction(FactionID id) const;

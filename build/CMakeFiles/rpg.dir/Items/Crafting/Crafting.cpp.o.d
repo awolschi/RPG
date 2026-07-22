@@ -181,6 +181,15 @@ CMakeFiles/rpg.dir/Items/Crafting/Crafting.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../../Jobs/../Items/Resources/Resources.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../../Jobs/JobPerk.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../../Jobs/JobSpecialization.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../SummoningItem.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../Item.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../../Characters/Monster.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../../Characters/Character.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../../Characters/Stats/Stats.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../../Characters/../Items/Equipment/Equipment.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../../Characters/../Items/Equipment/../Item.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../../Characters/../Skills/Skills.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Items/Crafting/../../Characters/../Skills/Skill.hpp \
  /usr/include/c++/10/algorithm \
  /usr/include/c++/10/pstl/glue_algorithm_defs.h \
  /usr/include/c++/10/iostream /usr/include/c++/10/ostream \

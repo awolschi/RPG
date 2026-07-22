@@ -990,6 +990,30 @@ Items/SetBonuses.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/SetBonuses.cpp.s
 .PHONY : Items/SetBonuses.cpp.s
 
+Items/SummoningItems.o: Items/SummoningItems.cpp.o
+.PHONY : Items/SummoningItems.o
+
+# target to build an object file
+Items/SummoningItems.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/SummoningItems.cpp.o
+.PHONY : Items/SummoningItems.cpp.o
+
+Items/SummoningItems.i: Items/SummoningItems.cpp.i
+.PHONY : Items/SummoningItems.i
+
+# target to preprocess a source file
+Items/SummoningItems.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/SummoningItems.cpp.i
+.PHONY : Items/SummoningItems.cpp.i
+
+Items/SummoningItems.s: Items/SummoningItems.cpp.s
+.PHONY : Items/SummoningItems.s
+
+# target to generate assembly for a file
+Items/SummoningItems.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rpg.dir/build.make CMakeFiles/rpg.dir/Items/SummoningItems.cpp.s
+.PHONY : Items/SummoningItems.cpp.s
+
 Items/Uniques/UniqueItems.o: Items/Uniques/UniqueItems.cpp.o
 .PHONY : Items/Uniques/UniqueItems.o
 
@@ -1630,6 +1654,9 @@ help:
 	@echo "... Items/SetBonuses.o"
 	@echo "... Items/SetBonuses.i"
 	@echo "... Items/SetBonuses.s"
+	@echo "... Items/SummoningItems.o"
+	@echo "... Items/SummoningItems.i"
+	@echo "... Items/SummoningItems.s"
 	@echo "... Items/Uniques/UniqueItems.o"
 	@echo "... Items/Uniques/UniqueItems.i"
 	@echo "... Items/Uniques/UniqueItems.s"

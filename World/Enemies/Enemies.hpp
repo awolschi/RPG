@@ -93,6 +93,18 @@ public:
     static std::shared_ptr<Monster> CreateChronos();
     static std::shared_ptr<Monster> CreateDragon(); // keep original
 
+    // ---- Forbidden Citadel bosses (difficulty 11) ----
+    static std::shared_ptr<Monster> CreateAbyssalSentinel();
+    static std::shared_ptr<Monster> CreateVoidEmpress();
+    static std::shared_ptr<Monster> CreateInfernalColossus();
+    static std::shared_ptr<Monster> CreateGlacialWraith();
+    static std::shared_ptr<Monster> CreateStormArbiter();
+    static std::shared_ptr<Monster> CreatePlagueSovereign();
+    static std::shared_ptr<Monster> CreateCitadelHolyArbiter();
+    static std::shared_ptr<Monster> CreateChronoOverlord();
+    static std::shared_ptr<Monster> CreateVoidMonarch();
+    static std::shared_ptr<Monster> CreateTheUnbroken();
+
     // Get weighted enemy pool for a given difficulty tier
     static const std::vector<EnemyEntry>& GetPool(int difficulty);
 };
