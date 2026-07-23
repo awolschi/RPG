@@ -3986,6 +3986,7 @@ CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.o: ../Graphics/BattleRenderer.cpp
   ../Jobs/JobQuest.hpp \
   ../Jobs/Job.hpp \
   ../Factions/Pet.hpp \
+  ../Skills/Skill.hpp \
   /usr/include/c++/10/cmath \
   /usr/include/math.h \
   /usr/include/x86_64-linux-gnu/bits/math-vector.h \

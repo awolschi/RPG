@@ -62,8 +62,32 @@ struct Pet
     // Leveling
     int level = 1;
     int experience = 0;
-    static constexpr int MAX_PET_LEVEL = 50;
+    static constexpr int MAX_PET_LEVEL = 100;
+    static constexpr int SKILL_TREE_UNLOCK_LEVEL = 100;
+    static constexpr int SKILL_TREE_BRANCHES = 3;
+    static constexpr int SKILL_TREE_NODES_PER_BRANCH = 5;
     static int CalculateRequiredXP(int level);
+
+    // Skill tree (unlocks at level 100)
+    int skillPoints = 0;
+    bool skillTreeNodes[SKILL_TREE_BRANCHES][SKILL_TREE_NODES_PER_BRANCH] = {};
+    static constexpr int XP_PER_SKILL_POINT = 500;
+
+    // Skill tree bonuses (computed from nodes)
+    float treeDamageBonus = 0.0f;
+    float treeDefenseBonus = 0.0f;
+    float treeCritChance = 0.0f;
+    float treeXPBonus = 0.0f;
+    float treeGoldFind = 0.0f;
+    int treeHealthBonus = 0;
+    int treeManaBonus = 0;
+    int treeHealOnKill = 0;
+    float treeBurnBonus = 0.0f;
+    float treeFreezeBonus = 0.0f;
+    float treePoisonBonus = 0.0f;
+    float treeStunBonus = 0.0f;
+
+    void RecalcTreeBonuses();
 
     // Evolution
     int evolutionTier = 0;  // 0=base, 1=evolved, 2=ascended, 3=mythic
@@ -89,17 +113,17 @@ struct Pet
         return evoMult * (1.0f + (level - 1) * 0.03f);
     }
 
-    // Scaled getters (base * level multiplier)
+    // Scaled getters (base * level multiplier + tree bonuses)
     int GetScaledAttack() const { return static_cast<int>(baseAttack * GetLevelMultiplier()); }
-    float GetScaledXPBonus() const { return xpBonus * GetLevelMultiplier(); }
-    float GetScaledGoldFind() const { return goldFind * GetLevelMultiplier(); }
-    float GetScaledCritChance() const { return critChance * GetLevelMultiplier(); }
+    float GetScaledXPBonus() const { return xpBonus * GetLevelMultiplier() + treeXPBonus; }
+    float GetScaledGoldFind() const { return goldFind * GetLevelMultiplier() + treeGoldFind; }
+    float GetScaledCritChance() const { return critChance * GetLevelMultiplier() + treeCritChance; }
     float GetScaledCritDamage() const { return critDamage * GetLevelMultiplier(); }
-    float GetScaledDamageBonus() const { return damageBonus * GetLevelMultiplier(); }
-    float GetScaledDefenseBonus() const { return defenseBonus * GetLevelMultiplier(); }
-    int GetScaledHealthBonus() const { return static_cast<int>(healthBonus * GetLevelMultiplier()); }
-    int GetScaledManaBonus() const { return static_cast<int>(manaBonus * GetLevelMultiplier()); }
-    int GetScaledHealOnKill() const { return static_cast<int>(healOnKill * GetLevelMultiplier()); }
+    float GetScaledDamageBonus() const { return damageBonus * GetLevelMultiplier() + treeDamageBonus; }
+    float GetScaledDefenseBonus() const { return defenseBonus * GetLevelMultiplier() + treeDefenseBonus; }
+    int GetScaledHealthBonus() const { return static_cast<int>(healthBonus * GetLevelMultiplier()) + treeHealthBonus; }
+    int GetScaledManaBonus() const { return static_cast<int>(manaBonus * GetLevelMultiplier()) + treeManaBonus; }
+    int GetScaledHealOnKill() const { return static_cast<int>(healOnKill * GetLevelMultiplier()) + treeHealOnKill; }
 
     // Evolution helpers
     bool CanEvolve() const { return CanEvolveNow(); }
@@ -125,6 +149,13 @@ struct Pet
 
     std::string GetAbilityName() const;
     std::string GetAbilityDescription() const;
+
+    bool CanSpendSkillPoint(int branch, int node) const;
+    void SpendSkillPoint(int branch, int node);
+    int GetTotalSkillNodesUnlocked() const;
+    static std::string GetSkillNodeName(ElementType element, int branch, int node);
+    static std::string GetSkillNodeDesc(ElementType element, int branch, int node);
+    static std::string GetBranchName(ElementType element, int branch);
 
     int GetAbilityPotency() const
     {

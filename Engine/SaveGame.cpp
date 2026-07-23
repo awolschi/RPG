@@ -32,7 +32,8 @@ static void SerializeItem(std::ostream& file, const std::shared_ptr<Item>& item,
     if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
         file << "|OH|" << oh->defense << "|" << oh->manaBonus << "|" << oh->arcaneDamage << "|" << static_cast<int>(oh->offhandType);
     else if (auto w = std::dynamic_pointer_cast<Weapon>(item))
-        file << "|W|" << w->damage << "|" << w->manaCost << "|" << static_cast<int>(w->element) << "|" << w->elementDamage;
+        file << "|W|" << w->damage << "|" << w->manaCost << "|" << static_cast<int>(w->element) << "|" << w->elementDamage
+             << "|" << static_cast<int>(w->weaponType);
     else if (auto a = std::dynamic_pointer_cast<Armor>(item))
     {
         file << "|A|" << static_cast<int>(a->armorType) << "|" << static_cast<int>(a->piece) << "|" << a->defense;
@@ -79,7 +80,14 @@ static std::shared_ptr<Item> DeserializeItem(std::istringstream& ss, int saveVer
             if (std::getline(ss, elemDmgStr, '|') && !elemDmgStr.empty())
                 elemDmg = SafeStoi(elemDmgStr);
         }
-        item = std::make_shared<Weapon>(iname, SafeStoi(dmgStr), SafeStoi(manaStr), rarity, elem, elemDmg);
+        WeaponType wType = WeaponType::Sword;
+        if (saveVersion >= 15)
+        {
+            std::string wTypeStr;
+            if (std::getline(ss, wTypeStr, '|') && !wTypeStr.empty())
+                wType = SafeCastEnum<WeaponType>(SafeStoi(wTypeStr), 8, WeaponType::Sword);
+        }
+        item = std::make_shared<Weapon>(iname, SafeStoi(dmgStr), SafeStoi(manaStr), rarity, elem, elemDmg, wType);
     }
     else if (subType == "A")
     {
@@ -342,6 +350,18 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
         // Legendary recipes unlocked bitmask (v14+)
         file << legendaryRecipesUnlocked << "\n";
 
+        // Character mastery data (v15+)
+        file << player->charMasteryXP << "\n";
+        file << player->charMasteryLevel << "\n";
+        file << player->charMasteryPoints << "\n";
+        for (int b = 0; b < Player::CHAR_MASTERY_BRANCHES; ++b)
+            for (int n = 0; n < Player::CHAR_MASTERY_NODES_PER_BRANCH; ++n)
+                file << (player->charMasteryNodes[b][n] ? "1" : "0") << " ";
+        file << "\n";
+
+        // Class evolution flag (v15+)
+        file << (player->HasClassEvolved() ? "1" : "0") << "\n";
+
         file.close();
         return true;
     }
@@ -499,7 +519,7 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
             {
                 // Assign to equipment slot based on index with proper casting
                 if (i == 0) player->GetEquipment().weapon = std::dynamic_pointer_cast<Weapon>(item);
-                else if (i == 1) player->GetEquipment().offhand = std::dynamic_pointer_cast<Offhand>(item);
+                else if (i == 1) player->GetEquipment().offhand = item;
                 else if (i == 2) player->GetEquipment().helmet = std::dynamic_pointer_cast<Armor>(item);
                 else if (i == 3) player->GetEquipment().chest = std::dynamic_pointer_cast<Armor>(item);
                 else if (i == 4) player->GetEquipment().gloves = std::dynamic_pointer_cast<Armor>(item);
@@ -804,6 +824,31 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 // Legendary recipes unlocked bitmask
                 file >> outLegendaryRecipesUnlocked;
                 file.ignore();
+
+                // Character mastery data (v15+)
+                if (saveVersion >= 15 && file.peek() != std::char_traits<char>::eof())
+                {
+                    int cmXP, cmLevel, cmPoints;
+                    file >> cmXP >> cmLevel >> cmPoints; file.ignore();
+                    player->charMasteryXP = cmXP;
+                    player->charMasteryLevel = cmLevel;
+                    player->charMasteryPoints = cmPoints;
+                    for (int b = 0; b < Player::CHAR_MASTERY_BRANCHES; ++b)
+                        for (int n = 0; n < Player::CHAR_MASTERY_NODES_PER_BRANCH; ++n)
+                        {
+                            int val;
+                            file >> val;
+                            player->charMasteryNodes[b][n] = (val == 1);
+                        }
+                    file.ignore();
+                    player->RecalcMasteryBonuses();
+
+                    // Class evolution flag (v15+)
+                    int evolvedFlag = 0;
+                    file >> evolvedFlag; file.ignore();
+                    if (evolvedFlag == 1 && !player->HasClassEvolved())
+                        player->EvolveClass();
+                }
             }
             else
             {

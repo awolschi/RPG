@@ -25,6 +25,7 @@ public:
     const QuestManager& GetQuestManager() const { return questManager; }
 
     void LevelUp() override;
+    void OnOverflowXP(int xp) override;
     void InitializeClassSkills();
     void CheckNewSkills();
 
@@ -60,6 +61,33 @@ public:
     float GetEvolvedManaCostReduction() const; // Mage Archmage: -15% mana cost
     float GetEvolvedCritBonus() const;        // Archer Ranger: +10% crit
     float GetEvolvedGoldFind() const;         // Merchant Tycoon: +25% gold find
+
+    // Character Mastery (unlocked at level 50)
+    static constexpr int CHAR_MASTERY_LEVEL_CAP = 999;
+    static constexpr int CHAR_MASTERY_BRANCHES = 3;
+    static constexpr int CHAR_MASTERY_NODES_PER_BRANCH = 5;
+    int charMasteryXP = 0;
+    int charMasteryLevel = 0;
+    int charMasteryPoints = 0;
+    bool charMasteryNodes[CHAR_MASTERY_BRANCHES][CHAR_MASTERY_NODES_PER_BRANCH] = {};
+
+    int GetCharMasteryXPToLevel() const { return std::max(200, charMasteryLevel * 200 + charMasteryLevel * charMasteryLevel * 5); }
+    void GainCharMasteryXP(int xp);
+    void CharMasteryLevelUp();
+    bool CanUnlockCharMasteryNode(int branch, int node) const;
+    bool UnlockCharMasteryNode(int branch, int node);
+    void RecalcMasteryBonuses();
+
+    // Stat bonuses from character mastery
+    int GetCharMasteryBonusHP() const;
+    int GetCharMasteryBonusDEF() const;
+    float GetCharMasteryDamageBonus() const;
+    float GetCharMasteryDamageReduction() const;
+    float GetCharMasteryHealingBonus() const;
+    float GetCharMasteryManaCostReduction() const;
+    float GetCharMasteryDodgeChance() const;
+    float GetCharMasteryGoldFind() const;
+    float GetCharMasteryXPBonus() const;
 
 private:
     CharacterClass characterClass;

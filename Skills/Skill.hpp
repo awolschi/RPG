@@ -106,7 +106,7 @@ public:
     std::vector<SkillUpgrade> upgrades;
 
     // Mastery system (unlocked at skill level 50)
-    static constexpr int MASTERY_LEVEL_CAP = 20;
+    static constexpr int MASTERY_LEVEL_CAP = 999;
     static constexpr int MASTERY_TREE_BRANCHES = 3;
     static constexpr int MASTERY_NODES_PER_BRANCH = 5;
     int masteryXP = 0;

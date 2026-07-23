@@ -115,6 +115,7 @@ enum class GameState
     CitadelBossSelect,
     JobSkillTree,
     JobUpgrades,
+    Evolution,
     Exit
 };
 
@@ -199,6 +200,9 @@ private:
     int skillOverviewPage;
     int skillLoadoutPage;
     int selectedSkillIdx = -1;
+    int viewingMasteryIdx = -1;
+    bool viewingCharacterMastery = false;
+    int lastUsedSkillIdx = -1;
 
     // Skill loadout editing state (persist across frames)
     std::vector<int> loadoutEditCopy;
@@ -272,6 +276,7 @@ private:
     void StateReputation();
     void StateCitadelBossSelect();
     void StatePets();
+    void StateEvolution();
     void StateCombat();
     void StateDungeonSelect();
     void StateDungeonExplore();

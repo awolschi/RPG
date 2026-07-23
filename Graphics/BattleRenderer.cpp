@@ -7,6 +7,7 @@
 #include "../Characters/Monster.hpp"
 #include "../Engine/Game.hpp"
 #include "../Factions/Pet.hpp"
+#include "../Skills/Skill.hpp"
 #include <cmath>
 
 static void DrawCreatureFallback(GRenderer& renderer, const std::string& name, int x, int y, int size)
@@ -28,7 +29,14 @@ void BattleRenderer::DrawBattleScreen(GRenderer& renderer,
                                        int playerMaxXP,
                                        int reputationValue,
                                        int reputationMax,
-                                       const std::string& repLabel)
+                                       const std::string& repLabel,
+                                       const std::string& masterySkillName,
+                                       int masteryXP,
+                                       int masteryMaxXP,
+                                       int masteryLevel,
+                                       int charMasteryXP,
+                                       int charMasteryMaxXP,
+                                       int charMasteryLevel)
 {
     BattleLayout layout;
     layout.Calculate(GRenderer::W, GRenderer::H);
@@ -140,7 +148,9 @@ void BattleRenderer::DrawBattleScreen(GRenderer& renderer,
                   player.GetCurrentHealth(), player.GetMaxHealth(),
                   player.GetCurrentMana(), player.GetMaxMana(),
                   layout.playerBarY,
-                  playerXP, playerMaxXP);
+                  playerXP, playerMaxXP,
+                  masterySkillName, masteryXP, masteryMaxXP, masteryLevel,
+                  charMasteryXP, charMasteryMaxXP, charMasteryLevel);
 
     // Show equipped pet info (inside player bar area, right side)
     int petInfoY = layout.playerBarY;
@@ -251,11 +261,18 @@ void BattleRenderer::DrawPlayerBar(GRenderer& renderer,
                                     int currentMP, int maxMP,
                                     int y,
                                     int currentXP,
-                                    int maxXP)
+                                    int maxXP,
+                                    const std::string& masterySkillName,
+                                    int masteryXP,
+                                    int masteryMaxXP,
+                                    int masteryLevel,
+                                    int charMasteryXP,
+                                    int charMasteryMaxXP,
+                                    int charMasteryLevel)
 {
     int barX = 30;
     int barW = GRenderer::W - 60;
-    int barH = 60;
+    int barH = 76;
 
     DrawRectangle(barX, y, barW, barH, {15, 15, 20, 240});
     DrawRectangleLines(barX, y, barW, barH, {60, 60, 80, 200});
@@ -281,4 +298,19 @@ void BattleRenderer::DrawPlayerBar(GRenderer& renderer,
                                 CQColors::XpFg, CQColors::XpBg, "XP");
     else
         renderer.DrawText("MAX LEVEL", xpBarX, xpBarY, 12, CQColors::TextGold);
+
+    // Mastery bar
+    int masteryBarY = y + 60;
+    if (masteryMaxXP > 0)
+        renderer.DrawBarLabeled(masteryXP, masteryMaxXP, barX + 10, masteryBarY, barW - 20, 12,
+                                CQColors::Gold, CQColors::GoldDim, "Mastery Lv" + std::to_string(masteryLevel) + " - " + masterySkillName);
+    else if (masteryLevel > 0)
+        DrawText(("Mastery Lv" + std::to_string(masteryLevel) + " - " + masterySkillName).c_str(), barX + 10, masteryBarY, 12, CQColors::TextGold);
+
+    // Character Mastery bar
+    if (charMasteryMaxXP > 0)
+        renderer.DrawBarLabeled(charMasteryXP, charMasteryMaxXP, barX + 10, masteryBarY + 14, barW - 20, 12,
+                                {180, 140, 220, 255}, {60, 40, 80, 255}, "Char Mastery Lv" + std::to_string(charMasteryLevel));
+    else if (charMasteryLevel > 0)
+        DrawText(("Char Mastery Lv" + std::to_string(charMasteryLevel)).c_str(), barX + 10, masteryBarY + 14, 12, {180, 140, 220, 255});
 }

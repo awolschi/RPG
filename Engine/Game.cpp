@@ -43,6 +43,7 @@ Game::Game()
       craftMaxPage(0),
       skillOverviewPage(0),
       skillLoadoutPage(0),
+      lastUsedSkillIdx(-1),
       selectedJobIdx(-1),
       jobPerkPage(0),
       inventoryTab(0),
@@ -306,6 +307,7 @@ void Game::Run()
                 case GameState::DungeonSelect:
                 case GameState::CitadelBossSelect:
                 case GameState::SavePrompt:
+                case GameState::Evolution:
                     currentState = GameState::Exploring;
                     break;
                 case GameState::JobPerks:
@@ -353,6 +355,7 @@ void Game::Run()
             case GameState::Reputation:         StateReputation(); break;
             case GameState::CitadelBossSelect:   StateCitadelBossSelect(); break;
             case GameState::Pets:              StatePets(); break;
+            case GameState::Evolution:          StateEvolution(); break;
             case GameState::Exit:              break;
             default:                           currentState = GameState::MainMenu;
         }
@@ -841,6 +844,7 @@ void Game::StateCharacterCreation()
         player->GetQuestManager().InitializeDefaultQuests();
         currentAreaIndex = 0;
         selectedSkillIdx = -1;
+        viewingMasteryIdx = -1;
         selectedAchievementCategory = -1;
         initialized = false;
         ClearLog();
@@ -906,7 +910,7 @@ void Game::StateExplore()
         "Explore Area", "Travel", "Quests",
         "Inventory", "Stats", "Jobs",
         "Skills", "Skill Upgrades", "Crafting", "Pray",
-        "Shop", "Rest at Inn", "Codex", "Achievements", "Reputation", "Pets", "Save Game", "Main Menu"
+        "Shop", "Rest at Inn", "Evolution", "Codex", "Achievements", "Reputation", "Pets", "Save Game", "Main Menu"
     };
 
     int bx = GRenderer::W - 240;
@@ -932,12 +936,13 @@ void Game::StateExplore()
                 // Restock shops
                 shopItems.clear();
             }
-            else if (i == 12) { currentState = GameState::Wiki; renderer.StartTransition(); }
-            else if (i == 13) { currentState = GameState::Achievements; renderer.StartTransition(); }
-            else if (i == 14) { currentState = GameState::Reputation; renderer.StartTransition(); }
-            else if (i == 15) { currentState = GameState::Pets; petListPage = 0; renderer.StartTransition(); }
-            else if (i == 16) currentState = GameState::SavePrompt;
-            else if (i == 17) {
+            else if (i == 12) { currentState = GameState::Evolution; renderer.StartTransition(); }
+            else if (i == 13) { currentState = GameState::Wiki; renderer.StartTransition(); }
+            else if (i == 14) { currentState = GameState::Achievements; renderer.StartTransition(); }
+            else if (i == 15) { currentState = GameState::Reputation; renderer.StartTransition(); }
+            else if (i == 16) { currentState = GameState::Pets; petListPage = 0; renderer.StartTransition(); }
+            else if (i == 17) currentState = GameState::SavePrompt;
+            else if (i == 18) {
                 currentState = GameState::MainMenu;
             }
             else {
@@ -3180,12 +3185,263 @@ void Game::StateSkillUpgrade()
 
     auto& skills = player->GetSkills();
 
-    // Calculate total skill points
-    int totalPoints = 0;
-    for (size_t i = 0; i < skills.GetSkillCount(); ++i)
+    // ---- Character Mastery view ----
+    if (viewingCharacterMastery)
     {
-        auto sk = skills.GetSkill(i);
-        if (sk) totalPoints += sk->skillPoints;
+        std::string title = "Character Mastery";
+        renderer.DrawPanel(50, 60, GRenderer::W - 100, GRenderer::H - 120, title);
+
+        int y = 110;
+        renderer.DrawText("Level: " + std::to_string(player->charMasteryLevel)
+            + "  Points: " + std::to_string(player->charMasteryPoints)
+            + "  XP: " + std::to_string(player->charMasteryXP) + "/" + std::to_string(player->GetCharMasteryXPToLevel()),
+            70, y, 18, CQColors::TextGold);
+        y += 10;
+        renderer.DrawText("Spend mastery points to unlock class-themed stat bonuses.", 70, y + 18, 14, CQColors::TextDim);
+        y += 42;
+
+        const char* branchDescs[3][5] = {
+            { "+5% Max HP", "+5% Max HP", "+5% Max HP", "+5% Max HP", "+5% Max HP" },
+            { nullptr, nullptr, nullptr, nullptr, nullptr },
+            { nullptr, nullptr, nullptr, nullptr, nullptr },
+        };
+
+        // Class-specific branch names and descriptions
+        struct BranchInfo { const char* name; const char* desc; };
+        BranchInfo offenseInfo, utilityInfo;
+        switch (player->GetCharacterClass())
+        {
+            case CharacterClass::Warrior:
+                offenseInfo = {"Might", "+5% Physical DMG per node"};
+                utilityInfo = {"Fortitude", "+2% Damage Reduction per node"};
+                break;
+            case CharacterClass::Priest:
+                offenseInfo = {"Divinity", "+5% Holy DMG per node"};
+                utilityInfo = {"Grace", "+5% Healing Power per node"};
+                break;
+            case CharacterClass::Mage:
+                offenseInfo = {"Arcana", "+5% Spell DMG per node"};
+                utilityInfo = {"Channeling", "-3% Mana Cost per node"};
+                break;
+            case CharacterClass::Archer:
+                offenseInfo = {"Precision", "+5% Ranged DMG per node"};
+                utilityInfo = {"Swiftness", "+3% Dodge Chance per node"};
+                break;
+            case CharacterClass::Merchant:
+                offenseInfo = {"Opulence", "+5% Gold Find per node"};
+                utilityInfo = {"Endurance", "+3% XP Gain per node"};
+                break;
+            default:
+                offenseInfo = {"Offense", "+5% DMG per node"};
+                utilityInfo = {"Utility", "Class bonus per node"};
+                break;
+        }
+
+        const char* branch2Desc[5];
+        const char* branch3Desc[5];
+        for (int i = 0; i < 5; ++i) { branch2Desc[i] = offenseInfo.desc; branch3Desc[i] = utilityInfo.desc; }
+
+        int colW = (GRenderer::W - 180) / 3;
+        const char* bNames[3] = { "Vitality", offenseInfo.name, utilityInfo.name };
+        const char* bDescs[3][5];
+        for (int i = 0; i < 5; ++i) { bDescs[0][i] = branchDescs[0][i]; bDescs[1][i] = branch2Desc[i]; bDescs[2][i] = branch3Desc[i]; }
+
+        int focusCount = 2; // Back to Skills + Back
+        for (int b = 0; b < 3; ++b)
+            for (int n = 0; n < 5; ++n)
+                if (player->CanUnlockCharMasteryNode(b, n))
+                    focusCount++;
+        keyboardNav.SetFocusCount(focusCount);
+        int focusIdx = 0;
+
+        for (int b = 0; b < 3; ++b)
+        {
+            int bx = 80 + b * colW;
+            Color branchColor = (b == 0) ? CQColors::TextGreen : (b == 1) ? CQColors::TextFire : CQColors::TextArcane;
+            renderer.DrawText(bNames[b], bx, y, 16, branchColor);
+            for (int n = 0; n < 5; ++n)
+            {
+                int ny = y + 24 + n * 28;
+                bool unlocked = player->charMasteryNodes[b][n];
+                bool canUnlock = player->CanUnlockCharMasteryNode(b, n);
+                bool locked = !unlocked && !canUnlock;
+                std::string nodeText = "Lv" + std::to_string((n + 1) * 4) + ": " + bDescs[b][n];
+                Color nodeColor = unlocked ? CQColors::TextGreen : (canUnlock ? CQColors::TextGold : CQColors::TextDim);
+                std::string icon = unlocked ? "[*]" : (canUnlock ? "[o]" : "[ ]");
+                renderer.DrawText(icon + " " + nodeText, bx, ny, 13, nodeColor);
+
+                if (locked)
+                {
+                    int reqLvl = (n + 1) * 4;
+                    renderer.DrawText("Requires Lv" + std::to_string(reqLvl), bx + 20, ny + 14, 10, CQColors::TextDim);
+                }
+
+                if (canUnlock)
+                {
+                    if (renderer.Button("Unlock##cm" + std::to_string(b) + std::to_string(n),
+                                        bx + colW - 140, ny, 120, 24, focusIdx++))
+                    {
+                        player->UnlockCharMasteryNode(b, n);
+                    }
+                }
+            }
+        }
+        y += 24 + 5 * 28 + 20;
+
+        // Effect summary
+        int totalHpPct = player->GetCharMasteryBonusHP();
+        int totalDef = player->GetCharMasteryBonusDEF();
+        float totalDmg = player->GetCharMasteryDamageBonus();
+        float totalDr = player->GetCharMasteryDamageReduction();
+        float totalHeal = player->GetCharMasteryHealingBonus();
+        float totalManaReduce = player->GetCharMasteryManaCostReduction();
+        float totalDodge = player->GetCharMasteryDodgeChance();
+        float totalGoldFind = player->GetCharMasteryGoldFind();
+        float totalXpBonus = player->GetCharMasteryXPBonus();
+
+        std::string summary;
+        if (totalHpPct > 0) summary += "HP: +" + std::to_string(totalHpPct) + "%  ";
+        if (totalDef > 0) summary += "DEF: +" + std::to_string(totalDef) + "  ";
+        if (totalDmg > 0.0f) summary += "DMG: +" + std::to_string(static_cast<int>(totalDmg * 100)) + "%  ";
+        if (totalDr > 0.0f) summary += "DR: +" + std::to_string(static_cast<int>(totalDr * 100)) + "%  ";
+        if (totalHeal > 0.0f) summary += "Healing: +" + std::to_string(static_cast<int>(totalHeal * 100)) + "%  ";
+        if (totalManaReduce > 0.0f) summary += "Mana Cost: -" + std::to_string(static_cast<int>(totalManaReduce * 100)) + "%  ";
+        if (totalDodge > 0.0f) summary += "Dodge: +" + std::to_string(static_cast<int>(totalDodge * 100)) + "%  ";
+        if (totalGoldFind > 0.0f) summary += "Gold Find: +" + std::to_string(static_cast<int>(totalGoldFind * 100)) + "%  ";
+        if (totalXpBonus > 0.0f) summary += "XP Gain: +" + std::to_string(static_cast<int>(totalXpBonus * 100)) + "%  ";
+        if (summary.empty()) summary = "No mastery bonuses unlocked yet.";
+        renderer.DrawText(summary, 70, y, 14, CQColors::TextGold);
+
+        int backY = std::max(y + 30, GRenderer::H - 100);
+        if (renderer.Button("Back to Skills", 70, backY, 160, 36, focusIdx++))
+        {
+            viewingCharacterMastery = false;
+            return;
+        }
+        if (renderer.Button("Back", renderer.CenterX(120), backY, 120, 36, focusIdx++))
+        {
+            viewingCharacterMastery = false;
+            currentState = GameState::Exploring;
+        }
+
+        return;
+    }
+
+    // ---- Mastery-only view: dedicated panel for a single skill's mastery tree ----
+    if (viewingMasteryIdx >= 0 && viewingMasteryIdx < static_cast<int>(skills.GetSkillCount()))
+    {
+        auto sk = skills.GetSkill(viewingMasteryIdx);
+        if (!sk || sk->level < 50)
+        {
+            viewingMasteryIdx = -1;
+        }
+        else
+        {
+            int totalPoints = 0;
+            for (size_t i = 0; i < skills.GetSkillCount(); ++i)
+            {
+                auto s = skills.GetSkill(i);
+                if (s) totalPoints += s->skillPoints;
+            }
+
+            std::string title = sk->name + " Mastery";
+            renderer.DrawPanel(50, 60, GRenderer::W - 100, GRenderer::H - 120, title);
+
+            int y = 110;
+            renderer.DrawText("Skill Points: " + std::to_string(totalPoints), 70, y, 18, CQColors::TextGold);
+            y += 10;
+            renderer.DrawText("Mastery Level: " + std::to_string(sk->masteryLevel)
+                + "  Points: " + std::to_string(sk->masteryPoints)
+                + "  XP: " + std::to_string(sk->masteryXP) + "/" + std::to_string(sk->GetMasteryXPToLevel()),
+                70, y + 18, 14, CQColors::TextDim);
+            y += 50;
+
+            const char* branchNames[] = { "Damage", "Utility", "Special" };
+            const char* branchDescs[3][5] = {
+                { "+5% dmg per node", "+5% dmg per node", "+5% dmg per node", "+5% dmg per node", "+5% dmg per node" },
+                { "-1 cooldown", "-1 cooldown", "-2 mana cost", "-1 cooldown", "-3 mana cost" },
+                { "+10% skill XP", "+10% skill XP", "+10% skill XP", "+10% skill XP", "+10% skill XP" },
+            };
+            const char* branchRequirements[3][5] = {
+                { "Requires Lv10 skill", "Requires Lv20 skill", "Requires Lv30 skill", "Requires Lv40 skill", "Requires Lv50 skill" },
+                { "Requires Lv10 skill", "Requires Lv20 skill", "Requires Lv30 skill", "Requires Lv40 skill", "Requires Lv50 skill" },
+                { "Requires Lv10 skill", "Requires Lv20 skill", "Requires Lv30 skill", "Requires Lv40 skill", "Requires Lv50 skill" },
+            };
+
+            int masteryFocusCount = 0;
+            for (int b = 0; b < 3; ++b)
+                for (int n = 0; n < 5; ++n)
+                    if (sk->CanUnlockMasteryNode(b, n))
+                        masteryFocusCount++;
+            int focusCount = masteryFocusCount + 2; // + Back to Skills + Back
+            keyboardNav.SetFocusCount(focusCount);
+            int focusIdx = 0;
+
+            int colW = (GRenderer::W - 180) / 3;
+            for (int b = 0; b < 3; ++b)
+            {
+                int bx = 80 + b * colW;
+                Color branchColor = (b == 0) ? CQColors::TextFire : (b == 1) ? CQColors::TextIce : CQColors::TextArcane;
+                renderer.DrawText(branchNames[b], bx, y, 16, branchColor);
+                for (int n = 0; n < 5; ++n)
+                {
+                    int ny = y + 24 + n * 28;
+                    bool unlocked = sk->masteryNodes[b][n];
+                    bool canUnlock = sk->CanUnlockMasteryNode(b, n);
+                    bool locked = !unlocked && !canUnlock;
+                    std::string nodeText = "Lv" + std::to_string((n + 1) * 10) + ": " + branchDescs[b][n];
+                    Color nodeColor = unlocked ? CQColors::TextGreen : (canUnlock ? CQColors::TextGold : CQColors::TextDim);
+                    std::string icon = unlocked ? "[*]" : (canUnlock ? "[o]" : "[ ]");
+                    renderer.DrawText(icon + " " + nodeText, bx, ny, 13, nodeColor);
+
+                    if (locked)
+                        renderer.DrawText(branchRequirements[b][n], bx + 20, ny + 14, 10, CQColors::TextDim);
+
+                    if (canUnlock)
+                    {
+                        if (renderer.Button("Unlock##m" + std::to_string(b) + std::to_string(n),
+                                            bx + colW - 140, ny, 120, 24, focusIdx++))
+                        {
+                            sk->UnlockMasteryNode(b, n);
+                        }
+                    }
+                }
+            }
+            y += 24 + 5 * 28 + 20;
+
+            // Effect summary
+            int totalDmgBonus = 0;
+            for (int n = 0; n < 5; ++n) if (sk->masteryNodes[0][n]) totalDmgBonus += 5;
+            int totalCdReduce = 0;
+            for (int n = 0; n < 5; ++n) if (sk->masteryNodes[1][n]) totalCdReduce += (n == 1 || n == 3) ? 1 : (n == 2 ? 2 : (n == 4 ? 3 : 0));
+            int totalMpReduce = 0;
+            for (int n = 0; n < 5; ++n) if (sk->masteryNodes[1][n]) totalMpReduce += (n == 2 ? 2 : (n == 4 ? 3 : 0));
+            int totalXpBonus = 0;
+            for (int n = 0; n < 5; ++n) if (sk->masteryNodes[2][n]) totalXpBonus += 10;
+
+            std::string summary;
+            if (totalDmgBonus > 0) summary += "Damage: +" + std::to_string(totalDmgBonus) + "%  ";
+            if (totalCdReduce > 0) summary += "Cooldown: -" + std::to_string(totalCdReduce) + "s  ";
+            if (totalMpReduce > 0) summary += "Mana Cost: -" + std::to_string(totalMpReduce) + "  ";
+            if (totalXpBonus > 0) summary += "Skill XP: +" + std::to_string(totalXpBonus) + "%  ";
+            if (summary.empty()) summary = "No mastery bonuses unlocked yet.";
+            renderer.DrawText(summary, 70, y, 14, CQColors::TextGold);
+
+            // Back buttons
+            int backY = std::max(y + 30, GRenderer::H - 100);
+            if (renderer.Button("Back to Skills", 70, backY, 160, 36, focusIdx++))
+            {
+                viewingMasteryIdx = -1;
+                return;
+            }
+            if (renderer.Button("Back", renderer.CenterX(120), backY, 120, 36, focusIdx++))
+            {
+                viewingMasteryIdx = -1;
+                currentState = GameState::Exploring;
+            }
+
+            return;
+        }
     }
 
     // ---- Detail view: upgrade tree for selected skill ----
@@ -3198,6 +3454,14 @@ void Game::StateSkillUpgrade()
         }
         else
         {
+            // Calculate total skill points
+            int totalPoints = 0;
+            for (size_t i = 0; i < skills.GetSkillCount(); ++i)
+            {
+                auto s = skills.GetSkill(i);
+                if (s) totalPoints += s->skillPoints;
+            }
+
             std::string elemStr = (sk->element != ElementType::Physical) ? " [" + std::string(ElementName(sk->element)) + "]" : "";
             std::string title = sk->name + elemStr + " Upgrades";
             renderer.DrawPanel(50, 60, GRenderer::W - 100, GRenderer::H - 120, title);
@@ -3213,7 +3477,17 @@ void Game::StateSkillUpgrade()
             for (size_t u = 0; u < sk->upgrades.size(); ++u)
                 if (!sk->upgrades[u].unlocked && sk->CanUnlockUpgrade(static_cast<int>(u)))
                     unlockCount++;
-            int detailFocusCount = unlockCount + 2; // unlock buttons + Back to Skills + Back
+
+            // Count mastery unlock buttons
+            int masteryUnlockCount = 0;
+            if (sk->level >= 50)
+            {
+                for (int b = 0; b < 3; ++b)
+                    for (int n = 0; n < 5; ++n)
+                        if (sk->CanUnlockMasteryNode(b, n))
+                            masteryUnlockCount++;
+            }
+            int detailFocusCount = unlockCount + masteryUnlockCount + 2; // unlock buttons + Back to Skills + Back
             keyboardNav.SetFocusCount(detailFocusCount);
             int detailFocusIdx = 0;
 
@@ -3258,28 +3532,21 @@ void Game::StateSkillUpgrade()
                 y += 4;
             }
 
-            if (renderer.Button("Back to Skills", 70, GRenderer::H - 100, 160, 36, detailFocusIdx++))
-            {
-                selectedSkillIdx = -1;
-                return;
-            }
-
-            if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 100, 120, 36, detailFocusIdx++))
-            {
-                selectedSkillIdx = -1;
-                currentState = GameState::Exploring;
-            }
-
             // ---- Mastery Tree (shown for level 50 skills) ----
             if (sk->level >= 50)
             {
-                int my = GRenderer::H - 280;
-                renderer.DrawRect(60, my, GRenderer::W - 120, 160, CQColors::BgPanel);
-                renderer.DrawRectLines(60, my, GRenderer::W - 120, 160, CQColors::Gold, 1);
+                y += 8;
+                int my = y;
+                int panelH = 160;
+                int panelBottom = my + panelH;
+                int maxPanelBottom = GRenderer::H - 60;
+                if (panelBottom > maxPanelBottom) my = maxPanelBottom - panelH;
+                if (my < y) my = y;
+                renderer.DrawRect(60, my, GRenderer::W - 120, panelH, CQColors::BgPanel);
+                renderer.DrawRectLines(60, my, GRenderer::W - 120, panelH, CQColors::Gold, 1);
                 my += 8;
 
                 renderer.DrawText("--- MASTERY ---  Level " + std::to_string(sk->masteryLevel)
-                    + "/" + std::to_string(Skill::MASTERY_LEVEL_CAP)
                     + "  Points: " + std::to_string(sk->masteryPoints)
                     + "  XP: " + std::to_string(sk->masteryXP) + "/" + std::to_string(sk->GetMasteryXPToLevel()),
                     75, my, 14, CQColors::Gold);
@@ -3300,6 +3567,7 @@ void Game::StateSkillUpgrade()
                     for (int n = 0; n < 5; ++n)
                     {
                         int ny = my + 22 + n * 24;
+                        if (ny + 20 > my + panelH - 8) break;
                         bool unlocked = sk->masteryNodes[b][n];
                         bool canUnlock = sk->CanUnlockMasteryNode(b, n);
                         std::string nodeText = "Lv" + std::to_string((n + 1) * 2) + ": " + branchDescs[b][n];
@@ -3316,6 +3584,21 @@ void Game::StateSkillUpgrade()
                         }
                     }
                 }
+                y = my + panelH + 8;
+            }
+
+            // Back buttons at the bottom
+            int backY = std::max(y + 4, GRenderer::H - 100);
+            if (renderer.Button("Back to Skills", 70, backY, 160, 36, detailFocusIdx++))
+            {
+                selectedSkillIdx = -1;
+                return;
+            }
+
+            if (renderer.Button("Back", renderer.CenterX(120), backY, 120, 36, detailFocusIdx++))
+            {
+                selectedSkillIdx = -1;
+                currentState = GameState::Exploring;
             }
 
             return;
@@ -3325,6 +3608,13 @@ void Game::StateSkillUpgrade()
     // ---- Overview: list of all skills ----
     renderer.DrawPanel(50, 60, GRenderer::W - 100, GRenderer::H - 120, "Skill Upgrades");
     int y = 110;
+
+    int totalPoints = 0;
+    for (size_t i = 0; i < skills.GetSkillCount(); ++i)
+    {
+        auto s = skills.GetSkill(i);
+        if (s) totalPoints += s->skillPoints;
+    }
 
     renderer.DrawText("Skill Points: " + std::to_string(totalPoints), 70, y, 18, CQColors::TextGold);
     y += 10;
@@ -3351,8 +3641,22 @@ void Game::StateSkillUpgrade()
     int visibleSkills = endIdx - startIdx;
     int focusCount = visibleSkills + 1; // +1 for Back
     if (maxSkillPage > 0) focusCount += 2; // +2 for Prev/Next
+    if (player->GetLevel() >= Character::MAX_LEVEL) focusCount += 1; // +1 for Character Mastery button
     keyboardNav.SetFocusCount(focusCount);
     int focusIdx = 0;
+
+    // Character Mastery button (visible at level 50+)
+    if (player->GetLevel() >= Character::MAX_LEVEL)
+    {
+        std::string cmLabel = "Character Mastery  Lv" + std::to_string(player->charMasteryLevel)
+            + "  Pts:" + std::to_string(player->charMasteryPoints);
+        if (renderer.Button(cmLabel, 70, y, 360, 32, focusIdx++))
+        {
+            viewingCharacterMastery = true;
+            return;
+        }
+        y += 38;
+    }
 
     for (int si = startIdx; si < endIdx; ++si)
     {
@@ -3380,10 +3684,23 @@ void Game::StateSkillUpgrade()
 
         // Class-colored tinted background for skill card
         Color cardBg = CQColors::SkillCardBg(sk->characterClass);
-        renderer.DrawRect(70, y, 650, 32, cardBg);
+        int cardW = (sk->level >= 50) ? 530 : 650;
+        renderer.DrawRect(70, y, cardW, 32, cardBg);
 
-        if (renderer.Button(label, 70, y, 650, 32, focusIdx++))
+        if (renderer.Button(label, 70, y, cardW, 32, focusIdx++))
             selectedSkillIdx = static_cast<int>(i);
+
+        if (sk->level >= 50)
+        {
+            std::string masteryLabel = "Mastery";
+            if (sk->masteryLevel > 0)
+                masteryLabel += " Lv" + std::to_string(sk->masteryLevel);
+            if (renderer.Button(masteryLabel, 70 + cardW + 10, y, 110, 32, focusIdx++))
+            {
+                viewingMasteryIdx = static_cast<int>(i);
+                return;
+            }
+        }
 
         y += 38;
     }
@@ -4195,11 +4512,47 @@ void Game::StateCombat()
     int repValue = reputationSystem.GetRepIntoCurrentRank(areaFaction);
     int repMax = reputationSystem.GetRepForCurrentRankBracket(areaFaction);
     std::string repLabel = reputationSystem.GetRankTitle(areaFaction) + " Rep";
+
+    // Compute mastery data for combat display
+    std::string masterySkillName;
+    int masteryXP = 0, masteryMaxXP = 0, masteryLevel = 0;
+    auto& combatLoadout = player->GetSkillLoadout();
+    auto getMasteryData = [&](int skillIdx) -> bool {
+        auto msk = player->GetSkills().GetSkill(skillIdx);
+        if (msk && msk->level >= 50) {
+            masterySkillName = msk->name;
+            masteryXP = msk->masteryXP;
+            masteryMaxXP = msk->GetMasteryXPToLevel();
+            masteryLevel = msk->masteryLevel;
+            return true;
+        }
+        return false;
+    };
+    bool foundMastery = false;
+    if (lastUsedSkillIdx >= 0)
+        foundMastery = getMasteryData(lastUsedSkillIdx);
+    if (!foundMastery) {
+        for (int idx : combatLoadout) {
+            if (getMasteryData(idx)) { foundMastery = true; break; }
+        }
+    }
+    if (!foundMastery && lastUsedSkillIdx >= 0) {
+        auto msk = player->GetSkills().GetSkill(lastUsedSkillIdx);
+        if (msk && msk->masteryLevel > 0) {
+            masterySkillName = msk->name;
+            masteryLevel = msk->masteryLevel;
+        }
+    }
+
     BattleRenderer::DrawBattleScreen(renderer, *currentEnemy, *player, combatLog,
                                        combatPhase, enemyFlashTimer, isBoss, "",
                                        &petManager, player->GetLevel(),
                                        playerXP, playerMaxXP,
-                                       repValue, repMax, repLabel);
+                                       repValue, repMax, repLabel,
+                                       masterySkillName, masteryXP, masteryMaxXP, masteryLevel,
+                                       player->charMasteryXP,
+                                       player->GetCharMasteryXPToLevel(),
+                                       player->charMasteryLevel);
 
     // Update flash timer after rendering
     if (enemyFlashTimer > 0)
@@ -4272,7 +4625,10 @@ void Game::StateCombat()
                 if (b == 0)
                     DoPlayerAttack(CombatAction::Attack, player->GetAttackSkillIndex());
                 else if (b < loadoutOffset && b > 0)
+                {
+                    lastUsedSkillIdx = loadout[b - 1];
                     DoPlayerAttack(CombatAction::UseSkill, loadout[b - 1]);
+                }
                 else if (btns[b].label == "Defend")
                     DoPlayerAttack(CombatAction::Defend);
                 else if (btns[b].label == "Items")
@@ -4809,9 +5165,10 @@ void Game::DoPlayerGodAbility(int abilityIndex)
         {
             AddCombatLog(currentEnemy->GetName() + " has been defeated by your pet!");
             auto mon = std::dynamic_pointer_cast<Monster>(currentEnemy);
-            if (mon)
-                ProcessVictory(mon);
-            combatPhase = CombatPhase::Victory;
+        if (mon)
+            ProcessVictory(mon);
+        lastUsedSkillIdx = -1;
+        combatPhase = CombatPhase::Victory;
             return;
         }
     }
@@ -4946,6 +5303,7 @@ void Game::DoEnemyTurn()
         deathGoldLost = goldLost;
         deathXpLost = xpLost;
         deathPenaltyApplied = true;
+        lastUsedSkillIdx = -1;
         combatPhase = CombatPhase::Defeat;
     }
     else
@@ -4978,6 +5336,18 @@ void Game::ProcessVictory(std::shared_ptr<Monster> enemy)
         AddCombatLog("Gold Find: +" + std::to_string(bonus) + " gold!");
     }
 
+    // Character mastery gold find
+    float charMasteryGold = player->GetCharMasteryGoldFind();
+    if (charMasteryGold > 0.0f)
+    {
+        int cmGBonus = static_cast<int>(gold * charMasteryGold);
+        if (cmGBonus > 0)
+        {
+            gold += cmGBonus;
+            AddCombatLog("[Char Mastery] Gold Find: +" + std::to_string(cmGBonus) + " gold!");
+        }
+    }
+
     if (player->GetCharacterClass() == CharacterClass::Merchant)
     {
         int bonus = gold / 2;
@@ -5006,6 +5376,18 @@ void Game::ProcessVictory(std::shared_ptr<Monster> enemy)
         int bonus = xp * xpBoostPct / 100;
         xp += bonus;
         AddCombatLog("XP Boost: +" + std::to_string(bonus) + " XP!");
+    }
+
+    // Character mastery XP bonus
+    float charMasteryXpBonus = player->GetCharMasteryXPBonus();
+    if (charMasteryXpBonus > 0.0f)
+    {
+        int cmBonus = static_cast<int>(xp * charMasteryXpBonus);
+        if (cmBonus > 0)
+        {
+            xp += cmBonus;
+            AddCombatLog("[Char Mastery] XP Gain: +" + std::to_string(cmBonus) + " XP!");
+        }
     }
 
     // Achievement XP bonus
@@ -5311,7 +5693,11 @@ void Game::StartCombatWithEnemy(std::shared_ptr<Monster> enemy, bool isBoss)
     if (!player || !enemy) return;
     if (!tutorialCombatEntered) { tutorialCombatEntered = true; AddTutorialHint("Combat", "Pick a skill or attack. Defend to reduce incoming damage."); }
 
-    // Apply job combat synergy bonuses
+    religion.ResetGodAbilityCooldowns();
+    if (!combatSystem->StartCombat(player, enemy)) { currentState = GameState::Exploring; return; }
+    lastUsedSkillIdx = -1;
+
+    // Apply job combat synergy bonuses AFTER StartCombat() which resets tempDefenseBonus/attackBonus
     auto& js = player->GetJobSystem();
     int jobDef = js.GetTotalCombatDefense();
     int jobDmg = js.GetTotalCombatDamage();
@@ -5320,7 +5706,7 @@ void Game::StartCombatWithEnemy(std::shared_ptr<Monster> enemy, bool isBoss)
     if (jobDmg > 0) player->SetAttackBonus(player->GetAttackBonus() + player->GetWeaponDamage() * jobDmg / 100);
     if (jobHp > 0) player->SetCurrentHealth(std::min(player->GetCurrentHealth() + jobHp, player->GetMaxHealth()));
 
-    // Apply achievement reward bonuses
+    // Apply achievement reward bonuses AFTER StartCombat()
     AchievementReward achRewards = achievementSystem.GetTotalRewards();
     if (achRewards.statBonusATK > 0)
         player->SetAttackBonus(player->GetAttackBonus() + achRewards.statBonusATK);
@@ -5329,7 +5715,7 @@ void Game::StartCombatWithEnemy(std::shared_ptr<Monster> enemy, bool isBoss)
     if (achRewards.statBonusHP > 0)
         player->SetCurrentHealth(std::min(player->GetCurrentHealth() + achRewards.statBonusHP, player->GetMaxHealth()));
 
-    // Apply tier-based combat bonuses from achievements
+    // Apply tier-based combat bonuses from achievements AFTER StartCombat()
     int achTierATK = achievementSystem.GetCombatATKBonusByTier();
     int achTierDEF = achievementSystem.GetCombatDEFBonusByTier();
     if (achTierATK > 0)
@@ -5337,8 +5723,6 @@ void Game::StartCombatWithEnemy(std::shared_ptr<Monster> enemy, bool isBoss)
     if (achTierDEF > 0)
         player->IncreaseTempDefense(achTierDEF);
 
-    religion.ResetGodAbilityCooldowns();
-    if (!combatSystem->StartCombat(player, enemy)) { currentState = GameState::Exploring; return; }
     currentEnemy = enemy;
     combatPhase = CombatPhase::PlayerTurn;
     if (isBoss)
@@ -5491,6 +5875,7 @@ void Game::LoadFromSlot(int slot)
         if (currentAreaIndex < 0 || currentAreaIndex >= static_cast<int>(areas.size()))
             currentAreaIndex = 0;
         selectedSkillIdx = -1;
+        viewingMasteryIdx = -1;
         selectedAchievementCategory = -1;
         if (player->GetQuestManager().GetQuestCount() == 0)
             player->GetQuestManager().InitializeDefaultQuests();
@@ -6631,6 +7016,135 @@ void Game::StatePets()
 
     keyboardNav.SetFocusCount(focusIdx + 1);
     if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 80, 120, 40, focusIdx))
+    {
+        currentState = GameState::Exploring;
+        renderer.StartTransition();
+    }
+}
+
+void Game::StateEvolution()
+{
+    if (!player) { currentState = GameState::Exploring; return; }
+    keyboardNav.Update();
+    renderer.SetCurrentFocus(keyboardNav.GetFocus());
+
+    renderer.DrawPanel(50, 60, GRenderer::W - 100, GRenderer::H - 120, "Class Evolution");
+    int y = 120;
+    int focusIdx = 0;
+
+    std::string className;
+    switch (player->GetCharacterClass())
+    {
+        case CharacterClass::Warrior:  className = "Warrior";  break;
+        case CharacterClass::Priest:   className = "Priest";   break;
+        case CharacterClass::Mage:     className = "Mage";     break;
+        case CharacterClass::Archer:   className = "Archer";   break;
+        case CharacterClass::Merchant: className = "Merchant"; break;
+        default: className = "Unknown"; break;
+    }
+
+    if (player->HasClassEvolved())
+    {
+        renderer.DrawText("You have already evolved!", 70, y, 20, CQColors::TextGold);
+        y += 30;
+        renderer.DrawText("Class: " + className + " " + player->GetEvolvedClassName(),
+                          70, y, 16, CQColors::TextLight);
+        y += 22;
+        renderer.DrawText("Loadout skills: " + std::to_string(player->GetMaxLoadoutSkills()),
+                          70, y, 14, CQColors::TextDim);
+        y += 20;
+
+        std::string passive;
+        switch (player->GetCharacterClass())
+        {
+            case CharacterClass::Warrior:  passive = "Hero's Resolve — 10% damage reduction"; break;
+            case CharacterClass::Priest:   passive = "Sage's Grace — 15% healing bonus"; break;
+            case CharacterClass::Mage:     passive = "Archmage's Insight — 15% mana cost reduction"; break;
+            case CharacterClass::Archer:   passive = "Ranger's Precision — 10% critical hit bonus"; break;
+            case CharacterClass::Merchant: passive = "Tycoon's Fortune — 25% gold find bonus"; break;
+            default: passive = "Unknown"; break;
+        }
+        renderer.DrawText("Passive: " + passive, 70, y, 14, CQColors::TextGreen);
+    }
+    else
+    {
+        renderer.DrawText("Evolve your class to unlock new power!", 70, y, 16, CQColors::TextLight);
+        y += 24;
+        renderer.DrawText("New class: " + className + " " + player->GetEvolvedClassName(),
+                          70, y, 16, CQColors::TextGold);
+        y += 22;
+        renderer.DrawText("Benefits: +20% base stats, 6 loadout skill slots, class passive ability",
+                          70, y, 13, CQColors::TextDim);
+        y += 28;
+
+        renderer.DrawText("Requirements:", 70, y, 16, CQColors::TextLight);
+        y += 22;
+
+        // Requirement 1: Level 50+
+        bool reqLevel = player->GetLevel() >= 50;
+        renderer.DrawText(reqLevel ? "[x]" : "[ ]", 80, y, 14, reqLevel ? CQColors::TextGreen : CQColors::TextDim);
+        renderer.DrawText("Reach Level 50 (current: " + std::to_string(player->GetLevel()) + ")",
+                          110, y, 14, reqLevel ? CQColors::TextLight : CQColors::TextDim);
+        y += 20;
+
+        // Requirement 2: Chronos defeated
+        bool reqChronos = chronosDefeated;
+        renderer.DrawText(reqChronos ? "[x]" : "[ ]", 80, y, 14, reqChronos ? CQColors::TextGreen : CQColors::TextDim);
+        renderer.DrawText("Defeat Chronos, the Time Ender",
+                          110, y, 14, reqChronos ? CQColors::TextLight : CQColors::TextDim);
+        y += 20;
+
+        // Requirement 3: Devotion 7+
+        bool reqDevotion = religion.GetDevotionLevel() >= 7;
+        renderer.DrawText(reqDevotion ? "[x]" : "[ ]", 80, y, 14, reqDevotion ? CQColors::TextGreen : CQColors::TextDim);
+        renderer.DrawText("Devotion Rank 7+ (current: " + std::to_string(religion.GetDevotionLevel()) + ")",
+                          110, y, 14, reqDevotion ? CQColors::TextLight : CQColors::TextDim);
+        y += 20;
+
+        // Requirement 4: 3 specific boss essences in inventory
+        auto& inv = player->GetInventory();
+        std::string essenceNames[] = {"Sentinel's Essence", "Empress's Essence", "Colossus Essence"};
+        int essenceCounts[3] = {0, 0, 0};
+        for (size_t i = 0; i < inv.GetItemCount(); ++i)
+        {
+            auto item = inv.GetItem(i);
+            if (!item) continue;
+            for (int e = 0; e < 3; ++e)
+                if (item->name == essenceNames[e])
+                    essenceCounts[e] += item->count;
+        }
+        bool reqEssences = essenceCounts[0] > 0 && essenceCounts[1] > 0 && essenceCounts[2] > 0;
+        renderer.DrawText(reqEssences ? "[x]" : "[ ]", 80, y, 14, reqEssences ? CQColors::TextGreen : CQColors::TextDim);
+        std::string essenceStr = "Gather 3 Boss Essences (";
+        for (int e = 0; e < 3; ++e)
+        {
+            if (e > 0) essenceStr += ", ";
+            std::string shortName = essenceNames[e];
+            auto pos = shortName.find(" Essence");
+            if (pos != std::string::npos) shortName = shortName.substr(0, pos);
+            essenceStr += shortName + ": " + std::to_string(essenceCounts[e]);
+        }
+        essenceStr += ")";
+        renderer.DrawText(essenceStr, 110, y, 14, reqEssences ? CQColors::TextLight : CQColors::TextDim);
+        y += 30;
+
+        bool allMet = reqLevel && reqChronos && reqDevotion && reqEssences;
+
+        if (allMet)
+        {
+            if (renderer.Button("EVOLVE", renderer.CenterX(200), y, 200, 44, focusIdx++))
+            {
+                player->EvolveClass();
+            }
+        }
+        else
+        {
+            renderer.DrawText("Requirements not met", 70, y, 14, CQColors::TextDim);
+        }
+    }
+
+    keyboardNav.SetFocusCount(focusIdx + 1);
+    if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 80, 120, 40, focusIdx++))
     {
         currentState = GameState::Exploring;
         renderer.StartTransition();

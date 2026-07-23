@@ -17,7 +17,7 @@ int Character::CalculateRequiredXP(int level)
 void Character::TakeDamage(int damage, ElementType element)
 {
     float resist = GetResistance(element);
-    int totalDefense = stats.defense + equipment.GetTotalDefense() + tempDefenseBonus;
+    int totalDefense = stats.defense + equipment.GetTotalDefense() + tempDefenseBonus + masteryBonusDEF;
 
     // All resist bonus from passives (flat reduction)
     int allResist = Passives::GetAllResistBonus(equipment);
@@ -34,6 +34,10 @@ void Character::TakeDamage(int damage, ElementType element)
     int dmgReducePct = Passives::GetDamageReductionPercent(equipment);
     if (dmgReducePct > 0)
         mitigatedDamage = mitigatedDamage * (100 - dmgReducePct) / 100;
+
+    // Character mastery damage reduction
+    if (masteryDamageReduction > 0.0f)
+        mitigatedDamage = static_cast<int>(mitigatedDamage * (1.0f - masteryDamageReduction));
 
     mitigatedDamage = static_cast<int>(mitigatedDamage * resist);
 
@@ -232,7 +236,11 @@ void Character::GainXP(int xp)
         required = CalculateRequiredXP(level);
     }
     if (level >= MAX_LEVEL)
+    {
+        int overflow = experience;
         experience = 0;
+        OnOverflowXP(overflow);
+    }
 }
 
 void Character::LevelUp()

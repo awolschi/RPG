@@ -10,6 +10,12 @@ int Equipment::GetTotalDefense() const
     if (pants) totalDefense += pants->defense;
     if (boots) totalDefense += boots->defense;
 
+    if (offhand)
+    {
+        if (auto oh = std::dynamic_pointer_cast<Offhand>(offhand))
+            totalDefense += oh->defense;
+    }
+
     return totalDefense;
 }
 

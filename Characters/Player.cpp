@@ -40,6 +40,7 @@ void Player::LevelUp()
 
     currentHealth = GetMaxHealth();
     currentMana = GetMaxMana();
+    RecalcMasteryBonuses();
 
     CheckNewSkills();
 }
@@ -664,6 +665,7 @@ void Player::EvolveClass()
     // Restore HP/MP to new max
     SetCurrentHealth(GetMaxHealth());
     SetCurrentMana(GetMaxMana());
+    RecalcMasteryBonuses();
 }
 
 std::string Player::GetEvolvedClassName() const
@@ -707,4 +709,157 @@ float Player::GetEvolvedGoldFind() const
 {
     if (!evolved || characterClass != CharacterClass::Merchant) return 0.0f;
     return 0.25f;
+}
+
+// ---- Character Mastery ----
+
+void Player::OnOverflowXP(int xp) { GainCharMasteryXP(xp); }
+
+void Player::GainCharMasteryXP(int xp) {
+    float xpBonus = 1.0f + GetCharMasteryXPBonus();
+    charMasteryXP += static_cast<int>(xp * xpBonus);
+    int required = GetCharMasteryXPToLevel();
+    while (charMasteryXP >= required) {
+        charMasteryXP -= required;
+        CharMasteryLevelUp();
+        required = GetCharMasteryXPToLevel();
+    }
+}
+
+void Player::CharMasteryLevelUp() {
+    charMasteryLevel++;
+    charMasteryPoints++;
+    currentHealth = GetMaxHealth();
+    currentMana = GetMaxMana();
+    RecalcMasteryBonuses();
+}
+
+bool Player::CanUnlockCharMasteryNode(int branch, int node) const {
+    if (branch < 0 || branch >= CHAR_MASTERY_BRANCHES) return false;
+    if (node < 0 || node >= CHAR_MASTERY_NODES_PER_BRANCH) return false;
+    if (charMasteryNodes[branch][node]) return false;
+    if (charMasteryPoints <= 0) return false;
+    for (int n = 0; n < node; ++n)
+        if (!charMasteryNodes[branch][n]) return false;
+    int requiredLevel = (node + 1) * 4;
+    if (charMasteryLevel < requiredLevel) return false;
+    return true;
+}
+
+bool Player::UnlockCharMasteryNode(int branch, int node) {
+    if (!CanUnlockCharMasteryNode(branch, node)) return false;
+    charMasteryNodes[branch][node] = true;
+    charMasteryPoints--;
+    currentHealth = GetMaxHealth();
+    currentMana = GetMaxMana();
+    RecalcMasteryBonuses();
+    return true;
+}
+
+void Player::RecalcMasteryBonuses() {
+    int hpBonus = (stats.health * GetCharMasteryBonusHP()) / 100;
+    int mpBonus = 0;
+    SetMasteryBonuses(hpBonus, mpBonus, GetCharMasteryBonusDEF(),
+                      GetCharMasteryDamageBonus(), GetCharMasteryDamageReduction());
+}
+
+int Player::GetCharMasteryBonusHP() const {
+    int bonus = 0;
+    for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
+        if (charMasteryNodes[0][n]) bonus += 5;
+    // Overflow: +1% HP per level beyond node tree (level 20+)
+    int nodesComplete = 0;
+    for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
+        if (charMasteryNodes[0][n]) nodesComplete++;
+    if (nodesComplete == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
+        bonus += (charMasteryLevel - 20);
+    return bonus;
+}
+
+int Player::GetCharMasteryBonusDEF() const {
+    int count = 0;
+    for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
+        if (charMasteryNodes[0][n]) count++;
+    int def = count * 2;
+    // Overflow: +1 DEF per level beyond node tree
+    if (count == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
+        def += (charMasteryLevel - 20);
+    return def;
+}
+
+float Player::GetCharMasteryDamageBonus() const {
+    int count = 0;
+    for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
+        if (charMasteryNodes[1][n]) count++;
+    float bonus = count * 0.05f;
+    // Overflow: +1% damage per level beyond node tree
+    if (count == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
+        bonus += (charMasteryLevel - 20) * 0.01f;
+    return bonus;
+}
+
+float Player::GetCharMasteryDamageReduction() const {
+    if (characterClass != CharacterClass::Warrior) return 0.0f;
+    int count = 0;
+    for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
+        if (charMasteryNodes[2][n]) count++;
+    float bonus = count * 0.02f;
+    if (count == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
+        bonus += (charMasteryLevel - 20) * 0.01f;
+    return bonus;
+}
+
+float Player::GetCharMasteryHealingBonus() const {
+    if (characterClass != CharacterClass::Priest) return 0.0f;
+    int count = 0;
+    for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
+        if (charMasteryNodes[2][n]) count++;
+    float bonus = count * 0.05f;
+    if (count == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
+        bonus += (charMasteryLevel - 20) * 0.02f;
+    return bonus;
+}
+
+float Player::GetCharMasteryManaCostReduction() const {
+    if (characterClass != CharacterClass::Mage) return 0.0f;
+    int count = 0;
+    for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
+        if (charMasteryNodes[2][n]) count++;
+    float bonus = count * 0.03f;
+    if (count == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
+        bonus += (charMasteryLevel - 20) * 0.01f;
+    return bonus;
+}
+
+float Player::GetCharMasteryDodgeChance() const {
+    if (characterClass != CharacterClass::Archer) return 0.0f;
+    int count = 0;
+    for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
+        if (charMasteryNodes[2][n]) count++;
+    float bonus = count * 0.03f;
+    if (count == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
+        bonus += (charMasteryLevel - 20) * 0.01f;
+    return bonus;
+}
+
+float Player::GetCharMasteryGoldFind() const {
+    if (characterClass != CharacterClass::Merchant) return 0.0f;
+    int count = 0;
+    for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
+        if (charMasteryNodes[1][n]) count++;
+    float bonus = count * 0.05f;
+    if (count == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
+        bonus += (charMasteryLevel - 20) * 0.02f;
+    return bonus;
+}
+
+float Player::GetCharMasteryXPBonus() const {
+    if (characterClass != CharacterClass::Merchant) return 0.0f;
+    int count = 0;
+    for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
+        if (charMasteryNodes[2][n]) count++;
+    float bonus = count * 0.03f;
+    if (count == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
+        bonus += (charMasteryLevel - 20) * 0.01f;
+    return bonus;
 }

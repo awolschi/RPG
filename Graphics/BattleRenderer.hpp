@@ -28,7 +28,14 @@ namespace BattleRenderer
                           int playerMaxXP = 0,
                           int reputationValue = 0,
                           int reputationMax = 0,
-                          const std::string& repLabel = "");
+                          const std::string& repLabel = "",
+                          const std::string& masterySkillName = "",
+                          int masteryXP = 0,
+                          int masteryMaxXP = 0,
+                          int masteryLevel = 0,
+                          int charMasteryXP = 0,
+                          int charMasteryMaxXP = 0,
+                          int charMasteryLevel = 0);
 
     void DrawAbilityButton(GRenderer& renderer,
                            const std::string& label,
@@ -42,7 +49,14 @@ namespace BattleRenderer
                        int currentMP, int maxMP,
                        int y,
                        int currentXP = 0,
-                       int maxXP = 0);
+                       int maxXP = 0,
+                       const std::string& masterySkillName = "",
+                       int masteryXP = 0,
+                       int masteryMaxXP = 0,
+                       int masteryLevel = 0,
+                       int charMasteryXP = 0,
+                       int charMasteryMaxXP = 0,
+                       int charMasteryLevel = 0);
 }
 
 #endif

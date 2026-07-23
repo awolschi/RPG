@@ -455,14 +455,15 @@ void CraftingManager::InitializeRecipes()
     });
 
     // === LEGENDARY RECIPES (job level 12) — uses boss materials from all areas ===
+    // These are best-in-slot: stats exceed loot-drop legendaries at difficulty 10
 
     recipes.push_back({
         "Dragonslayer Greatsword",
         "A colossal blade forged from dragon heart, temporal shard, and colossus core. Tears through reality.",
         {{"Dragon Heart", 1}, {"Chronos Eye", 1}, {"Colossus Core", 1}},
         []() {
-            auto item = std::make_shared<Weapon>("Dragonslayer Greatsword", 180, 25, 5,
-                ElementType::Physical, 30, WeaponType::Sword,
+            auto item = std::make_shared<Weapon>("Dragonslayer Greatsword", 500, 30, 5,
+                ElementType::Physical, 50, WeaponType::Sword,
                 ItemPassive::PhysDmgBoost20, ItemPassive::CritChance30);
             item->requiredLevel = 50;
             return item;
@@ -475,8 +476,8 @@ void CraftingManager::InitializeRecipes()
         "A staff woven from void energy, monarch's will, and arcane heart. Spells cost less and hit harder.",
         {{"Void Core", 1}, {"Monarch's Scepter", 1}, {"Arcane Core", 1}},
         []() {
-            auto item = std::make_shared<Weapon>("Voidrender Staff", 100, 40, 5,
-                ElementType::Arcane, 60, WeaponType::Staff,
+            auto item = std::make_shared<Weapon>("Voidrender Staff", 380, 60, 5,
+                ElementType::Arcane, 80, WeaponType::Staff,
                 ItemPassive::SpellDmgBoost20, ItemPassive::ManaCostReduce15);
             item->requiredLevel = 50;
             return item;
@@ -490,7 +491,7 @@ void CraftingManager::InitializeRecipes()
         {{"Sentinel's Helm", 1}, {"Warlord Crest", 1}, {"Seraph Crown", 1}},
         []() {
             auto item = std::make_shared<Offhand>("Sentinel's Bulwark", OffhandType::Shield,
-                50, 0, 0, 5, ItemPassive::DamageReduce15, ItemPassive::StunImmune);
+                85, 200, 10, 5, ItemPassive::DamageReduce15, ItemPassive::StunImmune);
             item->requiredLevel = 50;
             return item;
         },
@@ -503,7 +504,7 @@ void CraftingManager::InitializeRecipes()
         {{"Empress's Crown", 1}, {"Overlord's Chronoshard", 1}, {"Kraken Ink", 1}},
         []() {
             auto item = std::make_shared<Armor>("Empress's Diadem", ArmorType::Cloth, ArmorPiece::Helmet,
-                25, 5, std::map<ElementType, int>{{ElementType::Arcane, 15}}, ItemPassive::SpellDmgBoost20, ItemPassive::ManaRegen10);
+                55, 5, std::map<ElementType, int>{{ElementType::Arcane, 25}}, ItemPassive::SpellDmgBoost20, ItemPassive::ManaRegen10);
             item->requiredLevel = 50;
             return item;
         },
@@ -516,7 +517,7 @@ void CraftingManager::InitializeRecipes()
         {{"Arbiter's Scales", 1}, {"Treant Heart", 1}, {"Warlord Crest", 1}},
         []() {
             auto item = std::make_shared<Accessory>("Stormweaver's Ring",
-                800, 200, 5, ElementType::Physical, 0,
+                1200, 350, 5, ElementType::Physical, 0,
                 ItemPassive::CritChance30, ItemPassive::AtkSpeed20);
             item->requiredLevel = 50;
             return item;
@@ -530,7 +531,7 @@ void CraftingManager::InitializeRecipes()
         {{"Arbiter's Halo", 1}, {"Wraith's Shroud", 1}, {"Sovereign's Filigree", 1}},
         []() {
             auto item = std::make_shared<Armor>("Plaguebane Plate", ArmorType::Plate, ArmorPiece::Chest,
-                60, 5, std::map<ElementType, int>{{ElementType::Poison, 15}, {ElementType::Holy, 10}},
+                90, 5, std::map<ElementType, int>{{ElementType::Poison, 25}, {ElementType::Holy, 15}},
                 ItemPassive::HealOnKill15, ItemPassive::DamageReduce10);
             item->requiredLevel = 50;
             return item;
@@ -544,7 +545,7 @@ void CraftingManager::InitializeRecipes()
         {{"Unbroken's Heart", 1}, {"Void Core", 1}, {"Chronos Eye", 1}},
         []() {
             auto item = std::make_shared<Accessory>("Heart of the Unbroken",
-                1200, 300, 5, ElementType::Physical, 0,
+                1800, 450, 5, ElementType::Physical, 0,
                 ItemPassive::Lifesteal25, ItemPassive::AllResist10);
             item->requiredLevel = 50;
             return item;
@@ -558,7 +559,7 @@ void CraftingManager::InitializeRecipes()
         {{"Wraith's Shroud", 1}, {"Dragon Heart", 1}, {"Arcane Core", 1}},
         []() {
             auto item = std::make_shared<Armor>("Chronoweave Shroud", ArmorType::Leather, ArmorPiece::Chest,
-                40, 5, std::map<ElementType, int>{{ElementType::Ice, 12}, {ElementType::Fire, 12}},
+                78, 5, std::map<ElementType, int>{{ElementType::Ice, 20}, {ElementType::Fire, 20}},
                 ItemPassive::Dodge20, ItemPassive::FreezeImmune);
             item->requiredLevel = 50;
             return item;

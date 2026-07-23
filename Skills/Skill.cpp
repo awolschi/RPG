@@ -202,19 +202,17 @@ int Skill::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBon
 
 int Skill::GetMasteryXPToLevel() const
 {
-    return std::max(200, masteryLevel * 200);
+    return std::max(200, masteryLevel * 200 + masteryLevel * masteryLevel * 5);
 }
 
 void Skill::GainMasteryXP(int xp)
 {
     masteryXP += xp;
-    while (masteryLevel < MASTERY_LEVEL_CAP && masteryXP >= GetMasteryXPToLevel())
+    while (masteryXP >= GetMasteryXPToLevel())
     {
         masteryXP -= GetMasteryXPToLevel();
         MasteryLevelUp();
     }
-    if (masteryLevel >= MASTERY_LEVEL_CAP)
-        masteryXP = 0;
 }
 
 void Skill::MasteryLevelUp()

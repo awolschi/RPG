@@ -37,12 +37,15 @@ public:
     const Stats& GetStats() const { return stats; }
     int GetCurrentHealth() const { return currentHealth; }
     int GetCurrentMana() const { return currentMana; }
-    int GetMaxHealth() const { return stats.health + equipment.GetHealthBonus() + petBonusHP; }
-    int GetMaxMana() const { return stats.mana + equipment.GetManaBonus() + petBonusMP; }
+    int GetMaxHealth() const { return stats.health + equipment.GetHealthBonus() + petBonusHP + masteryBonusHP; }
+    int GetMaxMana() const { return stats.mana + equipment.GetManaBonus() + petBonusMP + masteryBonusMP; }
     int GetLevel() const { return level; }
     int GetExperience() const { return experience; }
     bool IsAlive() const { return currentHealth > 0; }
-    int GetWeaponDamage() const { return equipment.GetWeaponDamage() + attackBonus; }
+    int GetWeaponDamage() const {
+        int base = equipment.GetWeaponDamage() + attackBonus;
+        return base + static_cast<int>(base * masteryDamageBonus);
+    }
     int GetAttackBonus() const { return attackBonus; }
     void SetAttackBonus(int bonus) { attackBonus = bonus; }
     void ResetAttackBonus() { attackBonus = 0; }
@@ -83,6 +86,19 @@ public:
     float GetPetBonusCritChance() const { return petBonusCritChance; }
     float GetPetBonusCritDamage() const { return petBonusCritDamage; }
 
+    // Character mastery bonuses
+    void SetMasteryBonuses(int hp, int mp, int def, float dmgBonus, float dmgReduction)
+    {
+        masteryBonusHP = hp;
+        masteryBonusMP = mp;
+        masteryBonusDEF = def;
+        masteryDamageBonus = dmgBonus;
+        masteryDamageReduction = dmgReduction;
+    }
+    int GetMasteryBonusDEF() const { return masteryBonusDEF; }
+    float GetMasteryDamageBonus() const { return masteryDamageBonus; }
+    float GetMasteryDamageReduction() const { return masteryDamageReduction; }
+
     // Status effects
     void ApplyEffect(EffectType type, int duration, int potency = 0, const std::string& source = "");
     std::string ProcessEffects();
@@ -101,6 +117,7 @@ public:
     // Experience and leveling
     void GainXP(int xp);
     virtual void LevelUp();
+    virtual void OnOverflowXP(int /*xp*/) {}
     static int CalculateRequiredXP(int level);
 
     // Display
@@ -123,6 +140,13 @@ protected:
     float petBonusDefense = 0.0f;
     float petBonusCritChance = 0.0f;
     float petBonusCritDamage = 0.0f;
+
+    // Character mastery bonuses (set by Player)
+    int masteryBonusHP = 0;
+    int masteryBonusMP = 0;
+    int masteryBonusDEF = 0;
+    float masteryDamageBonus = 0.0f;
+    float masteryDamageReduction = 0.0f;
 
     SkillSet skills;
     Equipment equipment;

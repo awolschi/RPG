@@ -48,21 +48,25 @@ What exists: Skills cap at level 50 (Skill.cpp:39). Further XP is discarded. No 
 What to build:
 - [DONE] Add int masteryXP and int masteryLevel to Skill class
 - [DONE] When skill hits level 50, overflow XP goes to masteryXP instead of being discarded
-- [DONE] Mastery level-up formula: masteryLevel * 200 XP per level (cap at 20)
+- [DONE] Mastery level-up formula: masteryLevel * 200 + masteryLevel^2 * 5 XP per level (cap at 999, effectively infinite)
 - [DONE] Mastery talent tree: 3 branches (Damage, Utility, Special) with 5 nodes each
 - [DONE] Node effects: Damage (+5% per node), Utility (-CD, -MP), Special (+10% XP gain)
 - [DONE] Unlock nodes by spending mastery levels
-- [DONE] Persist mastery data in save v14
+- [DONE] Persist mastery data in save v14+
+- [DONE] Mastery UI accessible from skill overview (per-skill "Mastery" button + "Character Mastery" button at level 50)
+- [DONE] Mastery XP bar shown in combat
 - [DONE] Files: Skill.hpp/cpp (mastery fields + tree), Game.cpp (mastery UI in StateSkillUpgrade), SaveGame.cpp (serialization)
-Feature 7: Class Evolution
+Feature 7: Class Evolution [DONE]
 What exists: Nothing. 5 classes with no upgrade path.
 What to build:
-- Add CharacterClass::WarriorHero, PriestSage, MageArchmage, ArcherRanger, MerchantTycoon (or similar evolution names) to the enum
-- bool evolved flag on Player, persists in save
-- Evolution quest: defeat Chronos + collect 3 specific boss materials + reach devotion rank X
-- On evolution: base stats +20%, unlock 2 new skill slots, new passive ability per class
-- Evolution UI: triggered from a new "Evolution" NPC or Inn option after conditions met
-- Files: Classes.hpp (new enum values), Player.hpp/cpp (evolution flag + stat boost), Game.cpp (evolution quest logic + UI)
+- [DONE] Add bool evolved flag on Player, persists in save (v15)
+- [DONE] EvolveClass() method: base stats +20%, unlock 2 new skill slots (6 total), new passive ability per class
+- [DONE] Evolution passives: Warrior Hero (+10% DR), Priest Sage (+15% healing), Mage Archmage (-15% mana cost), Archer Ranger (+10% crit), Merchant Tycoon (+25% gold find)
+- [DONE] GetMaxLoadoutSkills() returns 6 when evolved, 4 otherwise
+- [DONE] GetEvolvedClassName() returns evolved class name
+- [DONE] Evolution quest: defeat Chronos + gather 3 boss essences (Sentinel, Empress, Colossus) + devotion rank 7+
+- [DONE] Evolution UI: "Evolution" button in Inn menu, StateEvolution() with requirements check and confirmation
+- [DONE] Files: Player.hpp/cpp (evolved flag + EvolveClass + passives), Game.hpp/cpp (StateEvolution + Inn menu entry), SaveGame.cpp (evolved persistence)
 Feature 8: Reputation Vendor Rewards [DONE]
 What exists: Reputation system is largely complete (10 factions, 6 ranks, repeatable quests, serialization). Missing: vendor UI with faction-locked items.
 What to build:
@@ -177,7 +181,10 @@ Phase	Features	Effort
 4	Legendary crafting recipes (using Citadel boss materials) [DONE]	Medium
 5	Summoning items + field-use system [DONE]	Large
 6	Skill Mastery [DONE]	Large
-7	Class Evolution	Large
+7	Class Evolution [DONE]	Large
 8	Legendary boss pets from Citadel (rarity system + 4th evolution tier) [DONE]	Medium
 9	Save data expansion (bossKillCounts, legendaryRecipesUnlocked) [DONE]	Small
-10	UI polish + balance	Medium
+10	UI polish + balance [IN PROGRESS]	Medium
+11	Character Mastery (infinite grind system) [DONE]	Large
+12	Legendary item stat rebalancing [DONE]	Medium
+13	Job/achievement combat bonus fix [DONE]	Small

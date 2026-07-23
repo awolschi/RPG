@@ -149,7 +149,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #1 Overseer's Cleaver — Warrior Axe
     s_weapons.push_back({
         "Overseer's Cleaver", Rarity::Legendary, WeaponType::Axe,
-        55, 0, 5, ElementType::Physical, 0, 0,
+        55, 8, 5, ElementType::Physical, 0, 0,
         "Farm Overseer", -1,
         ItemPassive::PhysDmgBoost15, ItemPassive::None
     });
@@ -157,7 +157,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #2 Pitchfork of the Fields — Warrior Spear (closest: Mace)
     s_weapons.push_back({
         "Pitchfork of the Fields", Rarity::Legendary, WeaponType::Mace,
-        50, 0, 0, ElementType::Physical, 0, 0,
+        50, 8, 0, ElementType::Physical, 0, 0,
         "Farm Overseer", -1,
         ItemPassive::Thorns25, ItemPassive::None
     });
@@ -165,7 +165,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #3 Rusty Spellgrimoire — Mage Wand
     s_weapons.push_back({
         "Rusty Spellgrimoire", Rarity::Legendary, WeaponType::Wand,
-        35, 0, 30, ElementType::Physical, 0, 0,
+        60, 8, 30, ElementType::Physical, 0, 0,
         "Farm Overseer", -1,
         ItemPassive::ManaRegen5, ItemPassive::None
     });
@@ -173,7 +173,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #4 Scarecrow's Hood — Helmet
     s_armor.push_back({
         "Scarecrow's Hood", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Helmet,
-        12, 0, {{ElementType::Fire, 5}}, 0,
+        12, 3, {{ElementType::Fire, 5}}, 1,
         "Farm Overseer", -1,
         ItemPassive::Dodge15, ItemPassive::None
     });
@@ -181,7 +181,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #5 Straw-Filled Vest — Chest
     s_armor.push_back({
         "Straw-Filled Vest", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        15, 0, {{ElementType::Ice, 3}}, 0,
+        15, 3, {{ElementType::Ice, 3}}, 1,
         "Farm Overseer", -1,
         ItemPassive::DamageReduce10, ItemPassive::None
     });
@@ -189,7 +189,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #6 Work-Worn Gloves — Gloves
     s_armor.push_back({
         "Work-Worn Gloves", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Gloves,
-        8, 0, {}, 0,
+        8, 3, {}, 1,
         "Farm Overseer", -1,
         ItemPassive::CritChance20, ItemPassive::None
     });
@@ -197,7 +197,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #7 Fieldwalker Boots — Boots
     s_armor.push_back({
         "Fieldwalker Boots", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Boots,
-        7, 0, {}, 0,
+        7, 3, {}, 1,
         "Farm Overseer", -1,
         ItemPassive::HealOnKill10, ItemPassive::None
     });
@@ -205,7 +205,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #8 Ring of the Harvest — Ring
     s_accessories.push_back({
         "Ring of the Harvest", Rarity::Legendary,
-        40, 0, 20, 0, ElementType::Physical, 0, 0,
+        40, 10, 20, 5, ElementType::Physical, 0, 0,
         "Farm Overseer", -1,
         ItemPassive::GoldFind30, ItemPassive::None
     });
@@ -213,7 +213,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #9 Pendant of the Landlord — Amulet
     s_accessories.push_back({
         "Pendant of the Landlord", Rarity::Legendary,
-        30, 0, 15, 0, ElementType::Physical, 0, 0,
+        30, 10, 15, 5, ElementType::Physical, 0, 0,
         "Farm Overseer", -1,
         ItemPassive::ExpBoost20, ItemPassive::None
     });
@@ -225,7 +225,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #10 Briarwood Staff — Mage Staff (Verdant set)
     s_weapons.push_back({
         "Briarwood Staff", Rarity::Legendary, WeaponType::Staff,
-        80, 0, 60, ElementType::Fire, 30, 0,
+        80, 12, 60, ElementType::Fire, 30, 0,
         "Treant King", 1,
         ItemPassive::FireNoCd20, ItemPassive::None
     });
@@ -233,7 +233,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #11 Thornwhip — Archer Dagger
     s_weapons.push_back({
         "Thornwhip", Rarity::Legendary, WeaponType::Dagger,
-        70, 0, 10, ElementType::Poison, 25, 0,
+        70, 12, 10, ElementType::Poison, 25, 0,
         "Treant King", -1,
         ItemPassive::PoisonDmgPlus25, ItemPassive::None
     });
@@ -241,7 +241,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #12 Living Root Bow — Archer Bow
     s_weapons.push_back({
         "Living Root Bow", Rarity::Legendary, WeaponType::Bow,
-        75, 0, 15, ElementType::Poison, 20, 0,
+        75, 12, 15, ElementType::Poison, 20, 0,
         "Treant King", -1,
         ItemPassive::StatusExtend1, ItemPassive::None
     });
@@ -249,7 +249,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #13 Crown of Thorns — Helmet (Verdant set)
     s_armor.push_back({
         "Crown of Thorns", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Helmet,
-        18, 0, {{ElementType::Fire, 8}}, 0,
+        18, 4, {{ElementType::Fire, 8}}, 2,
         "Treant King", 1,
         ItemPassive::Thorns40, ItemPassive::None
     });
@@ -257,7 +257,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #14 Barkheart Chestguard — Warrior Chest (Verdant set)
     s_armor.push_back({
         "Barkheart Chestguard", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Chest,
-        25, 0, {{ElementType::Ice, 6}}, 0,
+        25, 4, {{ElementType::Ice, 6}}, 2,
         "Treant King", 1,
         ItemPassive::DamageReduce15, ItemPassive::None
     });
@@ -265,7 +265,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #15 Mantle of the Wild — Mage/Priest Chest (Verdant set)
     s_armor.push_back({
         "Mantle of the Wild", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        16, 0, {{ElementType::Fire, 10}}, 0,
+        16, 4, {{ElementType::Fire, 10}}, 2,
         "Treant King", 1,
         ItemPassive::SpellDmgBoost15, ItemPassive::None
     });
@@ -273,7 +273,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #16 Sapweave Gloves — Gloves
     s_armor.push_back({
         "Sapweave Gloves", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Gloves,
-        10, 0, {{ElementType::Poison, 8}}, 0,
+        10, 4, {{ElementType::Poison, 8}}, 2,
         "Treant King", -1,
         ItemPassive::Lifesteal15, ItemPassive::None
     });
@@ -281,7 +281,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #17 Rootwalker Leggings — Pants
     s_armor.push_back({
         "Rootwalker Leggings", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Pants,
-        12, 0, {{ElementType::Ice, 5}}, 0,
+        12, 4, {{ElementType::Ice, 5}}, 2,
         "Treant King", -1,
         ItemPassive::Dodge15, ItemPassive::None
     });
@@ -289,7 +289,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #18 Seedkeeper Boots — Boots (Verdant set)
     s_armor.push_back({
         "Seedkeeper Boots", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Boots,
-        9, 0, {{ElementType::Poison, 6}}, 0,
+        9, 4, {{ElementType::Poison, 6}}, 2,
         "Treant King", 1,
         ItemPassive::HealOnKill10, ItemPassive::None
     });
@@ -297,7 +297,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #19 Ring of Living Wood — Ring
     s_accessories.push_back({
         "Ring of Living Wood", Rarity::Legendary,
-        50, 0, 25, 0, ElementType::Physical, 0, 0,
+        50, 15, 25, 8, ElementType::Physical, 0, 0,
         "Treant King", -1,
         ItemPassive::AllResist5, ItemPassive::None
     });
@@ -305,7 +305,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #20 Amulet of the Forest Heart — Amulet
     s_accessories.push_back({
         "Amulet of the Forest Heart", Rarity::Legendary,
-        35, 0, 40, 0, ElementType::Physical, 0, 0,
+        35, 15, 40, 8, ElementType::Physical, 0, 0,
         "Treant King", -1,
         ItemPassive::ManaRegen5, ItemPassive::None
     });
@@ -317,7 +317,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #21 Tidecaller's Staff — Mage Staff (Abyssal set)
     s_weapons.push_back({
         "Tidecaller's Staff", Rarity::Legendary, WeaponType::Staff,
-        100, 0, 70, ElementType::Ice, 35, 0,
+        100, 16, 70, ElementType::Ice, 35, 0,
         "Kraken", 2,
         ItemPassive::IceFreezePlus1, ItemPassive::None
     });
@@ -325,7 +325,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #22 Kraken's Grip — Priest Mace (Abyssal set)
     s_weapons.push_back({
         "Kraken's Grip", Rarity::Legendary, WeaponType::Mace,
-        85, 0, 40, ElementType::Ice, 30, 0,
+        85, 16, 40, ElementType::Ice, 30, 0,
         "Kraken", 2,
         ItemPassive::HolyHealOnKill, ItemPassive::None
     });
@@ -333,7 +333,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #23 Inkshot Longbow — Archer Bow
     s_weapons.push_back({
         "Inkshot Longbow", Rarity::Legendary, WeaponType::Bow,
-        90, 0, 20, ElementType::Physical, 0, 0,
+        90, 16, 20, ElementType::Physical, 0, 0,
         "Kraken", -1,
         ItemPassive::CritChance30, ItemPassive::None
     });
@@ -341,7 +341,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #24 Abyssal Helm — Warrior Helmet (Abyssal set)
     s_armor.push_back({
         "Abyssal Helm", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Helmet,
-        22, 0, {{ElementType::Ice, 12}}, 0,
+        22, 5, {{ElementType::Ice, 12}}, 2,
         "Kraken", 2,
         ItemPassive::DamageReduce10, ItemPassive::None
     });
@@ -349,7 +349,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #25 Tide-Sworn Robes — Mage Chest (Abyssal set)
     s_armor.push_back({
         "Tide-Sworn Robes", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        18, 0, {{ElementType::Ice, 14}}, 0,
+        18, 5, {{ElementType::Ice, 14}}, 2,
         "Kraken", 2,
         ItemPassive::ManaCostReduce10, ItemPassive::None
     });
@@ -357,7 +357,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #26 Mantle of the Deep — Priest Chest
     s_armor.push_back({
         "Mantle of the Deep", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        17, 0, {{ElementType::Ice, 10}}, 0,
+        17, 5, {{ElementType::Ice, 10}}, 2,
         "Kraken", -1,
         ItemPassive::HealOnKill15, ItemPassive::None
     });
@@ -365,7 +365,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #27 Tentacle-Woven Bracers — Gloves
     s_armor.push_back({
         "Tentacle-Woven Bracers", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Gloves,
-        11, 0, {{ElementType::Lightning, 8}}, 0,
+        11, 5, {{ElementType::Lightning, 8}}, 2,
         "Kraken", -1,
         ItemPassive::CritChance20, ItemPassive::None
     });
@@ -373,7 +373,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #28 Pressure-Tossed Leggings — Pants
     s_armor.push_back({
         "Pressure-Tossed Leggings", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Pants,
-        14, 0, {{ElementType::Ice, 6}}, 0,
+        14, 5, {{ElementType::Ice, 6}}, 2,
         "Kraken", -1,
         ItemPassive::Dodge15, ItemPassive::None
     });
@@ -381,7 +381,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #29 Coral Stalkers — Boots (Abyssal set)
     s_armor.push_back({
         "Coral Stalkers", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Boots,
-        10, 0, {{ElementType::Ice, 8}}, 0,
+        10, 5, {{ElementType::Ice, 8}}, 2,
         "Kraken", 2,
         ItemPassive::FreezeImmune, ItemPassive::None
     });
@@ -389,7 +389,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #30 Ring of the Drowned King — Ring
     s_accessories.push_back({
         "Ring of the Drowned King", Rarity::Legendary,
-        60, 0, 30, 0, ElementType::Ice, 15, 0,
+        60, 20, 30, 10, ElementType::Ice, 15, 0,
         "Kraken", -1,
         ItemPassive::AllResist5, ItemPassive::None
     });
@@ -397,7 +397,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #31 Abyssal Pearl Pendant — Amulet
     s_accessories.push_back({
         "Abyssal Pearl Pendant", Rarity::Legendary,
-        45, 0, 50, 0, ElementType::Ice, 20, 0,
+        45, 20, 50, 10, ElementType::Ice, 20, 0,
         "Kraken", -1,
         ItemPassive::ManaOnKill15, ItemPassive::None
     });
@@ -409,7 +409,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #32 Staff of the Eternal Flame — Mage Staff (Dragonfire set)
     s_weapons.push_back({
         "Staff of the Eternal Flame", Rarity::Legendary, WeaponType::Staff,
-        140, 0, 90, ElementType::Fire, 50, 0,
+        140, 22, 90, ElementType::Fire, 50, 0,
         "Elder Dragon", 3,
         ItemPassive::FireNoCd20, ItemPassive::None
     });
@@ -417,7 +417,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #33 Dragonbone Wand — Mage Wand (Dragonfire set)
     s_weapons.push_back({
         "Dragonbone Wand", Rarity::Legendary, WeaponType::Wand,
-        120, 0, 100, ElementType::Fire, 45, 0,
+        120, 22, 100, ElementType::Fire, 45, 0,
         "Elder Dragon", 3,
         ItemPassive::DoubleCast15, ItemPassive::None
     });
@@ -425,7 +425,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #34 Fang of the Elder — Warrior Sword (Dragonfire set)
     s_weapons.push_back({
         "Fang of the Elder", Rarity::Legendary, WeaponType::Sword,
-        150, 0, 10, ElementType::Fire, 30, 0,
+        150, 22, 10, ElementType::Fire, 30, 0,
         "Elder Dragon", 3,
         ItemPassive::CritChance30, ItemPassive::None
     });
@@ -433,7 +433,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #35 Drake's Eye Scepter — Priest Scepter
     s_weapons.push_back({
         "Drake's Eye Scepter", Rarity::Legendary, WeaponType::Scepter,
-        110, 0, 80, ElementType::Holy, 40, 0,
+        110, 22, 80, ElementType::Holy, 40, 0,
         "Elder Dragon", -1,
         ItemPassive::HolyHealOnKill, ItemPassive::None
     });
@@ -441,7 +441,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #36 Dragonhide Helm — Warrior Helmet (Dragonfire set)
     s_armor.push_back({
         "Dragonhide Helm", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Helmet,
-        28, 0, {{ElementType::Fire, 15}}, 0,
+        28, 6, {{ElementType::Fire, 15}}, 3,
         "Elder Dragon", 3,
         ItemPassive::DamageReduce15, ItemPassive::None
     });
@@ -449,7 +449,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #37 Drakefire Cowl — Mage Helmet (Dragonfire set)
     s_armor.push_back({
         "Drakefire Cowl", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Helmet,
-        18, 0, {{ElementType::Fire, 12}}, 0,
+        18, 6, {{ElementType::Fire, 12}}, 3,
         "Elder Dragon", 3,
         ItemPassive::SpellDmgBoost20, ItemPassive::None
     });
@@ -457,7 +457,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #38 Scales of the Eternal — Warrior Chest (Dragonfire set)
     s_armor.push_back({
         "Scales of the Eternal", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Chest,
-        35, 0, {{ElementType::Fire, 10}, {ElementType::Ice, 5}}, 0,
+        35, 6, {{ElementType::Fire, 10}, {ElementType::Ice, 5}}, 3,
         "Elder Dragon", 3,
         ItemPassive::Thorns40, ItemPassive::None
     });
@@ -465,7 +465,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #39 Mantle of Living Flame — Mage/Priest Chest
     s_armor.push_back({
         "Mantle of Living Flame", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        20, 0, {{ElementType::Fire, 14}}, 0,
+        20, 6, {{ElementType::Fire, 14}}, 3,
         "Elder Dragon", -1,
         ItemPassive::SpellDmgLowHp30, ItemPassive::None
     });
@@ -473,7 +473,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #40 Gauntlets of the Brood — Warrior Gloves
     s_armor.push_back({
         "Gauntlets of the Brood", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Gloves,
-        14, 0, {{ElementType::Fire, 8}}, 0,
+        14, 6, {{ElementType::Fire, 8}}, 3,
         "Elder Dragon", -1,
         ItemPassive::PhysDmgBoost20, ItemPassive::None
     });
@@ -481,7 +481,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #41 Dragonclaw Boots — Boots
     s_armor.push_back({
         "Dragonclaw Boots", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Boots,
-        12, 0, {{ElementType::Fire, 6}}, 0,
+        12, 6, {{ElementType::Fire, 6}}, 3,
         "Elder Dragon", -1,
         ItemPassive::Dodge20, ItemPassive::None
     });
@@ -489,7 +489,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #42 Ring of the Broodmother — Ring
     s_accessories.push_back({
         "Ring of the Broodmother", Rarity::Legendary,
-        70, 0, 35, 0, ElementType::Fire, 20, 0,
+        70, 30, 35, 12, ElementType::Fire, 20, 0,
         "Elder Dragon", -1,
         ItemPassive::AllResist10, ItemPassive::None
     });
@@ -497,7 +497,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #43 Heart of the Dragon — Amulet
     s_accessories.push_back({
         "Heart of the Dragon", Rarity::Legendary,
-        50, 0, 60, 0, ElementType::Fire, 35, 0,
+        50, 30, 60, 12, ElementType::Fire, 35, 0,
         "Elder Dragon", -1,
         ItemPassive::Lifesteal25, ItemPassive::None
     });
@@ -509,7 +509,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #44 Warlord's Decree — Mage Staff
     s_weapons.push_back({
         "Warlord's Decree", Rarity::Legendary, WeaponType::Staff,
-        150, 0, 80, ElementType::Lightning, 40, 0,
+        150, 28, 80, ElementType::Lightning, 40, 0,
         "Aran Warlord", -1,
         ItemPassive::LightningStun15, ItemPassive::None
     });
@@ -517,7 +517,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #45 Blade of the Aran — Warrior Sword (Warlord's set)
     s_weapons.push_back({
         "Blade of the Aran", Rarity::Legendary, WeaponType::Sword,
-        170, 0, 5, ElementType::Physical, 0, 0,
+        170, 28, 5, ElementType::Physical, 0, 0,
         "Aran Warlord", 4,
         ItemPassive::PhysDmgBoost20, ItemPassive::None
     });
@@ -525,7 +525,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #46 Warbringer's Mace — Priest Mace (Warlord's set)
     s_weapons.push_back({
         "Warbringer's Mace", Rarity::Legendary, WeaponType::Mace,
-        130, 0, 60, ElementType::Holy, 35, 0,
+        130, 28, 60, ElementType::Holy, 35, 0,
         "Aran Warlord", 4,
         ItemPassive::StunImmune, ItemPassive::None
     });
@@ -533,7 +533,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #47 Siegebow of Aran — Archer Bow
     s_weapons.push_back({
         "Siegebow of Aran", Rarity::Legendary, WeaponType::Bow,
-        155, 0, 20, ElementType::Physical, 0, 0,
+        155, 28, 20, ElementType::Physical, 0, 0,
         "Aran Warlord", -1,
         ItemPassive::AtkSpeed20, ItemPassive::None
     });
@@ -541,7 +541,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #48 Warlord's Helm — Warrior Helmet (Warlord's set)
     s_armor.push_back({
         "Warlord's Helm", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Helmet,
-        30, 0, {{ElementType::Lightning, 10}}, 0,
+        30, 7, {{ElementType::Lightning, 10}}, 3,
         "Aran Warlord", 4,
         ItemPassive::TauntChance25, ItemPassive::None
     });
@@ -549,7 +549,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #49 Mantle of the Battle-Mage — Mage Chest
     s_armor.push_back({
         "Mantle of the Battle-Mage", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        22, 0, {{ElementType::Lightning, 12}}, 0,
+        22, 7, {{ElementType::Lightning, 12}}, 3,
         "Aran Warlord", -1,
         ItemPassive::ManaCostReduce15, ItemPassive::None
     });
@@ -557,7 +557,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #50 Battle-Hardened Plate — Warrior Chest (Warlord's set)
     s_armor.push_back({
         "Battle-Hardened Plate", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Chest,
-        40, 0, {{ElementType::Lightning, 8}}, 0,
+        40, 7, {{ElementType::Lightning, 8}}, 3,
         "Aran Warlord", 4,
         ItemPassive::DamageReduce15, ItemPassive::None
     });
@@ -565,7 +565,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #51 Bracers of Command — Gloves
     s_armor.push_back({
         "Bracers of Command", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Gloves,
-        13, 0, {{ElementType::Lightning, 6}}, 0,
+        13, 7, {{ElementType::Lightning, 6}}, 3,
         "Aran Warlord", -1,
         ItemPassive::CritChance20, ItemPassive::None
     });
@@ -573,7 +573,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #52 Greaves of Conquest — Pants (Warlord's set)
     s_armor.push_back({
         "Greaves of Conquest", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Pants,
-        15, 0, {}, 0,
+        15, 7, {}, 3,
         "Aran Warlord", 4,
         ItemPassive::PhysDmgBoost15, ItemPassive::None
     });
@@ -581,7 +581,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #53 Warboots of the Vanguard — Boots (Warlord's set)
     s_armor.push_back({
         "Warboots of the Vanguard", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Boots,
-        11, 0, {}, 0,
+        11, 7, {}, 3,
         "Aran Warlord", 4,
         ItemPassive::HealOnKill15, ItemPassive::None
     });
@@ -589,7 +589,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #54 Signet of the Warlord — Ring
     s_accessories.push_back({
         "Signet of the Warlord", Rarity::Legendary,
-        80, 0, 30, 0, ElementType::Physical, 0, 0,
+        80, 40, 30, 15, ElementType::Physical, 0, 0,
         "Aran Warlord", -1,
         ItemPassive::AllResist10, ItemPassive::None
     });
@@ -597,7 +597,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #55 Amulet of Broken Chains — Amulet
     s_accessories.push_back({
         "Amulet of Broken Chains", Rarity::Legendary,
-        60, 0, 40, 0, ElementType::Physical, 0, 0,
+        60, 40, 40, 15, ElementType::Physical, 0, 0,
         "Aran Warlord", -1,
         ItemPassive::StunImmune, ItemPassive::None
     });
@@ -609,7 +609,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #56 Wand of the Void — Mage Wand (Voidborn set)
     s_weapons.push_back({
         "Wand of the Void", Rarity::Legendary, WeaponType::Wand,
-        160, 0, 120, ElementType::Arcane, 60, 0,
+        160, 32, 120, ElementType::Arcane, 60, 0,
         "Void Lord", 5,
         ItemPassive::ManaCostReduce10, ItemPassive::ManaRegen5
     });
@@ -617,7 +617,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #57 Null-Staff — Mage Staff (Voidborn set)
     s_weapons.push_back({
         "Null-Staff", Rarity::Legendary, WeaponType::Staff,
-        145, 0, 100, ElementType::Arcane, 55, 0,
+        145, 32, 100, ElementType::Arcane, 55, 0,
         "Void Lord", 5,
         ItemPassive::ArcaneCrit30, ItemPassive::None
     });
@@ -625,7 +625,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #58 Soulreaper's Scythe — Warrior Axe (Voidborn set)
     s_weapons.push_back({
         "Soulreaper's Scythe", Rarity::Legendary, WeaponType::Axe,
-        180, 0, 15, ElementType::Arcane, 30, 0,
+        180, 32, 15, ElementType::Arcane, 30, 0,
         "Void Lord", 5,
         ItemPassive::Lifesteal25, ItemPassive::None
     });
@@ -633,7 +633,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #59 Voidchaser Bow — Archer Bow
     s_weapons.push_back({
         "Voidchaser Bow", Rarity::Legendary, WeaponType::Bow,
-        165, 0, 25, ElementType::Arcane, 25, 0,
+        165, 32, 25, ElementType::Arcane, 25, 0,
         "Void Lord", -1,
         ItemPassive::CritChance30, ItemPassive::None
     });
@@ -641,7 +641,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #60 Void-Touched Hood — Mage Helmet (Voidborn set)
     s_armor.push_back({
         "Void-Touched Hood", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Helmet,
-        20, 0, {{ElementType::Arcane, 18}}, 0,
+        20, 8, {{ElementType::Arcane, 18}}, 4,
         "Void Lord", 5,
         ItemPassive::ManaShield30, ItemPassive::None
     });
@@ -649,7 +649,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #61 Helm of the Null Knight — Warrior Helmet (Voidborn set)
     s_armor.push_back({
         "Helm of the Null Knight", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Helmet,
-        32, 0, {{ElementType::Arcane, 14}}, 0,
+        32, 8, {{ElementType::Arcane, 14}}, 4,
         "Void Lord", 5,
         ItemPassive::DamageReduce15, ItemPassive::None
     });
@@ -657,7 +657,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #62 Void Shroud — Mage/Priest Chest (Voidborn set)
     s_armor.push_back({
         "Void Shroud", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        24, 0, {{ElementType::Arcane, 16}}, 0,
+        24, 8, {{ElementType::Arcane, 16}}, 4,
         "Void Lord", 5,
         ItemPassive::SpellDmgBoost20, ItemPassive::None
     });
@@ -665,7 +665,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #63 Voidforged Plate — Warrior Chest
     s_armor.push_back({
         "Voidforged Plate", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Chest,
-        42, 0, {{ElementType::Arcane, 10}}, 0,
+        42, 8, {{ElementType::Arcane, 10}}, 4,
         "Void Lord", -1,
         ItemPassive::Thorns40, ItemPassive::None
     });
@@ -673,7 +673,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #64 Null-Grip Gauntlets — Gloves (Voidborn set)
     s_armor.push_back({
         "Null-Grip Gauntlets", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Gloves,
-        14, 0, {{ElementType::Arcane, 8}}, 0,
+        14, 8, {{ElementType::Arcane, 8}}, 4,
         "Void Lord", 5,
         ItemPassive::Dodge20, ItemPassive::None
     });
@@ -681,7 +681,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #65 Shadowthread Leggings — Pants
     s_armor.push_back({
         "Shadowthread Leggings", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Pants,
-        16, 0, {{ElementType::Arcane, 6}}, 0,
+        16, 8, {{ElementType::Arcane, 6}}, 4,
         "Void Lord", -1,
         ItemPassive::CooldownReduce1, ItemPassive::None
     });
@@ -689,7 +689,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #66 Voidstep Treads — Boots (Voidborn set)
     s_armor.push_back({
         "Voidstep Treads", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Boots,
-        13, 0, {{ElementType::Arcane, 10}}, 0,
+        13, 8, {{ElementType::Arcane, 10}}, 4,
         "Void Lord", 5,
         ItemPassive::FreezeImmune, ItemPassive::None
     });
@@ -697,7 +697,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #67 Band of the Void Lord — Ring
     s_accessories.push_back({
         "Band of the Void Lord", Rarity::Legendary,
-        90, 0, 50, 0, ElementType::Arcane, 25, 0,
+        90, 50, 50, 18, ElementType::Arcane, 25, 0,
         "Void Lord", -1,
         ItemPassive::AllResist10, ItemPassive::None
     });
@@ -705,7 +705,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #68 Pendant of Entropy — Amulet
     s_accessories.push_back({
         "Pendant of Entropy", Rarity::Legendary,
-        70, 0, 70, 0, ElementType::Arcane, 30, 0,
+        70, 50, 70, 18, ElementType::Arcane, 30, 0,
         "Void Lord", -1,
         ItemPassive::CooldownReduce2, ItemPassive::None
     });
@@ -717,7 +717,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #69 Staff of Radiant Truth — Mage Staff (Seraphic set)
     s_weapons.push_back({
         "Staff of Radiant Truth", Rarity::Legendary, WeaponType::Staff,
-        175, 0, 110, ElementType::Holy, 55, 0,
+        175, 36, 110, ElementType::Holy, 55, 0,
         "Seraphim Council", 6,
         ItemPassive::DoubleCast15, ItemPassive::HolyHealOnKill
     });
@@ -725,7 +725,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #70 Scepter of Judgment — Priest Scepter (Seraphic set)
     s_weapons.push_back({
         "Scepter of Judgment", Rarity::Legendary, WeaponType::Scepter,
-        150, 0, 100, ElementType::Holy, 60, 0,
+        150, 36, 100, ElementType::Holy, 60, 0,
         "Seraphim Council", 6,
         ItemPassive::HolyHealOnKill, ItemPassive::None
     });
@@ -733,7 +733,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #71 Blade of Dawn — Warrior Sword (Seraphic set)
     s_weapons.push_back({
         "Blade of Dawn", Rarity::Legendary, WeaponType::Sword,
-        190, 0, 15, ElementType::Holy, 35, 0,
+        190, 36, 15, ElementType::Holy, 35, 0,
         "Seraphim Council", 6,
         ItemPassive::PhysDmgBoost20, ItemPassive::HealOnKill10
     });
@@ -741,7 +741,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #72 Celestial Longbow — Archer Bow
     s_weapons.push_back({
         "Celestial Longbow", Rarity::Legendary, WeaponType::Bow,
-        170, 0, 30, ElementType::Holy, 30, 0,
+        170, 36, 30, ElementType::Holy, 30, 0,
         "Seraphim Council", -1,
         ItemPassive::CritChance30, ItemPassive::None
     });
@@ -749,7 +749,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #73 Halo of Ascension — Mage/Priest Helmet (Seraphic set)
     s_armor.push_back({
         "Halo of Ascension", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Helmet,
-        22, 0, {{ElementType::Holy, 16}}, 0,
+        22, 9, {{ElementType::Holy, 16}}, 4,
         "Seraphim Council", 6,
         ItemPassive::SpellDmgBoost20, ItemPassive::None
     });
@@ -757,7 +757,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #74 Helm of the Fallen Seraph — Warrior Helmet (Seraphic set)
     s_armor.push_back({
         "Helm of the Fallen Seraph", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Helmet,
-        34, 0, {{ElementType::Holy, 12}}, 0,
+        34, 9, {{ElementType::Holy, 12}}, 4,
         "Seraphim Council", 6,
         ItemPassive::DamageReduce15, ItemPassive::TauntChance25
     });
@@ -765,7 +765,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #75 Raiment of the Celestial Choir — Priest Chest (Seraphic set)
     s_armor.push_back({
         "Raiment of the Celestial Choir", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        26, 0, {{ElementType::Holy, 18}}, 0,
+        26, 9, {{ElementType::Holy, 18}}, 4,
         "Seraphim Council", 6,
         ItemPassive::HealOnKill15, ItemPassive::None
     });
@@ -773,7 +773,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #76 Mantle of Divine Light — Mage Chest
     s_armor.push_back({
         "Mantle of Divine Light", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        24, 0, {{ElementType::Holy, 14}}, 0,
+        24, 9, {{ElementType::Holy, 14}}, 4,
         "Seraphim Council", -1,
         ItemPassive::ManaCostReduce15, ItemPassive::None
     });
@@ -781,7 +781,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #77 Seraphim's Grace Gloves — Gloves (Seraphic set)
     s_armor.push_back({
         "Seraphim's Grace Gloves", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Gloves,
-        15, 0, {{ElementType::Holy, 10}}, 0,
+        15, 9, {{ElementType::Holy, 10}}, 4,
         "Seraphim Council", 6,
         ItemPassive::Lifesteal15, ItemPassive::None
     });
@@ -789,7 +789,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #78 Sandals of the Ascended — Boots (Seraphic set)
     s_armor.push_back({
         "Sandals of the Ascended", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Boots,
-        14, 0, {{ElementType::Holy, 8}}, 0,
+        14, 9, {{ElementType::Holy, 8}}, 4,
         "Seraphim Council", 6,
         ItemPassive::Revive50, ItemPassive::None
     });
@@ -797,7 +797,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #79 Radiant Band — Ring
     s_accessories.push_back({
         "Radiant Band", Rarity::Legendary,
-        80, 0, 60, 0, ElementType::Holy, 20, 0,
+        80, 60, 60, 20, ElementType::Holy, 20, 0,
         "Seraphim Council", -1,
         ItemPassive::AllResist10, ItemPassive::None
     });
@@ -805,7 +805,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #80 Amulet of the Divine Eye — Amulet
     s_accessories.push_back({
         "Amulet of the Divine Eye", Rarity::Legendary,
-        65, 0, 80, 0, ElementType::Holy, 30, 0,
+        65, 60, 80, 20, ElementType::Holy, 30, 0,
         "Seraphim Council", -1,
         ItemPassive::ManaRegen10, ItemPassive::None
     });
@@ -817,7 +817,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #81 Archmage Staff *(existing)* — Mage Staff (Primordial set)
     s_weapons.push_back({
         "Archmage Staff", Rarity::Legendary, WeaponType::Staff,
-        200, 0, 100, ElementType::Arcane, 50, 0,
+        200, 40, 100, ElementType::Arcane, 50, 0,
         "The Primordial One", 7,
         ItemPassive::None, ItemPassive::None
     });
@@ -825,7 +825,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #82 Titan's Greatsword *(existing)* — Warrior Sword (Primordial set)
     s_weapons.push_back({
         "Titan's Greatsword", Rarity::Legendary, WeaponType::Sword,
-        250, 0, 20, ElementType::Physical, 30, 0,
+        250, 40, 20, ElementType::Physical, 30, 0,
         "The Primordial One", 7,
         ItemPassive::None, ItemPassive::None
     });
@@ -833,7 +833,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #83 Divine Scepter *(existing)* — Priest Scepter (Primordial set)
     s_weapons.push_back({
         "Divine Scepter", Rarity::Legendary, WeaponType::Scepter,
-        180, 0, 80, ElementType::Holy, 40, 0,
+        180, 40, 80, ElementType::Holy, 40, 0,
         "The Primordial One", 7,
         ItemPassive::None, ItemPassive::None
     });
@@ -841,7 +841,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #84 Shadowstrike Bow *(existing)* — Archer Bow (Primordial set)
     s_weapons.push_back({
         "Shadowstrike Bow", Rarity::Legendary, WeaponType::Bow,
-        220, 0, 30, ElementType::Poison, 35, 0,
+        220, 40, 30, ElementType::Poison, 35, 0,
         "The Primordial One", 7,
         ItemPassive::None, ItemPassive::None
     });
@@ -849,7 +849,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #85 Gilded Blade *(existing)* — Merchant Sword (Primordial set)
     s_weapons.push_back({
         "Gilded Blade", Rarity::Legendary, WeaponType::Sword,
-        200, 0, 40, ElementType::Fire, 25, 0,
+        200, 40, 40, ElementType::Fire, 25, 0,
         "The Primordial One", 7,
         ItemPassive::None, ItemPassive::None
     });
@@ -857,7 +857,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #86 Archmage Orb *(existing)* — Offhand Orb (closest: Scepter for now)
     s_weapons.push_back({
         "Archmage Orb", Rarity::Legendary, WeaponType::Scepter,
-        80, 0, 200, ElementType::Arcane, 50, 0,
+        130, 40, 200, ElementType::Arcane, 50, 0,
         "The Primordial One", 7,
         ItemPassive::ManaRegen10, ItemPassive::None
     });
@@ -865,7 +865,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #87 Archmage Robes *(existing)* — Mage Chest (Primordial set)
     s_armor.push_back({
         "Archmage Robes", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        35, 0, {{ElementType::Arcane, 8}}, 0,
+        35, 10, {{ElementType::Arcane, 8}}, 5,
         "The Primordial One", 7,
         ItemPassive::None, ItemPassive::None
     });
@@ -873,7 +873,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #88 Crown of the Primordial — Helmet (Primordial set)
     s_armor.push_back({
         "Crown of the Primordial", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Helmet,
-        30, 0, {{ElementType::Fire, 10}, {ElementType::Ice, 10}, {ElementType::Lightning, 10}, {ElementType::Arcane, 10}, {ElementType::Poison, 10}, {ElementType::Holy, 10}}, 0,
+        30, 10, {{ElementType::Fire, 10}, {ElementType::Ice, 10}, {ElementType::Lightning, 10}, {ElementType::Arcane, 10}, {ElementType::Poison, 10}, {ElementType::Holy, 10}}, 5,
         "The Primordial One", 7,
         ItemPassive::AllResist10, ItemPassive::None
     });
@@ -881,7 +881,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #89 Primordial Plate — Warrior Chest
     s_armor.push_back({
         "Primordial Plate", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Chest,
-        50, 0, {{ElementType::Fire, 8}, {ElementType::Ice, 8}, {ElementType::Lightning, 8}, {ElementType::Arcane, 8}, {ElementType::Poison, 8}, {ElementType::Holy, 8}}, 0,
+        50, 10, {{ElementType::Fire, 8}, {ElementType::Ice, 8}, {ElementType::Lightning, 8}, {ElementType::Arcane, 8}, {ElementType::Poison, 8}, {ElementType::Holy, 8}}, 5,
         "The Primordial One", -1,
         ItemPassive::DamageReduce15, ItemPassive::None
     });
@@ -889,7 +889,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #90 Gloves of Creation — Gloves (Primordial set)
     s_armor.push_back({
         "Gloves of Creation", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Gloves,
-        18, 0, {{ElementType::Fire, 6}, {ElementType::Ice, 6}, {ElementType::Lightning, 6}, {ElementType::Arcane, 6}, {ElementType::Poison, 6}, {ElementType::Holy, 6}}, 0,
+        18, 10, {{ElementType::Fire, 6}, {ElementType::Ice, 6}, {ElementType::Lightning, 6}, {ElementType::Arcane, 6}, {ElementType::Poison, 6}, {ElementType::Holy, 6}}, 5,
         "The Primordial One", -1,
         ItemPassive::Lifesteal25, ItemPassive::None
     });
@@ -897,7 +897,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #91 Boots of the First Age — Boots (Primordial set)
     s_armor.push_back({
         "Boots of the First Age", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Boots,
-        16, 0, {{ElementType::Fire, 5}, {ElementType::Ice, 5}, {ElementType::Lightning, 5}, {ElementType::Arcane, 5}, {ElementType::Poison, 5}, {ElementType::Holy, 5}}, 0,
+        16, 10, {{ElementType::Fire, 5}, {ElementType::Ice, 5}, {ElementType::Lightning, 5}, {ElementType::Arcane, 5}, {ElementType::Poison, 5}, {ElementType::Holy, 5}}, 5,
         "The Primordial One", -1,
         ItemPassive::Dodge20, ItemPassive::None
     });
@@ -905,7 +905,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #92 Ring of the Primordial — Ring (Primordial set)
     s_accessories.push_back({
         "Ring of the Primordial", Rarity::Legendary,
-        100, 0, 80, 0, ElementType::Arcane, 20, 0,
+        100, 80, 80, 25, ElementType::Arcane, 20, 0,
         "The Primordial One", 7,
         ItemPassive::AllResist10, ItemPassive::None
     });
@@ -913,7 +913,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #93 Amulet of the End — Amulet
     s_accessories.push_back({
         "Amulet of the End", Rarity::Legendary,
-        80, 0, 100, 0, ElementType::Arcane, 25, 0,
+        80, 80, 100, 25, ElementType::Arcane, 25, 0,
         "The Primordial One", -1,
         ItemPassive::PhoenixRevive, ItemPassive::None
     });
@@ -925,7 +925,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #94 Tome of Infinite Spells — Offhand Book (closest: Wand) (Arcanum set)
     s_weapons.push_back({
         "Tome of Infinite Spells", Rarity::Legendary, WeaponType::Wand,
-        60, 0, 150, ElementType::Arcane, 45, 0,
+        140, 42, 150, ElementType::Arcane, 45, 0,
         "Arcane Construct", 8,
         ItemPassive::DoubleCast25, ItemPassive::None
     });
@@ -933,7 +933,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #95 Construct's Core Staff — Mage Staff (Arcanum set)
     s_weapons.push_back({
         "Construct's Core Staff", Rarity::Legendary, WeaponType::Staff,
-        190, 0, 130, ElementType::Arcane, 65, 0,
+        190, 42, 130, ElementType::Arcane, 65, 0,
         "Arcane Construct", 8,
         ItemPassive::ArcaneCrit30, ItemPassive::ManaRegen10
     });
@@ -941,7 +941,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #96 Arcane Shard Dagger — Archer Dagger
     s_weapons.push_back({
         "Arcane Shard Dagger", Rarity::Legendary, WeaponType::Dagger,
-        170, 0, 20, ElementType::Arcane, 40, 0,
+        170, 42, 20, ElementType::Arcane, 40, 0,
         "Arcane Construct", -1,
         ItemPassive::CritChance30, ItemPassive::None
     });
@@ -949,7 +949,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #97 Manaheart Crown — Mage Helmet (Arcanum set)
     s_armor.push_back({
         "Manaheart Crown", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Helmet,
-        24, 0, {{ElementType::Arcane, 20}}, 0,
+        24, 11, {{ElementType::Arcane, 20}}, 5,
         "Arcane Construct", 8,
         ItemPassive::ManaCostReduce15, ItemPassive::ManaRegen5
     });
@@ -957,7 +957,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #98 Robes of the Infinite Weave — Mage Chest (Arcanum set)
     s_armor.push_back({
         "Robes of the Infinite Weave", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        28, 0, {{ElementType::Arcane, 18}}, 0,
+        28, 11, {{ElementType::Arcane, 18}}, 5,
         "Arcane Construct", 8,
         ItemPassive::DoubleCast15, ItemPassive::SpellDmgBoost15
     });
@@ -965,7 +965,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #99 Construct's Plated Carapace — Warrior Chest
     s_armor.push_back({
         "Construct's Plated Carapace", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Chest,
-        45, 0, {{ElementType::Arcane, 12}}, 0,
+        45, 11, {{ElementType::Arcane, 12}}, 5,
         "Arcane Construct", -1,
         ItemPassive::Thorns40, ItemPassive::DamageReduce10
     });
@@ -973,7 +973,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #100 Spell-Etched Gloves — Gloves (Arcanum set)
     s_armor.push_back({
         "Spell-Etched Gloves", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Gloves,
-        16, 0, {{ElementType::Arcane, 10}}, 0,
+        16, 11, {{ElementType::Arcane, 10}}, 5,
         "Arcane Construct", 8,
         ItemPassive::CooldownReduce1, ItemPassive::None
     });
@@ -981,7 +981,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #101 Leggings of the Arcane Path — Pants
     s_armor.push_back({
         "Leggings of the Arcane Path", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Pants,
-        18, 0, {{ElementType::Arcane, 8}}, 0,
+        18, 11, {{ElementType::Arcane, 8}}, 5,
         "Arcane Construct", -1,
         ItemPassive::ManaShield30, ItemPassive::None
     });
@@ -989,7 +989,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #102 Boots of Mana Conduit — Boots (Arcanum set)
     s_armor.push_back({
         "Boots of Mana Conduit", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Boots,
-        15, 0, {{ElementType::Arcane, 12}}, 0,
+        15, 11, {{ElementType::Arcane, 12}}, 5,
         "Arcane Construct", 8,
         ItemPassive::ManaOnKill25, ItemPassive::None
     });
@@ -997,7 +997,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #103 Band of the Construct — Ring
     s_accessories.push_back({
         "Band of the Construct", Rarity::Legendary,
-        90, 0, 100, 0, ElementType::Arcane, 30, 0,
+        90, 100, 100, 28, ElementType::Arcane, 30, 0,
         "Arcane Construct", -1,
         ItemPassive::AllResist10, ItemPassive::None
     });
@@ -1005,7 +1005,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #104 Pendant of the Forgotten Lore — Amulet
     s_accessories.push_back({
         "Pendant of the Forgotten Lore", Rarity::Legendary,
-        70, 0, 120, 0, ElementType::Arcane, 40, 0,
+        70, 100, 120, 28, ElementType::Arcane, 40, 0,
         "Arcane Construct", -1,
         ItemPassive::CooldownReduce2, ItemPassive::ManaRegen5
     });
@@ -1017,7 +1017,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #105 Staff of Collapsed Timelines — Mage Staff (Chrono set)
     s_weapons.push_back({
         "Staff of Collapsed Timelines", Rarity::Legendary, WeaponType::Staff,
-        220, 0, 150, ElementType::Arcane, 75, 0,
+        220, 42, 150, ElementType::Arcane, 75, 0,
         "Chronos, the Time Ender", 9,
         ItemPassive::CooldownReduce2, ItemPassive::DoubleCast15
     });
@@ -1025,7 +1025,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #106 Chronoweaver Wand — Mage Wand (Chrono set)
     s_weapons.push_back({
         "Chronoweaver Wand", Rarity::Legendary, WeaponType::Wand,
-        200, 0, 160, ElementType::Ice, 60, 0,
+        200, 42, 160, ElementType::Ice, 60, 0,
         "Chronos, the Time Ender", 9,
         ItemPassive::IceFreezePlus1, ItemPassive::ManaCostReduce15
     });
@@ -1033,7 +1033,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #107 Temporal Greatsword — Warrior Sword
     s_weapons.push_back({
         "Temporal Greatsword", Rarity::Legendary, WeaponType::Sword,
-        260, 0, 20, ElementType::Physical, 40, 0,
+        260, 42, 20, ElementType::Physical, 40, 0,
         "Chronos, the Time Ender", -1,
         ItemPassive::CritChance30, ItemPassive::PhysDmgBoost20
     });
@@ -1041,7 +1041,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #108 Epoch Bow — Archer Bow
     s_weapons.push_back({
         "Epoch Bow", Rarity::Legendary, WeaponType::Bow,
-        230, 0, 35, ElementType::Lightning, 45, 0,
+        230, 42, 35, ElementType::Lightning, 45, 0,
         "Chronos, the Time Ender", -1,
         ItemPassive::AtkSpeed20, ItemPassive::CritChance30
     });
@@ -1049,7 +1049,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #109 Chronolord's Helm — Helmet (Chrono set)
     s_armor.push_back({
         "Chronolord's Helm", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Helmet,
-        35, 0, {{ElementType::Fire, 15}, {ElementType::Ice, 15}, {ElementType::Lightning, 15}, {ElementType::Arcane, 15}, {ElementType::Poison, 15}, {ElementType::Holy, 15}}, 0,
+        35, 11, {{ElementType::Fire, 15}, {ElementType::Ice, 15}, {ElementType::Lightning, 15}, {ElementType::Arcane, 15}, {ElementType::Poison, 15}, {ElementType::Holy, 15}}, 5,
         "Chronos, the Time Ender", 9,
         ItemPassive::AllResist10, ItemPassive::DamageReduce10
     });
@@ -1057,7 +1057,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #110 Robes of the Timeless Weave — Mage Chest (Chrono set)
     s_armor.push_back({
         "Robes of the Timeless Weave", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        30, 0, {{ElementType::Arcane, 20}}, 0,
+        30, 11, {{ElementType::Arcane, 20}}, 5,
         "Chronos, the Time Ender", 9,
         ItemPassive::SpellDmgBoost20, ItemPassive::ManaRegen10
     });
@@ -1065,7 +1065,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #111 Temporal Plate of the Infinite — Warrior Chest
     s_armor.push_back({
         "Temporal Plate of the Infinite", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Chest,
-        55, 0, {{ElementType::Fire, 10}, {ElementType::Ice, 10}, {ElementType::Lightning, 10}, {ElementType::Arcane, 10}, {ElementType::Poison, 10}, {ElementType::Holy, 10}}, 0,
+        55, 11, {{ElementType::Fire, 10}, {ElementType::Ice, 10}, {ElementType::Lightning, 10}, {ElementType::Arcane, 10}, {ElementType::Poison, 10}, {ElementType::Holy, 10}}, 5,
         "Chronos, the Time Ender", -1,
         ItemPassive::DamageReduce15, ItemPassive::Thorns40
     });
@@ -1073,7 +1073,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #112 Gauntlets of Frozen Time — Gloves (Chrono set)
     s_armor.push_back({
         "Gauntlets of Frozen Time", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Gloves,
-        20, 0, {{ElementType::Fire, 8}, {ElementType::Ice, 8}, {ElementType::Lightning, 8}, {ElementType::Arcane, 8}, {ElementType::Poison, 8}, {ElementType::Holy, 8}}, 0,
+        20, 11, {{ElementType::Fire, 8}, {ElementType::Ice, 8}, {ElementType::Lightning, 8}, {ElementType::Arcane, 8}, {ElementType::Poison, 8}, {ElementType::Holy, 8}}, 5,
         "Chronos, the Time Ender", 9,
         ItemPassive::StatusExtend2, ItemPassive::None
     });
@@ -1081,7 +1081,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #113 Leggings of the Void Walk — Pants
     s_armor.push_back({
         "Leggings of the Void Walk", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Pants,
-        22, 0, {{ElementType::Arcane, 12}}, 0,
+        22, 11, {{ElementType::Arcane, 12}}, 5,
         "Chronos, the Time Ender", -1,
         ItemPassive::Dodge20, ItemPassive::None
     });
@@ -1089,7 +1089,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #114 Sandals of Dimensional Rift — Boots
     s_armor.push_back({
         "Sandals of Dimensional Rift", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Boots,
-        18, 0, {{ElementType::Fire, 10}, {ElementType::Ice, 10}, {ElementType::Lightning, 10}, {ElementType::Arcane, 10}, {ElementType::Poison, 10}, {ElementType::Holy, 10}}, 0,
+        18, 11, {{ElementType::Fire, 10}, {ElementType::Ice, 10}, {ElementType::Lightning, 10}, {ElementType::Arcane, 10}, {ElementType::Poison, 10}, {ElementType::Holy, 10}}, 5,
         "Chronos, the Time Ender", -1,
         ItemPassive::Dodge15, ItemPassive::FreezeImmune
     });
@@ -1097,7 +1097,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #115 Loop of Eternity — Ring (Chrono set)
     s_accessories.push_back({
         "Loop of Eternity", Rarity::Legendary,
-        120, 0, 100, 0, ElementType::Arcane, 25, 0,
+        120, 100, 100, 28, ElementType::Arcane, 25, 0,
         "Chronos, the Time Ender", 9,
         ItemPassive::AllResist10, ItemPassive::ManaRegen5
     });
@@ -1105,7 +1105,7 @@ void UniqueItemRegistry::RegisterBossLegendaries()
     // #116 Pendant of the Time Ender — Amulet
     s_accessories.push_back({
         "Pendant of the Time Ender", Rarity::Legendary,
-        100, 0, 130, 0, ElementType::Arcane, 50, 0,
+        100, 100, 130, 28, ElementType::Arcane, 50, 0,
         "Chronos, the Time Ender", -1,
         ItemPassive::Revive50, ItemPassive::CooldownReduce1
     });
@@ -1158,7 +1158,7 @@ void UniqueItemRegistry::RegisterSetItems()
     // Frostweaver's Crown — Helmet (Cloth)
     s_armor.push_back({
         "Frostweaver's Crown", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Helmet,
-        25, 0, {{ElementType::Ice, 10}}, 0,
+        25, 11, {{ElementType::Ice, 10}}, 5,
         "Chronos, the Time Ender", 11,
         ItemPassive::None, ItemPassive::None
     });
@@ -1166,7 +1166,7 @@ void UniqueItemRegistry::RegisterSetItems()
     // Frostweaver's Robe — Chest (Cloth)
     s_armor.push_back({
         "Frostweaver's Robe", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        30, 0, {{ElementType::Ice, 12}}, 0,
+        30, 11, {{ElementType::Ice, 12}}, 5,
         "Chronos, the Time Ender", 11,
         ItemPassive::None, ItemPassive::None
     });
@@ -1174,7 +1174,7 @@ void UniqueItemRegistry::RegisterSetItems()
     // Frostweaver's Focus — Amulet
     s_accessories.push_back({
         "Frostweaver's Focus", Rarity::Legendary,
-        60, 0, 180, 0, ElementType::Ice, 45, 0,
+        60, 100, 180, 28, ElementType::Ice, 45, 0,
         "Chronos, the Time Ender", 11,
         ItemPassive::None, ItemPassive::None
     });
@@ -1186,7 +1186,7 @@ void UniqueItemRegistry::RegisterSetItems()
     // Coin-Lord's Crown — Helmet (Cloth)
     s_armor.push_back({
         "Coin-Lord's Crown", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Helmet,
-        20, 0, {{ElementType::Fire, 5}, {ElementType::Ice, 5}, {ElementType::Lightning, 5}, {ElementType::Arcane, 5}, {ElementType::Poison, 5}, {ElementType::Holy, 5}}, 0,
+        20, 3, {{ElementType::Fire, 5}, {ElementType::Ice, 5}, {ElementType::Lightning, 5}, {ElementType::Arcane, 5}, {ElementType::Poison, 5}, {ElementType::Holy, 5}}, 1,
         "Farm Overseer", 12,
         ItemPassive::None, ItemPassive::None
     });
@@ -1194,7 +1194,7 @@ void UniqueItemRegistry::RegisterSetItems()
     // Merchant Prince's Vest — Chest (Cloth)
     s_armor.push_back({
         "Merchant Prince's Vest", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        30, 0, {{ElementType::Fire, 8}, {ElementType::Ice, 8}, {ElementType::Lightning, 8}, {ElementType::Arcane, 8}, {ElementType::Poison, 8}, {ElementType::Holy, 8}}, 0,
+        30, 3, {{ElementType::Fire, 8}, {ElementType::Ice, 8}, {ElementType::Lightning, 8}, {ElementType::Arcane, 8}, {ElementType::Poison, 8}, {ElementType::Holy, 8}}, 1,
         "Farm Overseer", 12,
         ItemPassive::None, ItemPassive::None
     });
@@ -1202,7 +1202,7 @@ void UniqueItemRegistry::RegisterSetItems()
     // Gilded Signet — Ring
     s_accessories.push_back({
         "Gilded Signet", Rarity::Legendary,
-        80, 0, 40, 0, ElementType::Arcane, 10, 0,
+        80, 10, 40, 5, ElementType::Arcane, 10, 0,
         "Farm Overseer", 12,
         ItemPassive::None, ItemPassive::None
     });
@@ -1253,7 +1253,7 @@ void UniqueItemRegistry::RegisterMerchantUniques()
     // Coinlord's Cudgel — Mace (drops from Farm Overseer)
     s_weapons.push_back({
         "Coinlord's Cudgel", Rarity::Legendary, WeaponType::Mace,
-        60, 0, 15, ElementType::Physical, 10, 0,
+        60, 8, 15, ElementType::Physical, 10, 0,
         "Farm Overseer", 17,
         ItemPassive::GoldFind30, ItemPassive::None
     });
@@ -1261,7 +1261,7 @@ void UniqueItemRegistry::RegisterMerchantUniques()
     // Auctioneer's Blade — Sword (drops from Aran Warlord)
     s_weapons.push_back({
         "Auctioneer's Blade", Rarity::Legendary, WeaponType::Sword,
-        160, 0, 25, ElementType::Physical, 20, 0,
+        160, 28, 25, ElementType::Physical, 20, 0,
         "Aran Warlord", -1,
         ItemPassive::CritChance20, ItemPassive::GoldFind30
     });
@@ -1269,7 +1269,7 @@ void UniqueItemRegistry::RegisterMerchantUniques()
     // Ledger of Endless Wealth — Wand (drops from Arcane Construct)
     s_weapons.push_back({
         "Ledger of Endless Wealth", Rarity::Legendary, WeaponType::Wand,
-        180, 0, 140, ElementType::Arcane, 40, 0,
+        180, 32, 140, ElementType::Arcane, 40, 0,
         "Arcane Construct", -1,
         ItemPassive::ManaRegen10, ItemPassive::ExpBoost20
     });
@@ -1277,7 +1277,7 @@ void UniqueItemRegistry::RegisterMerchantUniques()
     // Merchant's Traveling Cloak — Cloth Chest (drops from Void Lord)
     s_armor.push_back({
         "Merchant's Traveling Cloak", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        22, 0, {{ElementType::Arcane, 8}}, 0,
+        22, 8, {{ElementType::Arcane, 8}}, 4,
         "Void Lord", 17,
         ItemPassive::Dodge15, ItemPassive::GoldFind30
     });
@@ -1285,7 +1285,7 @@ void UniqueItemRegistry::RegisterMerchantUniques()
     // Bullion Greaves — Plate Boots (drops from Kraken)
     s_armor.push_back({
         "Bullion Greaves", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Boots,
-        14, 0, {{ElementType::Ice, 6}}, 0,
+        14, 5, {{ElementType::Ice, 6}}, 2,
         "Kraken", -1,
         ItemPassive::HealOnKill10, ItemPassive::GoldFind30
     });
@@ -1293,7 +1293,7 @@ void UniqueItemRegistry::RegisterMerchantUniques()
     // Gilded Bracers — Plate Gloves (drops from Elder Dragon)
     s_armor.push_back({
         "Gilded Bracers", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Gloves,
-        16, 0, {{ElementType::Fire, 5}}, 0,
+        16, 6, {{ElementType::Fire, 5}}, 3,
         "Elder Dragon", -1,
         ItemPassive::CritChance20, ItemPassive::GoldFind30
     });
@@ -1301,7 +1301,7 @@ void UniqueItemRegistry::RegisterMerchantUniques()
     // Ring of the Golden Touch — Ring (drops from Seraphim Council)
     s_accessories.push_back({
         "Ring of the Golden Touch", Rarity::Legendary,
-        50, 0, 30, 0, ElementType::Holy, 15, 0,
+        50, 60, 30, 20, ElementType::Holy, 15, 0,
         "Seraphim Council", 17,
         ItemPassive::GoldFind30, ItemPassive::ExpBoost20
     });
@@ -1309,7 +1309,7 @@ void UniqueItemRegistry::RegisterMerchantUniques()
     // Amulet of Prosperity — Amulet (drops from Chronos)
     s_accessories.push_back({
         "Amulet of Prosperity", Rarity::Legendary,
-        60, 0, 50, 0, ElementType::Arcane, 20, 0,
+        60, 100, 50, 28, ElementType::Arcane, 20, 0,
         "Chronos, the Time Ender", 17,
         ItemPassive::ExpBoost20, ItemPassive::ManaRegen5
     });
@@ -1423,7 +1423,7 @@ void UniqueItemRegistry::RegisterAchievementItems()
     // Innkeeper's Key — "Inn Regular" (rest 100 times)
     s_weapons.push_back({
         "Innkeeper's Key", Rarity::Legendary, WeaponType::Dagger,
-        150, 0, 20, ElementType::Holy, 15, 0,
+        150, 42, 20, ElementType::Holy, 15, 0,
         "", -1,
         ItemPassive::HealOnKill15, ItemPassive::GoldFind30
     });
@@ -1431,7 +1431,7 @@ void UniqueItemRegistry::RegisterAchievementItems()
     // Gatherer's Pouch — "Gather Legend" (50 gather quests)
     s_accessories.push_back({
         "Gatherer's Pouch", Rarity::Legendary,
-        40, 0, 40, 0, ElementType::Physical, 0, 0,
+        40, 100, 40, 28, ElementType::Physical, 0, 0,
         "", -1,
         ItemPassive::GoldFind30, ItemPassive::ExpBoost20
     });
@@ -1439,7 +1439,7 @@ void UniqueItemRegistry::RegisterAchievementItems()
     // Explorer's Compass — "World Walker" (15 explore quests)
     s_accessories.push_back({
         "Explorer's Compass", Rarity::Legendary,
-        50, 0, 30, 0, ElementType::Physical, 0, 0,
+        50, 100, 30, 28, ElementType::Physical, 0, 0,
         "", -1,
         ItemPassive::Dodge20, ItemPassive::ExpBoost20
     });
@@ -1447,7 +1447,7 @@ void UniqueItemRegistry::RegisterAchievementItems()
     // World Map — "World Explorer" (visit all areas)
     s_accessories.push_back({
         "World Map", Rarity::Legendary,
-        60, 0, 60, 0, ElementType::Physical, 0, 0,
+        60, 100, 60, 28, ElementType::Physical, 0, 0,
         "", -1,
         ItemPassive::AllResist10, ItemPassive::ManaRegen10
     });
@@ -1455,7 +1455,7 @@ void UniqueItemRegistry::RegisterAchievementItems()
     // Shadow Cloak — "Secret Master" (10 secret areas)
     s_armor.push_back({
         "Shadow Cloak", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        22, 0, {{ElementType::Arcane, 12}}, 0,
+        22, 11, {{ElementType::Arcane, 12}}, 5,
         "", -1,
         ItemPassive::Dodge20, ItemPassive::ManaRegen5
     });
@@ -1463,7 +1463,7 @@ void UniqueItemRegistry::RegisterAchievementItems()
     // Hero's Crown — "Legendary Hero" (level 50)
     s_armor.push_back({
         "Hero's Crown", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Helmet,
-        30, 0, {{ElementType::Holy, 10}}, 0,
+        30, 11, {{ElementType::Holy, 10}}, 5,
         "", -1,
         ItemPassive::DamageReduce15, ItemPassive::ExpBoost20
     });
@@ -1471,7 +1471,7 @@ void UniqueItemRegistry::RegisterAchievementItems()
     // Tycoon's Ring — "Tycoon" (100k gold)
     s_accessories.push_back({
         "Tycoon's Ring", Rarity::Legendary,
-        70, 0, 40, 0, ElementType::Physical, 0, 0,
+        70, 100, 40, 28, ElementType::Physical, 0, 0,
         "", -1,
         ItemPassive::GoldFind30, ItemPassive::GoldFind30
     });
@@ -1479,7 +1479,7 @@ void UniqueItemRegistry::RegisterAchievementItems()
     // Archivist's Satchel — "Archivist" (100 unique items)
     s_accessories.push_back({
         "Archivist's Satchel", Rarity::Legendary,
-        50, 0, 50, 0, ElementType::Arcane, 10, 0,
+        50, 100, 50, 28, ElementType::Arcane, 10, 0,
         "", -1,
         ItemPassive::ExpBoost20, ItemPassive::ManaRegen5
     });
@@ -1487,7 +1487,7 @@ void UniqueItemRegistry::RegisterAchievementItems()
     // Merchant's Crown — "Trade Lord" (sell 1000 items)
     s_armor.push_back({
         "Merchant's Crown", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Helmet,
-        20, 0, {{ElementType::Fire, 5}, {ElementType::Ice, 5}, {ElementType::Lightning, 5}, {ElementType::Arcane, 5}, {ElementType::Poison, 5}, {ElementType::Holy, 5}}, 0,
+        20, 11, {{ElementType::Fire, 5}, {ElementType::Ice, 5}, {ElementType::Lightning, 5}, {ElementType::Arcane, 5}, {ElementType::Poison, 5}, {ElementType::Holy, 5}}, 5,
         "", -1,
         ItemPassive::GoldFind30, ItemPassive::ExpBoost20
     });
@@ -1507,7 +1507,7 @@ void UniqueItemRegistry::RegisterWarriorLegendaries()
     // Ironclad Warblade — Sword (drops from Aran Warlord)
     s_weapons.push_back({
         "Ironclad Warblade", Rarity::Legendary, WeaponType::Sword,
-        180, 0, 20, ElementType::Physical, 0, 0,
+        180, 28, 20, ElementType::Physical, 0, 0,
         "Aran Warlord", 14,
         ItemPassive::PhysDmgBoost20, ItemPassive::Thorns25
     });
@@ -1515,7 +1515,7 @@ void UniqueItemRegistry::RegisterWarriorLegendaries()
     // Abyssal Cleaver — Axe (drops from Kraken)
     s_weapons.push_back({
         "Abyssal Cleaver", Rarity::Legendary, WeaponType::Axe,
-        165, 0, 15, ElementType::Ice, 20, 0,
+        165, 16, 15, ElementType::Ice, 20, 0,
         "Kraken", -1,
         ItemPassive::DamageReduce15, ItemPassive::PhysDmgBoost20
     });
@@ -1523,7 +1523,7 @@ void UniqueItemRegistry::RegisterWarriorLegendaries()
     // Thunderstrike Mace — Mace (drops from Elder Dragon)
     s_weapons.push_back({
         "Thunderstrike Mace", Rarity::Legendary, WeaponType::Mace,
-        170, 0, 25, ElementType::Lightning, 15, 0,
+        170, 22, 25, ElementType::Lightning, 15, 0,
         "Elder Dragon", -1,
         ItemPassive::StunImmune, ItemPassive::Thorns40
     });
@@ -1531,7 +1531,7 @@ void UniqueItemRegistry::RegisterWarriorLegendaries()
     // Earthenbreaker — Hammer (drops from The Primordial One)
     s_weapons.push_back({
         "Earthenbreaker", Rarity::Legendary, WeaponType::Hammer,
-        200, 0, 30, ElementType::Physical, 10, 0,
+        200, 40, 30, ElementType::Physical, 10, 0,
         "The Primordial One", -1,
         ItemPassive::PhysDmgBoost20, ItemPassive::DamageReduce15
     });
@@ -1541,7 +1541,7 @@ void UniqueItemRegistry::RegisterWarriorLegendaries()
     // Bulwark Plate — Plate Chest (drops from Kraken)
     s_armor.push_back({
         "Bulwark Plate", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Chest,
-        30, 0, {{ElementType::Physical, 10}}, 0,
+        30, 5, {{ElementType::Physical, 10}}, 2,
         "Kraken", 14,
         ItemPassive::DamageReduce15, ItemPassive::Thorns40
     });
@@ -1549,7 +1549,7 @@ void UniqueItemRegistry::RegisterWarriorLegendaries()
     // Warlord's Casque — Plate Helmet (drops from Aran Warlord)
     s_armor.push_back({
         "Warlord's Casque", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Helmet,
-        28, 0, {{ElementType::Lightning, 8}}, 0,
+        28, 7, {{ElementType::Lightning, 8}}, 3,
         "Aran Warlord", 14,
         ItemPassive::TauntChance25, ItemPassive::DamageReduce15
     });
@@ -1557,7 +1557,7 @@ void UniqueItemRegistry::RegisterWarriorLegendaries()
     // Drakeplate Gauntlets — Plate Gloves (drops from Elder Dragon)
     s_armor.push_back({
         "Drakeplate Gauntlets", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Gloves,
-        16, 0, {{ElementType::Fire, 6}}, 0,
+        16, 6, {{ElementType::Fire, 6}}, 3,
         "Elder Dragon", 14,
         ItemPassive::Thorns25, ItemPassive::StunImmune
     });
@@ -1565,7 +1565,7 @@ void UniqueItemRegistry::RegisterWarriorLegendaries()
     // Primordial Leather Vest — Leather Chest (drops from The Primordial One)
     s_armor.push_back({
         "Primordial Leather Vest", Rarity::Legendary, ArmorType::Leather, ArmorPiece::Chest,
-        22, 0, {{ElementType::Physical, 5}, {ElementType::Lightning, 5}}, 0,
+        22, 10, {{ElementType::Physical, 5}, {ElementType::Lightning, 5}}, 5,
         "The Primordial One", -1,
         ItemPassive::Dodge20, ItemPassive::PhysDmgBoost15
     });
@@ -1575,7 +1575,7 @@ void UniqueItemRegistry::RegisterWarriorLegendaries()
     // Warlord's Signet — Ring (drops from Void Lord)
     s_accessories.push_back({
         "Warlord's Signet", Rarity::Legendary,
-        80, 0, 20, 0, ElementType::Physical, 0, 0,
+        80, 50, 20, 18, ElementType::Physical, 0, 0,
         "Void Lord", -1,
         ItemPassive::Thorns40, ItemPassive::AllResist10
     });
@@ -1583,7 +1583,7 @@ void UniqueItemRegistry::RegisterWarriorLegendaries()
     // Amulet of Iron Will — Amulet (drops from Seraphim Council)
     s_accessories.push_back({
         "Amulet of Iron Will", Rarity::Legendary,
-        60, 0, 30, 0, ElementType::Physical, 0, 0,
+        60, 60, 30, 20, ElementType::Physical, 0, 0,
         "Seraphim Council", -1,
         ItemPassive::StunImmune, ItemPassive::DamageReduce10
     });
@@ -1698,7 +1698,7 @@ void UniqueItemRegistry::RegisterPriestLegendaries()
     // Arbiter's Mace — Mace (drops from Seraphim Council)
     s_weapons.push_back({
         "Arbiter's Mace", Rarity::Legendary, WeaponType::Mace,
-        140, 0, 35, ElementType::Holy, 30, 0,
+        140, 36, 35, ElementType::Holy, 30, 0,
         "Seraphim Council", 15,
         ItemPassive::HolyHealOnKill, ItemPassive::HealOnKill15
     });
@@ -1706,7 +1706,7 @@ void UniqueItemRegistry::RegisterPriestLegendaries()
     // Scepter of the Faithful — Scepter (drops from Elder Dragon)
     s_weapons.push_back({
         "Scepter of the Faithful", Rarity::Legendary, WeaponType::Scepter,
-        120, 0, 60, ElementType::Holy, 45, 0,
+        120, 22, 60, ElementType::Holy, 45, 0,
         "Elder Dragon", -1,
         ItemPassive::ManaRegen10, ItemPassive::Revive50
     });
@@ -1714,7 +1714,7 @@ void UniqueItemRegistry::RegisterPriestLegendaries()
     // Staff of Benediction — Staff (drops from Arcane Construct)
     s_weapons.push_back({
         "Staff of Benediction", Rarity::Legendary, WeaponType::Staff,
-        100, 0, 80, ElementType::Holy, 50, 0,
+        130, 40, 80, ElementType::Holy, 50, 0,
         "Arcane Construct", -1,
         ItemPassive::DoubleCast15, ItemPassive::SpellDmgBoost20
     });
@@ -1722,7 +1722,7 @@ void UniqueItemRegistry::RegisterPriestLegendaries()
     // Mace of the Penance — Mace (drops from Chronos, the Time Ender)
     s_weapons.push_back({
         "Mace of the Penance", Rarity::Legendary, WeaponType::Mace,
-        160, 0, 40, ElementType::Holy, 35, 0,
+        160, 42, 40, ElementType::Holy, 35, 0,
         "Chronos, the Time Ender", -1,
         ItemPassive::DamageReduce15, ItemPassive::Lifesteal15
     });
@@ -1732,7 +1732,7 @@ void UniqueItemRegistry::RegisterPriestLegendaries()
     // Vestments of the Martyr — Cloth Chest (drops from Arcane Construct)
     s_armor.push_back({
         "Vestments of the Martyr", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
-        18, 0, {{ElementType::Holy, 12}}, 0,
+        18, 10, {{ElementType::Holy, 12}}, 5,
         "Arcane Construct", 15,
         ItemPassive::HealOnKill15, ItemPassive::Revive50
     });
@@ -1740,7 +1740,7 @@ void UniqueItemRegistry::RegisterPriestLegendaries()
     // Halo of the Redeemed — Cloth Helmet (drops from Seraphim Council)
     s_armor.push_back({
         "Halo of the Redeemed", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Helmet,
-        20, 0, {{ElementType::Holy, 14}}, 0,
+        20, 9, {{ElementType::Holy, 14}}, 4,
         "Seraphim Council", 15,
         ItemPassive::DamageReduce10, ItemPassive::ManaRegen10
     });
@@ -1748,7 +1748,7 @@ void UniqueItemRegistry::RegisterPriestLegendaries()
     // Gauntlets of Grace — Cloth Gloves (drops from Void Lord)
     s_armor.push_back({
         "Gauntlets of Grace", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Gloves,
-        12, 0, {{ElementType::Holy, 8}}, 0,
+        12, 8, {{ElementType::Holy, 8}}, 4,
         "Void Lord", 15,
         ItemPassive::HealOnKill10, ItemPassive::ManaCostReduce10
     });
@@ -1756,7 +1756,7 @@ void UniqueItemRegistry::RegisterPriestLegendaries()
     // Treads of the Pilgrim — Leather Boots (drops from Treant King)
     s_armor.push_back({
         "Treads of the Pilgrim", Rarity::Legendary, ArmorType::Leather, ArmorPiece::Boots,
-        14, 0, {{ElementType::Holy, 6}}, 0,
+        14, 4, {{ElementType::Holy, 6}}, 2,
         "Treant King", -1,
         ItemPassive::AllResist10, ItemPassive::FreezeImmune
     });
@@ -1766,7 +1766,7 @@ void UniqueItemRegistry::RegisterPriestLegendaries()
     // Pendant of Devotion — Amulet (drops from Chronos, the Time Ender)
     s_accessories.push_back({
         "Pendant of Devotion", Rarity::Legendary,
-        60, 0, 80, 0, ElementType::Holy, 20, 0,
+        60, 100, 80, 28, ElementType::Holy, 20, 0,
         "Chronos, the Time Ender", -1,
         ItemPassive::Revive50, ItemPassive::ManaRegen10
     });
@@ -1774,7 +1774,7 @@ void UniqueItemRegistry::RegisterPriestLegendaries()
     // Band of the Oathkeeper — Ring (drops from Kraken)
     s_accessories.push_back({
         "Band of the Oathkeeper", Rarity::Legendary,
-        50, 0, 60, 0, ElementType::Holy, 15, 0,
+        50, 20, 60, 10, ElementType::Holy, 15, 0,
         "Kraken", -1,
         ItemPassive::PhoenixRevive, ItemPassive::DamageReduce10
     });
@@ -1889,7 +1889,7 @@ void UniqueItemRegistry::RegisterArcherLegendaries()
     // Windrunner's Bow — Bow (drops from Elder Dragon)
     s_weapons.push_back({
         "Windrunner's Bow", Rarity::Legendary, WeaponType::Bow,
-        170, 0, 10, ElementType::Physical, 0, 0,
+        170, 22, 10, ElementType::Physical, 0, 0,
         "Elder Dragon", 16,
         ItemPassive::CritChance30, ItemPassive::AtkSpeed20
     });
@@ -1897,7 +1897,7 @@ void UniqueItemRegistry::RegisterArcherLegendaries()
     // Venomfang Recurve — Bow (drops from Kraken)
     s_weapons.push_back({
         "Venomfang Recurve", Rarity::Legendary, WeaponType::Bow,
-        155, 0, 15, ElementType::Poison, 30, 0,
+        155, 16, 15, ElementType::Poison, 30, 0,
         "Kraken", -1,
         ItemPassive::PoisonDmgPlus25, ItemPassive::AtkSpeed20
     });
@@ -1905,7 +1905,7 @@ void UniqueItemRegistry::RegisterArcherLegendaries()
     // Nightblade's Fang — Dagger (drops from Void Lord)
     s_weapons.push_back({
         "Nightblade's Fang", Rarity::Legendary, WeaponType::Dagger,
-        160, 0, 20, ElementType::Arcane, 20, 0,
+        160, 32, 20, ElementType::Arcane, 20, 0,
         "Void Lord", -1,
         ItemPassive::CritChance30, ItemPassive::Dodge20
     });
@@ -1913,7 +1913,7 @@ void UniqueItemRegistry::RegisterArcherLegendaries()
     // Stormstring Longbow — Bow (drops from Aran Warlord)
     s_weapons.push_back({
         "Stormstring Longbow", Rarity::Legendary, WeaponType::Bow,
-        165, 0, 12, ElementType::Lightning, 20, 0,
+        165, 28, 12, ElementType::Lightning, 20, 0,
         "Aran Warlord", -1,
         ItemPassive::PhysDmgBoost20, ItemPassive::AtkSpeed20
     });
@@ -1923,7 +1923,7 @@ void UniqueItemRegistry::RegisterArcherLegendaries()
     // Pathfinder's Cap — Leather Helmet (drops from Treant King)
     s_armor.push_back({
         "Pathfinder's Cap", Rarity::Legendary, ArmorType::Leather, ArmorPiece::Helmet,
-        14, 0, {{ElementType::Poison, 8}}, 0,
+        14, 4, {{ElementType::Poison, 8}}, 2,
         "Treant King", 16,
         ItemPassive::Dodge20, ItemPassive::CritChance20
     });
@@ -1931,7 +1931,7 @@ void UniqueItemRegistry::RegisterArcherLegendaries()
     // Wyrmhide Jerkin — Leather Chest (drops from Elder Dragon)
     s_armor.push_back({
         "Wyrmhide Jerkin", Rarity::Legendary, ArmorType::Leather, ArmorPiece::Chest,
-        20, 0, {{ElementType::Fire, 6}}, 0,
+        20, 6, {{ElementType::Fire, 6}}, 3,
         "Elder Dragon", 16,
         ItemPassive::PhysDmgBoost15, ItemPassive::Dodge15
     });
@@ -1939,7 +1939,7 @@ void UniqueItemRegistry::RegisterArcherLegendaries()
     // Shadowstalker Grips — Leather Gloves (drops from Seraphim Council)
     s_armor.push_back({
         "Shadowstalker Grips", Rarity::Legendary, ArmorType::Leather, ArmorPiece::Gloves,
-        12, 0, {{ElementType::Physical, 5}}, 0,
+        12, 9, {{ElementType::Physical, 5}}, 4,
         "Seraphim Council", 16,
         ItemPassive::CritChance20, ItemPassive::PoisonDmgPlus25
     });
@@ -1947,7 +1947,7 @@ void UniqueItemRegistry::RegisterArcherLegendaries()
     // Galewalkers — Leather Boots (drops from Chronos, the Time Ender)
     s_armor.push_back({
         "Galewalkers", Rarity::Legendary, ArmorType::Leather, ArmorPiece::Boots,
-        10, 0, {{ElementType::Lightning, 5}}, 0,
+        10, 11, {{ElementType::Lightning, 5}}, 5,
         "Chronos, the Time Ender", -1,
         ItemPassive::Dodge20, ItemPassive::AtkSpeed20
     });
@@ -1957,7 +1957,7 @@ void UniqueItemRegistry::RegisterArcherLegendaries()
     // Ranger's Focus — Ring (drops from Farm Overseer)
     s_accessories.push_back({
         "Ranger's Focus", Rarity::Legendary,
-        40, 0, 15, 0, ElementType::Physical, 10, 0,
+        40, 10, 15, 5, ElementType::Physical, 10, 0,
         "Farm Overseer", -1,
         ItemPassive::CritChance30, ItemPassive::PhysDmgBoost20
     });
@@ -1965,7 +1965,7 @@ void UniqueItemRegistry::RegisterArcherLegendaries()
     // Pendant of the Hunt — Amulet (drops from Arcane Construct)
     s_accessories.push_back({
         "Pendant of the Hunt", Rarity::Legendary,
-        55, 0, 20, 0, ElementType::Poison, 15, 0,
+        55, 100, 20, 28, ElementType::Poison, 15, 0,
         "Arcane Construct", -1,
         ItemPassive::AtkSpeed20, ItemPassive::CritChance20
     });

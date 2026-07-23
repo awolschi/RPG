@@ -42,6 +42,9 @@ const Color TextDim     = { 160, 140, 120, 255 };
 const Color TextRed     = { 220, 80, 60, 255 };
 const Color TextGreen   = { 80, 200, 80, 255 };
 const Color TextGold    = { 201, 168, 76, 255 };
+const Color TextFire    = { 255, 100, 50, 255 };
+const Color TextIce     = { 100, 200, 255, 255 };
+const Color TextArcane  = { 200, 120, 255, 255 };
 
 // Special
 const Color BorderLight = { 160, 130, 90, 255 };

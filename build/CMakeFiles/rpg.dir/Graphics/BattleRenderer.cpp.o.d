@@ -243,6 +243,7 @@ CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.o: \
  /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Engine/../Jobs/JobQuest.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Engine/../Jobs/Job.hpp \
  /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Factions/Pet.hpp \
+ /home/awolschi/Desktop/OwnProjects/RPG/Graphics/../Skills/Skill.hpp \
  /usr/include/c++/10/cmath /usr/include/math.h \
  /usr/include/x86_64-linux-gnu/bits/math-vector.h \
  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \

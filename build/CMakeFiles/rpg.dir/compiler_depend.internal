@@ -4004,6 +4004,7 @@ CMakeFiles/rpg.dir/Graphics/BattleRenderer.cpp.o
  /home/awolschi/Desktop/OwnProjects/RPG/Jobs/JobQuest.hpp
  /home/awolschi/Desktop/OwnProjects/RPG/Jobs/Job.hpp
  /home/awolschi/Desktop/OwnProjects/RPG/Factions/Pet.hpp
+ /home/awolschi/Desktop/OwnProjects/RPG/Skills/Skill.hpp
  /usr/include/c++/10/cmath
  /usr/include/math.h
  /usr/include/x86_64-linux-gnu/bits/math-vector.h
