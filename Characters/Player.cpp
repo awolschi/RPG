@@ -760,7 +760,9 @@ void Player::RecalcMasteryBonuses() {
     int hpBonus = (stats.health * GetCharMasteryBonusHP()) / 100;
     int mpBonus = 0;
     SetMasteryBonuses(hpBonus, mpBonus, GetCharMasteryBonusDEF(),
-                      GetCharMasteryDamageBonus(), GetCharMasteryDamageReduction());
+                      GetCharMasteryDamageBonus(), GetCharMasteryDamageReduction(),
+                      GetCharMasteryHealingBonus(), GetCharMasteryManaCostReduction(),
+                      GetCharMasteryDodgeChance());
 }
 
 int Player::GetCharMasteryBonusHP() const {
@@ -788,6 +790,8 @@ int Player::GetCharMasteryBonusDEF() const {
 }
 
 float Player::GetCharMasteryDamageBonus() const {
+    // Merchant branch 1 is "Opulence" (Gold Find), not damage — skip it
+    if (characterClass == CharacterClass::Merchant) return 0.0f;
     int count = 0;
     for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
         if (charMasteryNodes[1][n]) count++;

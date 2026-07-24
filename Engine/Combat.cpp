@@ -69,12 +69,17 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
     {
         case CombatAction::Attack:
         {
-            // Dodge check
-            if (Passives::RollProc(Passives::GetDodgePercent(defender->GetEquipment())))
+            // Dodge check (equipment passives + mastery dodge)
             {
-                attacker->GetSkills().UpdateCooldowns();
-                actionMsg = defender->GetName() + " dodges the attack! ";
-                break;
+                int totalDodge = Passives::GetDodgePercent(defender->GetEquipment());
+                int masteryDodge = static_cast<int>(defender->GetMasteryDodgeChance() * 100);
+                totalDodge += masteryDodge;
+                if (Passives::RollProc(totalDodge))
+                {
+                    attacker->GetSkills().UpdateCooldowns();
+                    actionMsg = defender->GetName() + " dodges the attack! ";
+                    break;
+                }
             }
 
             auto attackSkill = attacker->GetSkills().GetSkill(skillIndex);
@@ -146,6 +151,8 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
 
             int effectiveManaCost = skill->GetEffectiveManaCost();
             int manaCostReduction = Passives::GetManaCostReductionPercent(attacker->GetEquipment());
+            int masteryManaReduce = static_cast<int>(attacker->GetMasteryManaCostReduction() * 100);
+            manaCostReduction += masteryManaReduce;
             if (manaCostReduction > 0)
                 effectiveManaCost = effectiveManaCost * (100 - manaCostReduction) / 100;
 

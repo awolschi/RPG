@@ -87,17 +87,24 @@ public:
     float GetPetBonusCritDamage() const { return petBonusCritDamage; }
 
     // Character mastery bonuses
-    void SetMasteryBonuses(int hp, int mp, int def, float dmgBonus, float dmgReduction)
+    void SetMasteryBonuses(int hp, int mp, int def, float dmgBonus, float dmgReduction,
+                           float healBonus, float manaCostReduction, float dodgeChance)
     {
         masteryBonusHP = hp;
         masteryBonusMP = mp;
         masteryBonusDEF = def;
         masteryDamageBonus = dmgBonus;
         masteryDamageReduction = dmgReduction;
+        masteryHealingBonus = healBonus;
+        masteryManaCostReduction = manaCostReduction;
+        masteryDodgeChance = dodgeChance;
     }
     int GetMasteryBonusDEF() const { return masteryBonusDEF; }
     float GetMasteryDamageBonus() const { return masteryDamageBonus; }
     float GetMasteryDamageReduction() const { return masteryDamageReduction; }
+    float GetMasteryHealingBonus() const { return masteryHealingBonus; }
+    float GetMasteryManaCostReduction() const { return masteryManaCostReduction; }
+    float GetMasteryDodgeChance() const { return masteryDodgeChance; }
 
     // Status effects
     void ApplyEffect(EffectType type, int duration, int potency = 0, const std::string& source = "");
@@ -147,6 +154,9 @@ protected:
     int masteryBonusDEF = 0;
     float masteryDamageBonus = 0.0f;
     float masteryDamageReduction = 0.0f;
+    float masteryHealingBonus = 0.0f;
+    float masteryManaCostReduction = 0.0f;
+    float masteryDodgeChance = 0.0f;
 
     SkillSet skills;
     Equipment equipment;

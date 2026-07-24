@@ -68,6 +68,8 @@ float Character::GetResistance(ElementType element) const
 
 void Character::RestoreHealth(int amount)
 {
+    if (masteryHealingBonus > 0.0f)
+        amount = static_cast<int>(amount * (1.0f + masteryHealingBonus));
     currentHealth += amount;
     if (currentHealth > GetMaxHealth())
         currentHealth = GetMaxHealth();
@@ -226,7 +228,11 @@ void Character::SetExperience(int xp)
 
 void Character::GainXP(int xp)
 {
-    if (level >= MAX_LEVEL) return;
+    if (level >= MAX_LEVEL)
+    {
+        OnOverflowXP(xp);
+        return;
+    }
     experience += xp;
     int required = CalculateRequiredXP(level);
     while (experience >= required && level < MAX_LEVEL)

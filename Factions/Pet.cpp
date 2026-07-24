@@ -525,6 +525,66 @@ PetAbilityResult PetManager::TryProcPetAbility(int playerLevel) const
     return result;
 }
 
+std::vector<PetAbilityResult> PetManager::TryTreeElementalProcs(int playerLevel) const
+{
+    std::vector<PetAbilityResult> results;
+    const Pet* pet = GetEquippedPet();
+    if (!pet || pet->level < Pet::SKILL_TREE_UNLOCK_LEVEL) return results;
+
+    // Each tree bonus is a proc chance (0.0-1.0). Roll each independently.
+    auto rollEffect = [&](EffectType type, float chance, const std::string& name,
+                          int potency, int duration)
+    {
+        if (chance <= 0.0f) return;
+        int roll = RNG::Percent();
+        if (roll < static_cast<int>(chance * 100.0f))
+        {
+            PetAbilityResult r;
+            r.procced = true;
+            r.effect = type;
+            r.potency = potency;
+            r.duration = duration;
+            r.abilityName = name;
+            r.message = pet->GetCurrentName() + " inflicts " + name + "!";
+            results.push_back(r);
+        }
+    };
+
+    int atk = pet->GetScaledAttack();
+
+    // Fire pet tree → Burn (damage over time, scales with ATK)
+    if (pet->treeBurnBonus > 0.0f)
+    {
+        int burnPotency = atk / 10;
+        rollEffect(EffectType::Burn, pet->treeBurnBonus,
+                   "Burn", burnPotency, 2);
+    }
+
+    // Ice pet tree → Freeze (stops enemy action for 1 turn)
+    if (pet->treeFreezeBonus > 0.0f)
+    {
+        rollEffect(EffectType::Freeze, pet->treeFreezeBonus,
+                   "Freeze", 0, 1);
+    }
+
+    // Lightning pet tree → Stun (stops enemy action for 1 turn)
+    if (pet->treeStunBonus > 0.0f)
+    {
+        rollEffect(EffectType::Stun, pet->treeStunBonus,
+                   "Stun", 0, 1);
+    }
+
+    // Poison pet tree → Poison (damage over time, scales with ATK)
+    if (pet->treePoisonBonus > 0.0f)
+    {
+        int poisonPotency = atk / 12;
+        rollEffect(EffectType::Poison, pet->treePoisonBonus,
+                   "Poison", poisonPotency, 2);
+    }
+
+    return results;
+}
+
 float PetManager::GetXPBonus() const
 {
     const Pet* pet = GetEquippedPet();
@@ -614,13 +674,28 @@ float PetManager::GetBossXPBonus() const
 
 int Pet::CalculateRequiredXP(int level)
 {
+    if (level >= SKILL_TREE_UNLOCK_LEVEL)
+        return XP_PER_SKILL_POINT;
     return level * 100;
 }
 
 void PetManager::GainPetXP(int xp)
 {
     Pet* pet = GetEquippedPet();
-    if (!pet || pet->level >= Pet::MAX_PET_LEVEL) return;
+    if (!pet) return;
+
+    // At level 100+, XP converts to skill points
+    if (pet->level >= Pet::SKILL_TREE_UNLOCK_LEVEL)
+    {
+        pet->experience += xp;
+        while (pet->experience >= Pet::CalculateRequiredXP(pet->level))
+        {
+            pet->experience -= Pet::CalculateRequiredXP(pet->level);
+            pet->skillPoints++;
+            leveledUpFlag = true;
+        }
+        return;
+    }
 
     pet->experience += xp;
 
@@ -708,6 +783,275 @@ std::string Pet::GetAbilityDescription() const
     return desc;
 }
 
+std::string Pet::GetBranchName(ElementType element, int branch)
+{
+    switch (branch)
+    {
+        case 0: // Offensive
+            switch (element)
+            {
+                case ElementType::Fire:      return "Inferno Path";
+                case ElementType::Ice:       return "Glacier Path";
+                case ElementType::Lightning: return "Storm Path";
+                case ElementType::Arcane:    return "Rune Path";
+                case ElementType::Poison:    return "Venom Path";
+                case ElementType::Holy:      return "Radiance Path";
+                default:                     return "Fury Path";
+            }
+        case 1: // Defensive
+            switch (element)
+            {
+                case ElementType::Fire:      return "Molten Core";
+                case ElementType::Ice:       return "Permafrost";
+                case ElementType::Lightning: return "Static Veil";
+                case ElementType::Arcane:    return "Mana Ward";
+                case ElementType::Poison:    return "Blight Shield";
+                case ElementType::Holy:      return "Sacred Guard";
+                default:                     return "Iron Will";
+            }
+        case 2: // Utility
+            switch (element)
+            {
+                case ElementType::Fire:      return "Ashes of War";
+                case ElementType::Ice:       return "Winter's Gift";
+                case ElementType::Lightning: return "Quickening";
+                case ElementType::Arcane:    return "Arcane Insight";
+                case ElementType::Poison:    return "Contagion";
+                case ElementType::Holy:      return "Blessed Fortune";
+                default:                     return "Spoils of Battle";
+            }
+        default: return "Unknown";
+    }
+}
+
+std::string Pet::GetSkillNodeName(ElementType element, int branch, int node)
+{
+    if (branch == 0) // Offensive
+    {
+        switch (element)
+        {
+            case ElementType::Fire:
+                switch (node) { case 0: return "Ember Touch"; case 1: return "Flame Mastery"; case 2: return "Blazing Fury"; case 3: return "Inferno Core"; case 4: return "Phoenix Heart"; }
+                break;
+            case ElementType::Ice:
+                switch (node) { case 0: return "Frost Bite"; case 1: return "Ice Shard"; case 2: return "Frozen Edge"; case 3: return "Blizzard Fury"; case 4: return "Absolute Zero"; }
+                break;
+            case ElementType::Lightning:
+                switch (node) { case 0: return "Spark"; case 1: return "Charged Strike"; case 2: return "Thunderbolt"; case 3: return "Storm Surge"; case 4: return "Tempest Wrath"; }
+                break;
+            case ElementType::Arcane:
+                switch (node) { case 0: return "Arcane Bolt"; case 1: return "Power Surge"; case 2: return "Mana Flood"; case 3: return "Void Rend"; case 4: return "Eldritch Mastery"; }
+                break;
+            case ElementType::Poison:
+                switch (node) { case 0: return "Toxic Touch"; case 1: return "Corrosive"; case 2: return "Pandemic"; case 3: return "Necrotic"; case 4: return "Deathbloom"; }
+                break;
+            case ElementType::Holy:
+                switch (node) { case 0: return "Smite"; case 1: return "Holy Fire"; case 2: return "Divine Wrath"; case 3: return "Judgement"; case 4: return "Celestial Might"; }
+                break;
+            default:
+                switch (node) { case 0: return "Brutal Strike"; case 1: return "Heavy Hitter"; case 2: return "Crushing Blow"; case 3: return "War Cry"; case 4: return "Colossus"; }
+                break;
+        }
+    }
+    else if (branch == 1) // Defensive
+    {
+        switch (node)
+        {
+            case 0: return "Thick Hide";
+            case 1: return "Hardened Scale";
+            case 2: return "Elemental Ward";
+            case 3: return "Damage Barrier";
+            case 4: return "Unbreakable";
+        }
+    }
+    else // Utility (branch 2)
+    {
+        switch (node)
+        {
+            case 0: return "Lucky Star";
+            case 1: return "Gold Finder";
+            case 2: return "Quick Learner";
+            case 3: return "Vampiric Touch";
+            case 4: return "Jackpot";
+        }
+    }
+    return "Unknown";
+}
+
+std::string Pet::GetSkillNodeDesc(ElementType element, int branch, int node)
+{
+    if (branch == 0) // Offensive — element-specific damage boosts
+    {
+        switch (element)
+        {
+            case ElementType::Fire:
+                switch (node) { case 0: return "+5% damage"; case 1: return "+8% damage"; case 2: return "+10% damage, +5% burn potency"; case 3: return "+15% damage, +10% burn potency"; case 4: return "+20% damage, +15% burn potency"; }
+                break;
+            case ElementType::Ice:
+                switch (node) { case 0: return "+5% damage"; case 1: return "+8% damage"; case 2: return "+10% damage, +5% freeze chance"; case 3: return "+15% damage, +8% freeze chance"; case 4: return "+20% damage, +12% freeze chance"; }
+                break;
+            case ElementType::Lightning:
+                switch (node) { case 0: return "+5% damage"; case 1: return "+8% damage"; case 2: return "+10% damage, +5% stun chance"; case 3: return "+15% damage, +8% stun chance"; case 4: return "+20% damage, +12% stun chance"; }
+                break;
+            case ElementType::Arcane:
+                switch (node) { case 0: return "+5% damage"; case 1: return "+8% damage, +10 mana"; case 2: return "+12% damage, +15 mana"; case 3: return "+16% damage, +20 mana"; case 4: return "+20% damage, +30 mana"; }
+                break;
+            case ElementType::Poison:
+                switch (node) { case 0: return "+5% damage"; case 1: return "+8% damage"; case 2: return "+10% damage, +5% poison potency"; case 3: return "+15% damage, +8% poison potency"; case 4: return "+20% damage, +12% poison potency"; }
+                break;
+            case ElementType::Holy:
+                switch (node) { case 0: return "+5% damage"; case 1: return "+8% damage"; case 2: return "+10% damage, +3 heal on kill"; case 3: return "+15% damage, +5 heal on kill"; case 4: return "+20% damage, +8 heal on kill"; }
+                break;
+            default:
+                switch (node) { case 0: return "+5% damage"; case 1: return "+8% damage"; case 2: return "+12% damage"; case 3: return "+16% damage"; case 4: return "+20% damage"; }
+                break;
+        }
+    }
+    else if (branch == 1) // Defensive
+    {
+        switch (node)
+        {
+            case 0: return "+3% defense bonus";
+            case 1: return "+5% defense bonus, +20 HP";
+            case 2: return "+5% damage reduction";
+            case 3: return "+5% defense, +30 HP, +3% damage reduction";
+            case 4: return "+10% defense, +50 HP, +5% damage reduction";
+        }
+    }
+    else // Utility (branch 2)
+    {
+        switch (node)
+        {
+            case 0: return "+3% crit chance";
+            case 1: return "+8% gold find";
+            case 2: return "+10% XP bonus";
+            case 3: return "+5 heal on kill, +3% crit chance";
+            case 4: return "+15% gold find, +10% XP, +5% crit";
+        }
+    }
+    return "";
+}
+
+bool Pet::CanSpendSkillPoint(int branch, int node) const
+{
+    if (skillPoints <= 0) return false;
+    if (branch < 0 || branch >= SKILL_TREE_BRANCHES) return false;
+    if (node < 0 || node >= SKILL_TREE_NODES_PER_BRANCH) return false;
+    if (skillTreeNodes[branch][node]) return false;
+    // Must unlock previous nodes in branch first
+    for (int n = 0; n < node; ++n)
+        if (!skillTreeNodes[branch][n]) return false;
+    return true;
+}
+
+void Pet::SpendSkillPoint(int branch, int node)
+{
+    if (!CanSpendSkillPoint(branch, node)) return;
+    skillPoints--;
+    skillTreeNodes[branch][node] = true;
+    RecalcTreeBonuses();
+}
+
+int Pet::GetTotalSkillNodesUnlocked() const
+{
+    int total = 0;
+    for (int b = 0; b < SKILL_TREE_BRANCHES; ++b)
+        for (int n = 0; n < SKILL_TREE_NODES_PER_BRANCH; ++n)
+            if (skillTreeNodes[b][n]) total++;
+    return total;
+}
+
+void Pet::RecalcTreeBonuses()
+{
+    treeDamageBonus = 0.0f;
+    treeDefenseBonus = 0.0f;
+    treeCritChance = 0.0f;
+    treeXPBonus = 0.0f;
+    treeGoldFind = 0.0f;
+    treeHealthBonus = 0;
+    treeManaBonus = 0;
+    treeHealOnKill = 0;
+    treeBurnBonus = 0.0f;
+    treeFreezeBonus = 0.0f;
+    treePoisonBonus = 0.0f;
+    treeStunBonus = 0.0f;
+
+    for (int b = 0; b < SKILL_TREE_BRANCHES; ++b)
+    {
+        for (int n = 0; n < SKILL_TREE_NODES_PER_BRANCH; ++n)
+        {
+            if (!skillTreeNodes[b][n]) continue;
+
+            if (b == 0) // Offensive — element-specific
+            {
+                switch (n)
+                {
+                    case 0: treeDamageBonus += 0.05f; break;
+                    case 1: treeDamageBonus += 0.08f; break;
+                    case 2: treeDamageBonus += 0.10f; break;
+                    case 3: treeDamageBonus += 0.15f; break;
+                    case 4: treeDamageBonus += 0.20f; break;
+                }
+                // Element-specific bonuses at higher nodes
+                if (n >= 2)
+                {
+                    switch (element)
+                    {
+                        case ElementType::Fire:
+                            treeBurnBonus += (n == 2) ? 0.05f : (n == 3) ? 0.10f : 0.15f;
+                            break;
+                        case ElementType::Ice:
+                            treeFreezeBonus += (n == 2) ? 0.05f : (n == 3) ? 0.08f : 0.12f;
+                            break;
+                        case ElementType::Lightning:
+                            treeStunBonus += (n == 2) ? 0.05f : (n == 3) ? 0.08f : 0.12f;
+                            break;
+                        case ElementType::Poison:
+                            treePoisonBonus += (n == 2) ? 0.05f : (n == 3) ? 0.08f : 0.12f;
+                            break;
+                        case ElementType::Arcane:
+                            treeManaBonus += (n == 1) ? 10 : (n == 2) ? 15 : (n == 3) ? 20 : 30;
+                            break;
+                        case ElementType::Holy:
+                            treeHealOnKill += (n == 2) ? 3 : (n == 3) ? 5 : 8;
+                            break;
+                        default: break;
+                    }
+                }
+            }
+            else if (b == 1) // Defensive
+            {
+                switch (n)
+                {
+                    case 0: treeDefenseBonus += 0.03f; break;
+                    case 1: treeDefenseBonus += 0.05f; treeHealthBonus += 20; break;
+                    case 2: treeDamageBonus += 0.0f; treeDefenseBonus += 0.02f; break; // 5% DR = 2% def + 3% later
+                    case 3: treeDefenseBonus += 0.05f; treeHealthBonus += 30; break;
+                    case 4: treeDefenseBonus += 0.10f; treeHealthBonus += 50; break;
+                }
+                // Damage reduction from nodes 2+
+                if (n >= 2)
+                {
+                    float dr = (n == 2) ? 0.05f : (n == 3) ? 0.03f : 0.05f;
+                    // Store DR in treeDamageBonus (negative = reduction)
+                    treeDamageBonus -= dr;
+                }
+            }
+            else // Utility (branch 2)
+            {
+                switch (n)
+                {
+                    case 0: treeCritChance += 0.03f; break;
+                    case 1: treeGoldFind += 0.08f; break;
+                    case 2: treeXPBonus += 0.10f; break;
+                    case 3: treeHealOnKill += 5; treeCritChance += 0.03f; break;
+                    case 4: treeGoldFind += 0.15f; treeXPBonus += 0.10f; treeCritChance += 0.05f; break;
+                }
+            }
+        }
+    }
+}
+
 void PetManager::AddNotification(const std::string& petName, const std::string& message)
 {
     notifications.emplace_back(petName, message);
@@ -731,7 +1075,13 @@ std::string PetManager::Serialize() const
         ss << p.id << ":" << (p.obtained ? "1" : "0")
            << ":" << (p.equipped ? "1" : "0")
            << ":" << p.level << ":" << p.experience
-           << ":" << p.evolutionTier << ":" << static_cast<int>(p.rarity) << ";";
+           << ":" << p.evolutionTier << ":" << static_cast<int>(p.rarity)
+           << ":" << p.skillPoints;
+        // Serialize skill tree nodes (3 branches x 5 nodes = 15 bools)
+        for (int b = 0; b < Pet::SKILL_TREE_BRANCHES; ++b)
+            for (int n = 0; n < Pet::SKILL_TREE_NODES_PER_BRANCH; ++n)
+                ss << "," << (p.skillTreeNodes[b][n] ? "1" : "0");
+        ss << ";";
     }
     return ss.str();
 }
@@ -781,9 +1131,46 @@ void PetManager::Deserialize(const std::string& data)
                         if (c6 != std::string::npos)
                         {
                             p->evolutionTier = std::stoi(remainder3.substr(0, c6));
-                            std::string rarityStr = remainder3.substr(c6 + 1);
-                            if (!rarityStr.empty())
-                                p->rarity = static_cast<PetRarity>(std::stoi(rarityStr));
+                            std::string afterRarity = remainder3.substr(c6 + 1);
+                            // Parse rarity and optional skill tree data
+                            size_t c7 = afterRarity.find(':');
+                            if (c7 != std::string::npos)
+                            {
+                                std::string rarityStr = afterRarity.substr(0, c7);
+                                if (!rarityStr.empty())
+                                    p->rarity = static_cast<PetRarity>(std::stoi(rarityStr));
+                                // Skill tree: skillPoints,n0,n1,...,n14
+                                std::string treeStr = afterRarity.substr(c7 + 1);
+                                size_t c8 = treeStr.find(':');
+                                if (c8 != std::string::npos)
+                                {
+                                    p->skillPoints = std::stoi(treeStr.substr(0, c8));
+                                    std::string nodesStr = treeStr.substr(c8 + 1);
+                                    std::istringstream nss(nodesStr);
+                                    std::string tok;
+                                    int idx = 0;
+                                    while (std::getline(nss, tok, ',') && idx < Pet::SKILL_TREE_BRANCHES * Pet::SKILL_TREE_NODES_PER_BRANCH)
+                                    {
+                                        int b = idx / Pet::SKILL_TREE_NODES_PER_BRANCH;
+                                        int n = idx % Pet::SKILL_TREE_NODES_PER_BRANCH;
+                                        p->skillTreeNodes[b][n] = (tok == "1");
+                                        idx++;
+                                    }
+                                    p->RecalcTreeBonuses();
+                                }
+                                else
+                                {
+                                    std::string rarityOrTree = afterRarity;
+                                    if (!rarityOrTree.empty() && rarityOrTree.find(',') == std::string::npos)
+                                        p->rarity = static_cast<PetRarity>(std::stoi(rarityOrTree));
+                                }
+                            }
+                            else
+                            {
+                                std::string rarityStr = remainder3.substr(c6 + 1);
+                                if (!rarityStr.empty())
+                                    p->rarity = static_cast<PetRarity>(std::stoi(rarityStr));
+                            }
                         }
                         else
                         {

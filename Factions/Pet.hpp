@@ -226,6 +226,9 @@ public:
     // Special ability proc
     PetAbilityResult TryProcPetAbility(int playerLevel) const;
 
+    // Tree elemental procs (burn/freeze/stun/poison from skill tree nodes)
+    std::vector<PetAbilityResult> TryTreeElementalProcs(int playerLevel) const;
+
     // Passive bonuses from equipped pet (level-scaled)
     float GetXPBonus() const;
     float GetGoldFind() const;

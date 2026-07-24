@@ -308,6 +308,7 @@ void Game::Run()
                 case GameState::CitadelBossSelect:
                 case GameState::SavePrompt:
                 case GameState::Evolution:
+                case GameState::PetDetail:
                     currentState = GameState::Exploring;
                     break;
                 case GameState::JobPerks:
@@ -356,6 +357,7 @@ void Game::Run()
             case GameState::CitadelBossSelect:   StateCitadelBossSelect(); break;
             case GameState::Pets:              StatePets(); break;
             case GameState::Evolution:          StateEvolution(); break;
+            case GameState::PetDetail:          StatePetDetail(); break;
             case GameState::Exit:              break;
             default:                           currentState = GameState::MainMenu;
         }
@@ -3273,7 +3275,7 @@ void Game::StateSkillUpgrade()
                 if (locked)
                 {
                     int reqLvl = (n + 1) * 4;
-                    renderer.DrawText("Requires Lv" + std::to_string(reqLvl), bx + 20, ny + 14, 10, CQColors::TextDim);
+                    renderer.DrawText("Req Mastery Lv" + std::to_string(reqLvl), bx + 20, ny + 14, 10, CQColors::TextDim);
                 }
 
                 if (canUnlock)
@@ -5084,6 +5086,26 @@ void Game::DoPlayerUseItem(int inventoryIndex)
                 AddParticleBurst(680.0f, 160.0f, RED, 8);
             }
 
+            // Pet skill tree elemental procs (burn/freeze/stun/poison)
+            if (currentEnemy->IsAlive())
+            {
+                auto treeProcs = petManager.TryTreeElementalProcs(player->GetLevel());
+                for (auto& tp : treeProcs)
+                {
+                    if (!currentEnemy->IsAlive()) break;
+                    currentEnemy->ApplyEffect(tp.effect, tp.duration,
+                                              tp.potency, tp.abilityName);
+                    AddCombatLog(tp.message);
+                    Color elemCol = PURPLE;
+                    if (tp.effect == EffectType::Burn)    elemCol = {255, 100, 50, 255};
+                    if (tp.effect == EffectType::Freeze)  elemCol = {100, 200, 255, 255};
+                    if (tp.effect == EffectType::Poison)  elemCol = {100, 220, 80, 255};
+                    if (tp.effect == EffectType::Stun)    elemCol = {255, 255, 100, 255};
+                    AddFloatingText(tp.abilityName, 680.0f, 130.0f, elemCol, 12);
+                    AddParticleBurst(680.0f, 140.0f, elemCol, 5);
+                }
+            }
+
             if (!currentEnemy->IsAlive())
             {
                 AddCombatLog(currentEnemy->GetName() + " has been defeated by your pet!");
@@ -5150,18 +5172,38 @@ void Game::DoPlayerGodAbility(int abilityIndex)
             AddParticleBurst(680.0f, 180.0f, PURPLE, 5);
         }
 
-        // Pet special ability proc
-        PetAbilityResult abilityResult = petManager.TryProcPetAbility(player->GetLevel());
-        if (abilityResult.procced && currentEnemy->IsAlive())
-        {
-            currentEnemy->ApplyEffect(abilityResult.effect, abilityResult.duration,
-                                      abilityResult.potency, abilityResult.abilityName);
-            AddCombatLog(abilityResult.message);
-            AddFloatingText(abilityResult.abilityName, 680.0f, 150.0f, RED, 14);
-            AddParticleBurst(680.0f, 160.0f, RED, 8);
-        }
+            // Pet special ability proc
+            PetAbilityResult abilityResult = petManager.TryProcPetAbility(player->GetLevel());
+            if (abilityResult.procced && currentEnemy->IsAlive())
+            {
+                currentEnemy->ApplyEffect(abilityResult.effect, abilityResult.duration,
+                                          abilityResult.potency, abilityResult.abilityName);
+                AddCombatLog(abilityResult.message);
+                AddFloatingText(abilityResult.abilityName, 680.0f, 150.0f, RED, 14);
+                AddParticleBurst(680.0f, 160.0f, RED, 8);
+            }
 
-        if (!currentEnemy->IsAlive())
+            // Pet skill tree elemental procs (burn/freeze/stun/poison)
+            if (currentEnemy->IsAlive())
+            {
+                auto treeProcs = petManager.TryTreeElementalProcs(player->GetLevel());
+                for (auto& tp : treeProcs)
+                {
+                    if (!currentEnemy->IsAlive()) break;
+                    currentEnemy->ApplyEffect(tp.effect, tp.duration,
+                                              tp.potency, tp.abilityName);
+                    AddCombatLog(tp.message);
+                    Color elemCol = PURPLE;
+                    if (tp.effect == EffectType::Burn)    elemCol = {255, 100, 50, 255};
+                    if (tp.effect == EffectType::Freeze)  elemCol = {100, 200, 255, 255};
+                    if (tp.effect == EffectType::Poison)  elemCol = {100, 220, 80, 255};
+                    if (tp.effect == EffectType::Stun)    elemCol = {255, 255, 100, 255};
+                    AddFloatingText(tp.abilityName, 680.0f, 130.0f, elemCol, 12);
+                    AddParticleBurst(680.0f, 140.0f, elemCol, 5);
+                }
+            }
+
+            if (!currentEnemy->IsAlive())
         {
             AddCombatLog(currentEnemy->GetName() + " has been defeated by your pet!");
             auto mon = std::dynamic_pointer_cast<Monster>(currentEnemy);
@@ -6940,6 +6982,8 @@ void Game::StatePets()
                                   + "  ATK:" + std::to_string(p.GetScaledAttack())
                                   + "  Lv:" + std::to_string(p.level)
                                   + " / " + std::to_string(Pet::MAX_PET_LEVEL);
+            if (p.level >= Pet::SKILL_TREE_UNLOCK_LEVEL && p.skillPoints > 0)
+                statsLine += "  SP:" + std::to_string(p.skillPoints);
             renderer.DrawText(statsLine, 80, y + 18, 11, CQColors::TextDim);
 
             // XP bar
@@ -6954,6 +6998,18 @@ void Game::StatePets()
                 int fillW = static_cast<int>(barW * std::min(progress, 1.0f));
                 if (fillW > 0)
                     renderer.DrawRect(barX + 1, y + 33, fillW - 1, barH - 1, CQColors::TextGold);
+            }
+            else if (p.skillPoints > 0)
+            {
+                int reqXP = Pet::CalculateRequiredXP(p.level);
+                float progress = (reqXP > 0) ? static_cast<float>(p.experience) / static_cast<float>(reqXP) : 0.0f;
+                int barX = 80;
+                int barW = 150;
+                int barH = 8;
+                renderer.DrawRect(barX, y + 32, barW, barH, Color{20, 20, 25, 255});
+                int fillW = static_cast<int>(barW * std::min(progress, 1.0f));
+                if (fillW > 0)
+                    renderer.DrawRect(barX + 1, y + 33, fillW - 1, barH - 1, CQColors::TextGreen);
             }
 
             // Ability info
@@ -6970,7 +7026,7 @@ void Game::StatePets()
             // Equip/Unequip button
             if (!isEquipped)
             {
-                if (renderer.Button("Equip##pet" + p.id, GRenderer::W - 160, y + 10, 80, 28, focusIdx++))
+                if (renderer.Button("Equip##pet" + p.id, GRenderer::W - 240, y + 10, 80, 28, focusIdx++))
                 {
                     petManager.EquipPet(p.id);
                     ApplyPetPassivesToPlayer();
@@ -6978,11 +7034,18 @@ void Game::StatePets()
             }
             else
             {
-                if (renderer.Button("Unequip##pet" + p.id, GRenderer::W - 160, y + 10, 80, 28, focusIdx++))
+                if (renderer.Button("Unequip##pet" + p.id, GRenderer::W - 240, y + 10, 80, 28, focusIdx++))
                 {
                     petManager.UnequipAll();
                     ApplyPetPassivesToPlayer();
                 }
+            }
+            // Details button
+            if (renderer.Button("Info##pet" + p.id, GRenderer::W - 150, y + 10, 80, 28, focusIdx++))
+            {
+                viewingPetIdx = pi;
+                currentState = GameState::PetDetail;
+                renderer.StartTransition();
             }
         }
         else
@@ -7147,6 +7210,165 @@ void Game::StateEvolution()
     if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 80, 120, 40, focusIdx++))
     {
         currentState = GameState::Exploring;
+        renderer.StartTransition();
+    }
+}
+
+void Game::StatePetDetail()
+{
+    if (!player || viewingPetIdx < 0) { currentState = GameState::Pets; return; }
+    auto& allPets = petManager.GetPets();
+    if (viewingPetIdx >= static_cast<int>(allPets.size())) { currentState = GameState::Pets; return; }
+
+    Pet& pet = allPets[viewingPetIdx];
+    keyboardNav.Update();
+    renderer.SetCurrentFocus(keyboardNav.GetFocus());
+
+    renderer.DrawPanel(50, 40, GRenderer::W - 100, GRenderer::H - 80, pet.GetCurrentName());
+    int y = 80;
+    int focusIdx = 0;
+
+    Color elemCol = CQColors::TextLight;
+    switch (pet.element)
+    {
+        case ElementType::Fire:      elemCol = {255, 100, 50, 255}; break;
+        case ElementType::Ice:       elemCol = {100, 200, 255, 255}; break;
+        case ElementType::Lightning: elemCol = {255, 255, 100, 255}; break;
+        case ElementType::Arcane:    elemCol = {200, 120, 255, 255}; break;
+        case ElementType::Poison:    elemCol = {100, 220, 80, 255}; break;
+        case ElementType::Holy:      elemCol = {255, 240, 200, 255}; break;
+        default:                     elemCol = {200, 200, 200, 255}; break;
+    }
+
+    // Header info
+    renderer.DrawText(std::string(ElementName(pet.element)) + " Pet  |  " + PetRarityName(pet.rarity)
+                      + "  |  " + pet.GetEvolutionLabel(),
+                      70, y, 14, elemCol);
+    y += 20;
+    renderer.DrawText(pet.description, 70, y, 12, CQColors::TextDim);
+    y += 22;
+
+    if (pet.source == PetSource::FactionLegend)
+        renderer.DrawText("Source: Faction Legend", 70, y, 11, CQColors::TextDim);
+    else if (pet.source == PetSource::CitadelDrop)
+        renderer.DrawText("Source: Citadel Boss — " + pet.bossName, 70, y, 11, CQColors::TextDim);
+    else
+        renderer.DrawText("Source: Boss Drop — " + pet.bossName, 70, y, 11, CQColors::TextDim);
+    y += 20;
+
+    // Level and XP
+    if (pet.level >= Pet::SKILL_TREE_UNLOCK_LEVEL)
+    {
+        renderer.DrawText("Level: " + std::to_string(pet.level) + " (MAX)   Skill Points: " + std::to_string(pet.skillPoints),
+                          70, y, 14, CQColors::TextGold);
+    }
+    else
+    {
+        renderer.DrawText("Level: " + std::to_string(pet.level) + " / " + std::to_string(Pet::MAX_PET_LEVEL),
+                          70, y, 14, CQColors::TextLight);
+        int reqXP = Pet::CalculateRequiredXP(pet.level);
+        float progress = (reqXP > 0) ? static_cast<float>(pet.experience) / static_cast<float>(reqXP) : 0.0f;
+        int barX = 70;
+        int barW = 200;
+        int barH = 8;
+        y += 18;
+        renderer.DrawRect(barX, y, barW, barH, Color{20, 20, 25, 255});
+        int fillW = static_cast<int>(barW * std::min(progress, 1.0f));
+        if (fillW > 0)
+            renderer.DrawRect(barX + 1, y + 1, fillW - 1, barH - 2, CQColors::TextGold);
+        renderer.DrawText(std::to_string(pet.experience) + " / " + std::to_string(reqXP) + " XP",
+                          barX + barW + 8, y - 1, 11, CQColors::TextDim);
+    }
+    y += 20;
+
+    // Stats
+    renderer.DrawText("--- Stats ---", 70, y, 13, CQColors::TextLight);
+    y += 16;
+
+    auto drawStat = [&](const std::string& label, const std::string& value, Color col = CQColors::TextLight) {
+        renderer.DrawText(label + ": " + value, 80, y, 12, col);
+        y += 15;
+    };
+
+    drawStat("Attack", std::to_string(pet.GetScaledAttack()));
+    drawStat("Damage Bonus", "+" + std::to_string(static_cast<int>(pet.GetScaledDamageBonus() * 100)) + "%");
+    drawStat("Defense Bonus", "+" + std::to_string(static_cast<int>(pet.GetScaledDefenseBonus() * 100)) + "%");
+    drawStat("Crit Chance", "+" + std::to_string(static_cast<int>(pet.GetScaledCritChance() * 100)) + "%");
+    drawStat("Crit Damage", "+" + std::to_string(static_cast<int>(pet.GetScaledCritDamage() * 100)) + "%");
+    drawStat("HP Bonus", "+" + std::to_string(pet.GetScaledHealthBonus()));
+    drawStat("MP Bonus", "+" + std::to_string(pet.GetScaledManaBonus()));
+    drawStat("Heal On Kill", "+" + std::to_string(pet.GetScaledHealOnKill()));
+    drawStat("XP Bonus", "+" + std::to_string(static_cast<int>(pet.GetScaledXPBonus() * 100)) + "%");
+    drawStat("Gold Find", "+" + std::to_string(static_cast<int>(pet.GetScaledGoldFind() * 100)) + "%");
+    y += 4;
+
+    // Special ability
+    renderer.DrawText("--- Special Ability ---", 70, y, 13, CQColors::TextLight);
+    y += 16;
+    if (pet.evolutionTier > 0 && pet.specialAbility != EffectType::None)
+    {
+        drawStat(pet.GetAbilityName(), pet.GetAbilityDescription(), CQColors::TextGreen);
+    }
+    else
+    {
+        renderer.DrawText("Unlocks at evolution (Lv." + std::to_string(Pet::EVOLVE_LEVEL) + ")",
+                          80, y, 12, CQColors::TextDim);
+        y += 15;
+    }
+    y += 6;
+
+    // Skill tree (only at level 100+)
+    renderer.DrawText("--- Skill Tree ---", 70, y, 13, CQColors::TextLight);
+    y += 16;
+
+    if (pet.level < Pet::SKILL_TREE_UNLOCK_LEVEL)
+    {
+        renderer.DrawText("Unlocks at Level " + std::to_string(Pet::SKILL_TREE_UNLOCK_LEVEL),
+                          80, y, 12, CQColors::TextDim);
+        y += 15;
+    }
+    else
+    {
+        for (int b = 0; b < Pet::SKILL_TREE_BRANCHES; ++b)
+        {
+            Color branchCol = (b == 0) ? CQColors::TextGreen : (b == 1) ? Color{100, 180, 255, 255} : CQColors::TextGold;
+            renderer.DrawText(Pet::GetBranchName(pet.element, b), 80, y, 13, branchCol);
+            y += 16;
+
+            for (int n = 0; n < Pet::SKILL_TREE_NODES_PER_BRANCH; ++n)
+            {
+                std::string nodeName = Pet::GetSkillNodeName(pet.element, b, n);
+                std::string nodeDesc = Pet::GetSkillNodeDesc(pet.element, b, n);
+                bool unlocked = pet.skillTreeNodes[b][n];
+
+                if (unlocked)
+                {
+                    renderer.DrawText("[x] " + nodeName + " — " + nodeDesc, 90, y, 11, CQColors::TextGreen);
+                    y += 14;
+                }
+                else if (pet.CanSpendSkillPoint(b, n))
+                {
+                    if (renderer.Button("[ ] " + nodeName + " (" + nodeDesc + ")##petSkill" + pet.id + std::to_string(b) + std::to_string(n),
+                                        90, y, 500, 18, focusIdx++))
+                    {
+                        pet.SpendSkillPoint(b, n);
+                    }
+                    y += 18;
+                }
+                else
+                {
+                    renderer.DrawText("[ ] " + nodeName + " — locked", 90, y, 11, CQColors::TextDim);
+                    y += 14;
+                }
+            }
+            y += 4;
+        }
+    }
+
+    keyboardNav.SetFocusCount(focusIdx + 1);
+    if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 60, 120, 36, focusIdx++))
+    {
+        currentState = GameState::Pets;
         renderer.StartTransition();
     }
 }

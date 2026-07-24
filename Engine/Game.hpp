@@ -116,6 +116,7 @@ enum class GameState
     JobSkillTree,
     JobUpgrades,
     Evolution,
+    PetDetail,
     Exit
 };
 
@@ -252,6 +253,7 @@ private:
 
     // Pet UI state
     int petListPage = 0;
+    int viewingPetIdx = -1;
     static constexpr int PETS_PER_PAGE = 9;
 
     // Main game states
@@ -277,6 +279,7 @@ private:
     void StateCitadelBossSelect();
     void StatePets();
     void StateEvolution();
+    void StatePetDetail();
     void StateCombat();
     void StateDungeonSelect();
     void StateDungeonExplore();
