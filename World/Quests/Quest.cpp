@@ -133,6 +133,11 @@ void QuestManager::InitializeDefaultQuests()
     quests.emplace_back("Shadow Research",      QuestType::Collect, "Collect Shadow Essence for arcane research.",                   "Shadow Essence", 5, 550, 275, "Shadow Essence");
     quests.emplace_back("Demon Parts",          QuestType::Collect, "Gather Demon Horns for protective ward crafting.",              "Demon Horn",     3, 700, 350, "Demon Horn");
 
+    // === Escort quests ===
+    quests.emplace_back("Merchant Escort",      QuestType::Escort, "A merchant needs protection traveling through Dark Woods. Defeat 5 wolves on the road.",  "Wolf",     5, 300, 150);
+    quests.emplace_back("Pilgrim's Passage",    QuestType::Escort, "A pilgrim seeks safe passage through Dragon's Peak. Defeat 3 Orcs along the way.",       "Orc",      3, 500, 250);
+    quests.emplace_back("Royal Courier",        QuestType::Escort, "A courier must deliver urgent messages through the Highlands. Defeat 4 Highland Warriors.", "Highland Warrior", 4, 700, 350);
+
     // === Celestial Spire kill quests ===
     quests.emplace_back("Knight Fall",          QuestType::Kill, "Corrupted Celestial Knights guard forbidden halls. Defeat them.",          "Celestial Knight", 5, 1200, 600);
 
@@ -158,7 +163,7 @@ void QuestManager::UpdateKillQuests(const std::string& enemyName)
 {
     for (auto& quest : quests)
     {
-        if (quest.type == QuestType::Kill &&
+        if ((quest.type == QuestType::Kill || quest.type == QuestType::Escort) &&
             quest.status == QuestStatus::InProgress &&
             quest.targetName == enemyName)
         {

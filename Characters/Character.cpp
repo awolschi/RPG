@@ -39,6 +39,10 @@ void Character::TakeDamage(int damage, ElementType element)
     if (masteryDamageReduction > 0.0f)
         mitigatedDamage = static_cast<int>(mitigatedDamage * (1.0f - masteryDamageReduction));
 
+    // Master class damage reduction (+10%)
+    if (masterClassDamageReduction > 0.0f)
+        mitigatedDamage = static_cast<int>(mitigatedDamage * (1.0f - masterClassDamageReduction));
+
     mitigatedDamage = static_cast<int>(mitigatedDamage * resist);
 
     // Mana shield: absorb damage with mana

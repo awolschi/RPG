@@ -30,7 +30,7 @@ static void SerializeItem(std::ostream& file, const std::shared_ptr<Item>& item,
          << "|" << item->setId << "|" << static_cast<int>(item->passive1) << "|" << static_cast<int>(item->passive2);
 
     if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
-        file << "|OH|" << oh->defense << "|" << oh->manaBonus << "|" << oh->arcaneDamage << "|" << static_cast<int>(oh->offhandType);
+        file << "|OH|" << oh->defense << "|" << oh->manaBonus << "|" << oh->arcaneDamage << "|" << static_cast<int>(oh->offhandType) << "|" << oh->damageBonus;
     else if (auto w = std::dynamic_pointer_cast<Weapon>(item))
         file << "|W|" << w->damage << "|" << w->manaCost << "|" << static_cast<int>(w->element) << "|" << w->elementDamage
              << "|" << static_cast<int>(w->weaponType);
@@ -135,13 +135,17 @@ static std::shared_ptr<Item> DeserializeItem(std::istringstream& ss, int saveVer
     }
     else if (subType == "OH")
     {
-        std::string defStr, manaStr, arcStr, ohTypeStr;
+        std::string defStr, manaStr, arcStr, ohTypeStr, dmgBonusStr;
         std::getline(ss, defStr, '|');
         std::getline(ss, manaStr, '|');
         std::getline(ss, arcStr, '|');
         std::getline(ss, ohTypeStr, '|');
-        item = std::make_shared<Offhand>(iname, SafeCastEnum<OffhandType>(SafeStoi(ohTypeStr), 3, OffhandType::Shield),
-            SafeStoi(defStr), SafeStoi(manaStr), SafeStoi(arcStr), rarity);
+        int dmgBonus = 0;
+        if (std::getline(ss, dmgBonusStr, '|') && !dmgBonusStr.empty())
+            dmgBonus = SafeStoi(dmgBonusStr);
+        item = std::make_shared<Offhand>(iname, SafeCastEnum<OffhandType>(SafeStoi(ohTypeStr), 4, OffhandType::Shield),
+            SafeStoi(defStr), SafeStoi(manaStr), SafeStoi(arcStr), rarity,
+            ItemPassive::None, ItemPassive::None, dmgBonus);
     }
     else if (subType == "R")
     {
@@ -361,6 +365,9 @@ bool SaveGameManager::SaveGame(const std::shared_ptr<Player>& player, int slot, 
 
         // Class evolution flag (v15+)
         file << (player->HasClassEvolved() ? "1" : "0") << "\n";
+
+        // Master class flag (v16+)
+        file << (player->HasMastered() ? "1" : "0") << "\n";
 
         file.close();
         return true;
@@ -848,6 +855,15 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                     file >> evolvedFlag; file.ignore();
                     if (evolvedFlag == 1 && !player->HasClassEvolved())
                         player->EvolveClass();
+
+                    // Master class flag (v16+)
+                    if (file.peek() != '\n' && !file.eof())
+                    {
+                        int masteredFlag = 0;
+                        file >> masteredFlag; file.ignore();
+                        if (masteredFlag == 1 && !player->HasMastered())
+                            player->MasterClass();
+                    }
                 }
             }
             else

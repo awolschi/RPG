@@ -61,6 +61,7 @@ NPC NPCDatabase::CreateDarkWoodsRanger()
     d.farewell = "Watch your back in the shadows.";
     NPC npc("Theron the Ranger", d, 5);
     npc.AddLinkedQuest(7);
+    npc.AddLinkedQuest(21);  // Merchant Escort (escort quest)
     return npc;
 }
 
@@ -113,6 +114,7 @@ NPC NPCDatabase::CreateDragonPeakScholar()
     d.questComplete = "Incredible! You've slain the beast. The realm owes you a debt.";
     d.farewell = "Knowledge is power. Use it wisely.";
     NPC npc("Elder Magnus", d, 13);
+    npc.AddLinkedQuest(22);  // Pilgrim's Passage (escort quest)
     return npc;
 }
 
@@ -125,6 +127,7 @@ NPC NPCDatabase::CreateDragonPeakElementalist()
     d.farewell = "May the flames guide you.";
     NPC npc("Pyra the Elementalist", d, 12);
     npc.AddLinkedQuest(15);
+    npc.AddLinkedQuest(22);  // Pilgrim's Passage (escort quest)
     return npc;
 }
 
@@ -138,7 +141,9 @@ NPC NPCDatabase::CreateHighlandsShieldbearer()
     d.questOffer = "The Highland Warriors grow restless. Prove your strength against them.";
     d.questComplete = "You fight with honor. The Highlands respect your prowess.";
     d.farewell = "Stand tall.";
-    return NPC("Shieldbearer Gorath", d, 16);
+    NPC npc("Shieldbearer Gorath", d, 16);
+    npc.AddLinkedQuest(23);  // Royal Courier (escort quest)
+    return npc;
 }
 
 NPC NPCDatabase::CreateHighlandsSkywatcher()

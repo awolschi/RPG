@@ -5,6 +5,7 @@
 std::vector<UniqueWeaponDef> UniqueItemRegistry::s_weapons;
 std::vector<UniqueArmorDef> UniqueItemRegistry::s_armor;
 std::vector<UniqueAccessoryDef> UniqueItemRegistry::s_accessories;
+std::vector<UniqueOffhandDef> UniqueItemRegistry::s_offhands;
 bool UniqueItemRegistry::s_initialized = false;
 
 // Helper: apply difficulty multiplier to base + perDiff pattern
@@ -21,6 +22,7 @@ void UniqueItemRegistry::Initialize()
     s_weapons.clear();
     s_armor.clear();
     s_accessories.clear();
+    s_offhands.clear();
     RegisterMageEpics();
     RegisterBossLegendaries();
     RegisterSetItems();
@@ -33,6 +35,38 @@ void UniqueItemRegistry::Initialize()
     RegisterArcherLegendaries();
     RegisterArcherEpics();
     RegisterAchievementItems();
+    RegisterCitadelLegendaries();
+    RegisterOffhands();
+
+    // Enforce minimum scaling values so all uniques stay competitive with procedural loot
+    // Epic weapon scaling: 35 + difficulty*28, so legendaries need damagePerDiff >= 28
+    for (auto& w : s_weapons)
+    {
+        if (w.damagePerDiff < 28) w.damagePerDiff = 28;
+        if (w.elementDamagePerDiff < 6) w.elementDamagePerDiff = 6;
+    }
+    // Epic armor scaling: 12 + difficulty*6
+    for (auto& a : s_armor)
+    {
+        if (a.defensePerDiff < 5) a.defensePerDiff = 5;
+        if (a.resistPerDiff < 2) a.resistPerDiff = 2;
+    }
+    // Epic accessory scaling
+    for (auto& ac : s_accessories)
+    {
+        if (ac.healthPerDiff < 10) ac.healthPerDiff = 10;
+        if (ac.manaPerDiff < 8) ac.manaPerDiff = 8;
+        if (ac.elementDamagePerDiff < 2) ac.elementDamagePerDiff = 2;
+    }
+    // Offhand scaling
+    for (auto& oh : s_offhands)
+    {
+        if (oh.defensePerDiff < 2) oh.defensePerDiff = 2;
+        if (oh.damageBonusPerDiff < 3) oh.damageBonusPerDiff = 3;
+        if (oh.arcaneDamagePerDiff < 2) oh.arcaneDamagePerDiff = 2;
+        if (oh.manaBonusPerDiff < 4) oh.manaBonusPerDiff = 4;
+    }
+
     s_initialized = true;
 }
 
@@ -2067,6 +2101,442 @@ void UniqueItemRegistry::RegisterArcherEpics()
     });
 }
 
+// ---- Forbidden Citadel Legendaries (difficulty 11) ----
+// The strongest items in the game. Each drops from a specific Citadel boss.
+
+void UniqueItemRegistry::RegisterCitadelLegendaries()
+{
+    // ================================================================
+    // CITADEL WEAPONS (10) — One per boss
+    // ================================================================
+
+    // Abyssal Sentinel's Edge — Warrior Sword
+    s_weapons.push_back({
+        "Abyssal Sentinel's Edge", Rarity::Legendary, WeaponType::Sword,
+        80, 32, 20, ElementType::Arcane, 25, 10,
+        "Abyssal Sentinel", -1,
+        ItemPassive::CritChance30, ItemPassive::Dodge20
+    });
+
+    // Void Empress's Grimoire — Mage Wand
+    s_weapons.push_back({
+        "Void Empress's Grimoire", Rarity::Legendary, WeaponType::Wand,
+        65, 30, 50, ElementType::Arcane, 40, 12,
+        "Void Empress", -1,
+        ItemPassive::DoubleCast25, ItemPassive::ManaRegen10
+    });
+
+    // Colossus Breaker — Warrior Mace
+    s_weapons.push_back({
+        "Colossus Breaker", Rarity::Legendary, WeaponType::Mace,
+        90, 35, 15, ElementType::Fire, 15, 8,
+        "Infernal Colossus", -1,
+        ItemPassive::PhysDmgBoost20, ItemPassive::DamageReduce15
+    });
+
+    // Frostbound Requiem — Priest Staff
+    s_weapons.push_back({
+        "Frostbound Requiem", Rarity::Legendary, WeaponType::Staff,
+        60, 28, 60, ElementType::Ice, 35, 10,
+        "Glacial Wraith", -1,
+        ItemPassive::IceFreezePlus1, ItemPassive::SpellDmgBoost20
+    });
+
+    // Thunderlord's Decree — Archer Bow
+    s_weapons.push_back({
+        "Thunderlord's Decree", Rarity::Legendary, WeaponType::Bow,
+        70, 30, 10, ElementType::Lightning, 30, 12,
+        "Storm Arbiter", -1,
+        ItemPassive::AtkSpeed20, ItemPassive::LightningStun15
+    });
+
+    // Plaguebearer's Kiss — Archer Dagger
+    s_weapons.push_back({
+        "Plaguebearer's Kiss", Rarity::Legendary, WeaponType::Dagger,
+        65, 30, 5, ElementType::Poison, 35, 12,
+        "Plague Sovereign", -1,
+        ItemPassive::PoisonDmgPlus25, ItemPassive::Lifesteal25
+    });
+
+    // Radiant Arbiter's Blade — Priest Mace
+    s_weapons.push_back({
+        "Radiant Arbiter's Blade", Rarity::Legendary, WeaponType::Mace,
+        75, 32, 25, ElementType::Holy, 30, 10,
+        "Holy Arbiter", -1,
+        ItemPassive::HolyHealOnKill, ItemPassive::HealOnKill15
+    });
+
+    // Chrono Shatter — Mage Staff
+    s_weapons.push_back({
+        "Chrono Shatter", Rarity::Legendary, WeaponType::Staff,
+        70, 32, 65, ElementType::Arcane, 45, 14,
+        "Chrono Overlord", -1,
+        ItemPassive::DoubleCast15, ItemPassive::CooldownReduce2
+    });
+
+    // Monarch's Ruin — Warrior Axe
+    s_weapons.push_back({
+        "Monarch's Ruin", Rarity::Legendary, WeaponType::Axe,
+        95, 38, 20, ElementType::Arcane, 20, 10,
+        "Void Monarch", -1,
+        ItemPassive::PhysDmgBoost20, ItemPassive::CritChance30
+    });
+
+    // The Unbroken Oath — Priest Mace
+    s_weapons.push_back({
+        "The Unbroken Oath", Rarity::Legendary, WeaponType::Mace,
+        85, 36, 30, ElementType::Holy, 35, 12,
+        "The Unbroken", -1,
+        ItemPassive::Revive50, ItemPassive::DamageReduce15
+    });
+
+    // ================================================================
+    // CITADEL ARMOR (5) — Spread across bosses
+    // ================================================================
+
+    // Abyssal Aegis — Warrior Plate Chest
+    s_armor.push_back({
+        "Abyssal Aegis", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Chest,
+        25, 8, {{ElementType::Arcane, 12}, {ElementType::Holy, 8}}, 4,
+        "Abyssal Sentinel", -1,
+        ItemPassive::DamageReduce15, ItemPassive::Thorns40
+    });
+
+    // Void Empress's Mantle — Mage Cloth Chest
+    s_armor.push_back({
+        "Void Empress's Mantle", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Chest,
+        18, 6, {{ElementType::Arcane, 15}}, 4,
+        "Void Empress", -1,
+        ItemPassive::ManaShield30, ItemPassive::SpellDmgBoost20
+    });
+
+    // Stormforged Plate — Warrior Plate Boots
+    s_armor.push_back({
+        "Stormforged Plate", Rarity::Legendary, ArmorType::Plate, ArmorPiece::Boots,
+        18, 7, {{ElementType::Lightning, 10}}, 3,
+        "Storm Arbiter", -1,
+        ItemPassive::Dodge20, ItemPassive::StunImmune
+    });
+
+    // Plagueveil Shroud — Archer Leather Chest
+    s_armor.push_back({
+        "Plagueveil Shroud", Rarity::Legendary, ArmorType::Leather, ArmorPiece::Chest,
+        20, 7, {{ElementType::Poison, 12}}, 3,
+        "Plague Sovereign", -1,
+        ItemPassive::Lifesteal15, ItemPassive::AllResist10
+    });
+
+    // Chrono-Woven Wraps — Mage Cloth Gloves
+    s_armor.push_back({
+        "Chrono-Woven Wraps", Rarity::Legendary, ArmorType::Cloth, ArmorPiece::Gloves,
+        14, 6, {{ElementType::Arcane, 10}}, 3,
+        "Chrono Overlord", -1,
+        ItemPassive::CooldownReduce2, ItemPassive::ManaOnKill25
+    });
+
+    // ================================================================
+    // CITADEL ACCESSORIES (3)
+    // ================================================================
+
+    // Monarch's Coronet — Ring
+    s_accessories.push_back({
+        "Monarch's Coronet", Rarity::Legendary,
+        80, 20, 50, 12, ElementType::Arcane, 25, 8,
+        "Void Monarch", -1,
+        ItemPassive::AllResist10, ItemPassive::ManaRegen10
+    });
+
+    // Unbroken Will — Amulet
+    s_accessories.push_back({
+        "Unbroken Will", Rarity::Legendary,
+        100, 25, 40, 10, ElementType::Holy, 20, 8,
+        "The Unbroken", -1,
+        ItemPassive::PhoenixRevive, ItemPassive::DamageReduce10
+    });
+
+    // Chrono Paradox — Ring
+    s_accessories.push_back({
+        "Chrono Paradox", Rarity::Legendary,
+        70, 18, 60, 15, ElementType::Arcane, 30, 10,
+        "Chrono Overlord", -1,
+        ItemPassive::DoubleCast15, ItemPassive::ManaOnSkillUse10
+    });
+}
+
+// ---- Epic & Legendary Offhands ----
+
+void UniqueItemRegistry::RegisterOffhands()
+{
+    // ================================================================
+    // EPIC OFFHANDS — Mid-game boss drops (difficulty 5-8)
+    // ================================================================
+
+    // --- Warrior Shields (Epic) ---
+
+    s_offhands.push_back({
+        "Bulwark of the Fallen", Rarity::Epic, OffhandType::Shield,
+        18, 4, 0, 0, 0, 0, 0, 0,
+        "Shadow Knight", -1,
+        ItemPassive::DamageReduce10, ItemPassive::None
+    });
+
+    s_offhands.push_back({
+        "Ironclad Bastion", Rarity::Epic, OffhandType::Shield,
+        22, 5, 0, 0, 0, 0, 0, 0,
+        "Orc Warlord", -1,
+        ItemPassive::Thorns25, ItemPassive::None
+    });
+
+    s_offhands.push_back({
+        "Aegis of the Dire Wolf", Rarity::Epic, OffhandType::Shield,
+        25, 5, 0, 0, 0, 0, 0, 0,
+        "Dire Wolf Alpha", -1,
+        ItemPassive::StunImmune, ItemPassive::DamageReduce10
+    });
+
+    s_offhands.push_back({
+        "Stormwall Guard", Rarity::Epic, OffhandType::Shield,
+        28, 6, 0, 0, 0, 0, 0, 0,
+        "Storm Giant", -1,
+        ItemPassive::DamageReduce15, ItemPassive::Thorns25
+    });
+
+    // --- Mage Orbs (Epic) ---
+
+    s_offhands.push_back({
+        "Orb of Pyroclasm", Rarity::Epic, OffhandType::Orb,
+        3, 2, 15, 4, 12, 3, 0, 0,
+        "Fire Elemental", -1,
+        ItemPassive::FireNoCd20, ItemPassive::None
+    });
+
+    s_offhands.push_back({
+        "Frostweaver's Eye", Rarity::Epic, OffhandType::Orb,
+        4, 2, 20, 5, 15, 4, 0, 0,
+        "Frost Wyrm", -1,
+        ItemPassive::IceFreezePlus1, ItemPassive::ManaRegen5
+    });
+
+    s_offhands.push_back({
+        "Stormheart Core", Rarity::Epic, OffhandType::Orb,
+        3, 2, 18, 4, 18, 5, 0, 0,
+        "Thunder Drake", -1,
+        ItemPassive::LightningStun15, ItemPassive::None
+    });
+
+    s_offhands.push_back({
+        "Voidglass Sphere", Rarity::Epic, OffhandType::Orb,
+        5, 3, 25, 6, 20, 5, 0, 0,
+        "Void Knight", -1,
+        ItemPassive::DoubleCast15, ItemPassive::ManaOnKill15
+    });
+
+    // --- Priest Books (Epic) ---
+
+    s_offhands.push_back({
+        "Tome of Restoration", Rarity::Epic, OffhandType::Book,
+        3, 2, 18, 5, 8, 3, 0, 0,
+        "High Priestess", -1,
+        ItemPassive::HolyHealOnKill, ItemPassive::None
+    });
+
+    s_offhands.push_back({
+        "Scripture of Shadows", Rarity::Epic, OffhandType::Book,
+        4, 2, 22, 5, 12, 4, 0, 0,
+        "Dark Bishop", -1,
+        ItemPassive::Lifesteal15, ItemPassive::ManaRegen5
+    });
+
+    s_offhands.push_back({
+        "Codex of the Sacred Flame", Rarity::Epic, OffhandType::Book,
+        4, 3, 25, 6, 14, 4, 0, 0,
+        "Holy Arbiter", -1,
+        ItemPassive::HealOnKill15, ItemPassive::ManaCostReduce10
+    });
+
+    s_offhands.push_back({
+        "Grimoire of Twilight", Rarity::Epic, OffhandType::Book,
+        5, 3, 28, 6, 16, 5, 0, 0,
+        "Lich", -1,
+        ItemPassive::SpellDmgBoost20, ItemPassive::ManaOnKill25
+    });
+
+    // --- Archer Quivers (Epic) ---
+
+    s_offhands.push_back({
+        "Quiver of the Flaming Arrow", Rarity::Epic, OffhandType::Quiver,
+        4, 2, 0, 0, 0, 0, 12, 3,
+        "Fire Elemental", -1,
+        ItemPassive::PhysDmgBoost15, ItemPassive::None
+    });
+
+    s_offhands.push_back({
+        "Venomtip Quiver", Rarity::Epic, OffhandType::Quiver,
+        5, 2, 0, 0, 0, 0, 15, 4,
+        "Giant Spider", -1,
+        ItemPassive::CritChance20, ItemPassive::None
+    });
+
+    s_offhands.push_back({
+        "Quiver of the Stormwind", Rarity::Epic, OffhandType::Quiver,
+        4, 2, 0, 0, 0, 0, 18, 4,
+        "Sea Serpent", -1,
+        ItemPassive::AtkSpeed20, ItemPassive::PhysDmgBoost15
+    });
+
+    s_offhands.push_back({
+        "Shadowstalker Bandolier", Rarity::Epic, OffhandType::Quiver,
+        6, 3, 0, 0, 0, 0, 22, 5,
+        "Shadow Knight", -1,
+        ItemPassive::CritChance30, ItemPassive::Dodge15
+    });
+
+    // ================================================================
+    // LEGENDARY OFFHANDS — Boss drops (difficulty 8+)
+    // ================================================================
+
+    // --- Warrior Shields (Legendary) ---
+
+    s_offhands.push_back({
+        "Sentinel's Bulwark", Rarity::Legendary, OffhandType::Shield,
+        35, 7, 0, 0, 0, 0, 0, 0,
+        "Treant King", 1,
+        ItemPassive::DamageReduce15, ItemPassive::Thorns40
+    });
+
+    s_offhands.push_back({
+        "Dragonfire Aegis", Rarity::Legendary, OffhandType::Shield,
+        38, 7, 0, 0, 0, 0, 0, 0,
+        "Ancient Drake", -1,
+        ItemPassive::BurnImmune, ItemPassive::DamageReduce15
+    });
+
+    s_offhands.push_back({
+        "Bulwark of the Void", Rarity::Legendary, OffhandType::Shield,
+        42, 8, 0, 0, 0, 0, 0, 0,
+        "Void Knight", -1,
+        ItemPassive::DamageReduce15, ItemPassive::StunImmune
+    });
+
+    s_offhands.push_back({
+        "Titan's Ward", Rarity::Legendary, OffhandType::Shield,
+        45, 8, 0, 0, 0, 0, 0, 0,
+        "Chronos, the Time Ender", -1,
+        ItemPassive::DamageReduce15, ItemPassive::Thorns40
+    });
+
+    s_offhands.push_back({
+        "Aegis of the Eternal", Rarity::Legendary, OffhandType::Shield,
+        50, 9, 0, 0, 0, 0, 0, 0,
+        "Primordial One", -1,
+        ItemPassive::Revive50, ItemPassive::DamageReduce15
+    });
+
+    // --- Mage Orbs (Legendary) ---
+
+    s_offhands.push_back({
+        "Orb of Eternal Flame", Rarity::Legendary, OffhandType::Orb,
+        5, 3, 35, 7, 30, 7, 0, 0,
+        "Fire Elemental", -1,
+        ItemPassive::FireNoCd20, ItemPassive::ManaRegen10
+    });
+
+    s_offhands.push_back({
+        "Glacial Heart", Rarity::Legendary, OffhandType::Orb,
+        6, 3, 40, 8, 35, 8, 0, 0,
+        "Frost Wyrm", -1,
+        ItemPassive::IceFreezePlus1, ItemPassive::SpellDmgBoost20
+    });
+
+    s_offhands.push_back({
+        "Stormlord's Focus", Rarity::Legendary, OffhandType::Orb,
+        5, 3, 38, 7, 32, 7, 0, 0,
+        "Thunder Drake", -1,
+        ItemPassive::LightningStun15, ItemPassive::DoubleCast15
+    });
+
+    s_offhands.push_back({
+        "Voidbinder Shard", Rarity::Legendary, OffhandType::Orb,
+        7, 4, 45, 8, 38, 8, 0, 0,
+        "Void Monarch", -1,
+        ItemPassive::DoubleCast25, ItemPassive::ManaOnKill25
+    });
+
+    s_offhands.push_back({
+        "Archmage's Focus", Rarity::Legendary, OffhandType::Orb,
+        8, 4, 50, 9, 42, 9, 0, 0,
+        "Primordial One", -1,
+        ItemPassive::DoubleCast25, ItemPassive::ManaCostReduce15
+    });
+
+    // --- Priest Books (Legendary) ---
+
+    s_offhands.push_back({
+        "Tome of Divine Light", Rarity::Legendary, OffhandType::Book,
+        5, 3, 35, 7, 20, 6, 0, 0,
+        "Holy Arbiter", -1,
+        ItemPassive::HolyHealOnKill, ItemPassive::HealOnKill15
+    });
+
+    s_offhands.push_back({
+        "Gospel of the Undying", Rarity::Legendary, OffhandType::Book,
+        6, 3, 40, 8, 25, 7, 0, 0,
+        "Lich", -1,
+        ItemPassive::Revive50, ItemPassive::Lifesteal25
+    });
+
+    s_offhands.push_back({
+        "Scripture of the Faithful", Rarity::Legendary, OffhandType::Book,
+        7, 4, 45, 8, 28, 7, 0, 0,
+        "The Unbroken", -1,
+        ItemPassive::ManaShield30, ItemPassive::SpellDmgBoost20
+    });
+
+    s_offhands.push_back({
+        "Codex of Infinite Mercy", Rarity::Legendary, OffhandType::Book,
+        8, 4, 50, 9, 30, 8, 0, 0,
+        "Primordial One", -1,
+        ItemPassive::HolyHealOnKill, ItemPassive::ManaCostReduce15
+    });
+
+    // --- Archer Quivers (Legendary) ---
+
+    s_offhands.push_back({
+        "Quiver of the Crimson Flame", Rarity::Legendary, OffhandType::Quiver,
+        6, 3, 0, 0, 0, 0, 28, 6,
+        "Fire Elemental", -1,
+        ItemPassive::PhysDmgBoost20, ItemPassive::CritChance20
+    });
+
+    s_offhands.push_back({
+        "Quiver of the Frozen Wind", Rarity::Legendary, OffhandType::Quiver,
+        7, 3, 0, 0, 0, 0, 32, 7,
+        "Frost Wyrm", -1,
+        ItemPassive::CritChance30, ItemPassive::AtkSpeed20
+    });
+
+    s_offhands.push_back({
+        "Quiver of the Storm King", Rarity::Legendary, OffhandType::Quiver,
+        6, 3, 0, 0, 0, 0, 35, 7,
+        "Thunder Drake", -1,
+        ItemPassive::PhysDmgBoost20, ItemPassive::AtkSpeed20
+    });
+
+    s_offhands.push_back({
+        "Shadowveil Quiver", Rarity::Legendary, OffhandType::Quiver,
+        8, 4, 0, 0, 0, 0, 40, 8,
+        "Shadow Knight", -1,
+        ItemPassive::CritChance30, ItemPassive::Dodge20
+    });
+
+    s_offhands.push_back({
+        "Windrunner's Legacy", Rarity::Legendary, OffhandType::Quiver,
+        9, 4, 0, 0, 0, 0, 45, 9,
+        "Primordial One", -1,
+        ItemPassive::PhysDmgBoost20, ItemPassive::CritChance30
+    });
+}
+
 // ---- Create ----
 
 std::shared_ptr<Item> UniqueItemRegistry::Create(const std::string& name, int difficulty)
@@ -2124,6 +2594,24 @@ std::shared_ptr<Item> UniqueItemRegistry::Create(const std::string& name, int di
         }
     }
 
+    // Look up offhand
+    for (const auto& oh : s_offhands)
+    {
+        if (oh.name == name)
+        {
+            int def = ScaledValue(oh.baseDefense, oh.defensePerDiff, difficulty);
+            int mana = ScaledValue(oh.baseManaBonus, oh.manaBonusPerDiff, difficulty);
+            int arcDmg = ScaledValue(oh.baseArcaneDamage, oh.arcaneDamagePerDiff, difficulty);
+            int dmgBonus = ScaledValue(oh.baseDamageBonus, oh.damageBonusPerDiff, difficulty);
+            int sellVal = (oh.rarity == Rarity::Legendary) ? 250 : 100;
+            auto item = std::make_shared<Offhand>(name, oh.offhandType, def, mana, arcDmg,
+                                                   static_cast<int>(oh.rarity), oh.passive1, oh.passive2, dmgBonus);
+            item->sellValue = sellVal;
+            item->setId = oh.setId;
+            return item;
+        }
+    }
+
     return nullptr;
 }
 
@@ -2147,6 +2635,13 @@ const UniqueAccessoryDef* UniqueItemRegistry::FindAccessory(const std::string& n
 {
     for (const auto& ac : s_accessories)
         if (ac.name == name) return &ac;
+    return nullptr;
+}
+
+const UniqueOffhandDef* UniqueItemRegistry::FindOffhand(const std::string& name)
+{
+    for (const auto& oh : s_offhands)
+        if (oh.name == name) return &oh;
     return nullptr;
 }
 
@@ -2176,6 +2671,14 @@ std::vector<const UniqueAccessoryDef*> UniqueItemRegistry::GetAccessoriesByDropS
     return result;
 }
 
+std::vector<const UniqueOffhandDef*> UniqueItemRegistry::GetOffhandsByDropSource(const std::string& enemyName)
+{
+    std::vector<const UniqueOffhandDef*> result;
+    for (const auto& oh : s_offhands)
+        if (oh.dropSource == enemyName) result.push_back(&oh);
+    return result;
+}
+
 // ---- Lookup by Rarity ----
 
 std::vector<const UniqueWeaponDef*> UniqueItemRegistry::GetWeaponsByRarity(Rarity r)
@@ -2201,3 +2704,13 @@ std::vector<const UniqueAccessoryDef*> UniqueItemRegistry::GetAccessoriesByRarit
         if (ac.rarity == r) result.push_back(&ac);
     return result;
 }
+
+std::vector<const UniqueOffhandDef*> UniqueItemRegistry::GetOffhandsByRarity(Rarity r)
+{
+    std::vector<const UniqueOffhandDef*> result;
+    for (const auto& oh : s_offhands)
+        if (oh.rarity == r) result.push_back(&oh);
+    return result;
+}
+
+

@@ -62,6 +62,15 @@ public:
     float GetEvolvedCritBonus() const;        // Archer Ranger: +10% crit
     float GetEvolvedGoldFind() const;         // Merchant Tycoon: +25% gold find
 
+    // Master Class (post-evolution endgame advancement)
+    bool HasMastered() const { return mastered; }
+    bool CanMaster() const;
+    void MasterClass();
+    std::string GetMasterClassName() const;
+    float GetMasterClassBonus() const;  // +15% all damage
+    float GetMasterClassDR() const;     // +10% damage reduction
+    int GetMasterClassHP() const;       // +20% max HP
+
     // Character Mastery (unlocked at level 50)
     static constexpr int CHAR_MASTERY_LEVEL_CAP = 999;
     static constexpr int CHAR_MASTERY_BRANCHES = 3;
@@ -76,6 +85,7 @@ public:
     void CharMasteryLevelUp();
     bool CanUnlockCharMasteryNode(int branch, int node) const;
     bool UnlockCharMasteryNode(int branch, int node);
+    bool AllCharMasteryNodesUnlocked() const;
     void RecalcMasteryBonuses();
 
     // Stat bonuses from character mastery
@@ -98,6 +108,7 @@ private:
     std::vector<int> skillLoadout;
     int attackSkillIndex = 0;
     bool evolved = false;
+    bool mastered = false;
 };
 
 #endif

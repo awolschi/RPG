@@ -358,6 +358,10 @@ void Game::Run()
             case GameState::Pets:              StatePets(); break;
             case GameState::Evolution:          StateEvolution(); break;
             case GameState::PetDetail:          StatePetDetail(); break;
+            case GameState::JobQuests:          StateJobQuests(); break;
+            case GameState::ResourceChain:      StateResourceChain(); break;
+            case GameState::MasterClass:        StateMasterClass(); break;
+            case GameState::Escort:             StateEscort(); break;
             case GameState::Exit:              break;
             default:                           currentState = GameState::MainMenu;
         }
@@ -912,7 +916,7 @@ void Game::StateExplore()
         "Explore Area", "Travel", "Quests",
         "Inventory", "Stats", "Jobs",
         "Skills", "Skill Upgrades", "Crafting", "Pray",
-        "Shop", "Rest at Inn", "Evolution", "Codex", "Achievements", "Reputation", "Pets", "Save Game", "Main Menu"
+        "Shop", "Rest at Inn", "Evolution", "Codex", "Achievements", "Reputation", "Pets", "Job Quests", "Chain Crafting", "Escort", "Save Game", "Main Menu"
     };
 
     int bx = GRenderer::W - 240;
@@ -935,6 +939,8 @@ void Game::StateExplore()
                 player->GetJobSystem().GetEnvironment().UpdateDaily();
                 // Reset job fatigue
                 player->GetJobSystem().ResetAllFatigue();
+                // Generate new daily job quests
+                jobQuestSystem.GenerateDailyQuests(player->GetJobSystem().GetJobs());
                 // Restock shops
                 shopItems.clear();
             }
@@ -943,8 +949,11 @@ void Game::StateExplore()
             else if (i == 14) { currentState = GameState::Achievements; renderer.StartTransition(); }
             else if (i == 15) { currentState = GameState::Reputation; renderer.StartTransition(); }
             else if (i == 16) { currentState = GameState::Pets; petListPage = 0; renderer.StartTransition(); }
-            else if (i == 17) currentState = GameState::SavePrompt;
-            else if (i == 18) {
+            else if (i == 17) { currentState = GameState::JobQuests; jobQuestPage = 0; renderer.StartTransition(); }
+            else if (i == 18) { currentState = GameState::ResourceChain; chainPage = 0; renderer.StartTransition(); }
+            else if (i == 19) { currentState = GameState::Escort; renderer.StartTransition(); }
+            else if (i == 20) currentState = GameState::SavePrompt;
+            else if (i == 21) {
                 currentState = GameState::MainMenu;
             }
             else {
@@ -1456,6 +1465,7 @@ static std::string SlotLabel(const std::string& slot, const std::shared_ptr<Item
     {
         s += " (" + std::string(OffhandTypeName(oh->offhandType)) + ")";
         if (oh->defense > 0) s += " DEF:" + std::to_string(oh->defense);
+        if (oh->damageBonus > 0) s += " DMG:" + std::to_string(oh->damageBonus);
         if (oh->manaBonus > 0) s += " MP:" + std::to_string(oh->manaBonus);
         if (oh->arcaneDamage > 0) s += " [Arcane:" + std::to_string(oh->arcaneDamage) + "]";
     }
@@ -1552,6 +1562,30 @@ void Game::StateInventory()
     }
     y += 34;
 
+    // Sort buttons
+    static const char* sortLabels[] = {"Rarity", "Name", "Level", "Type"};
+    static constexpr int sortCount = 4;
+    int sortBtnW = 60;
+    int sortBtnH = 20;
+    int sortBtnSpacing = 3;
+    int sortStartX = xLeft;
+    renderer.DrawText("Sort:", sortStartX, y, 14, CQColors::TextDim);
+    for (int s = 0; s < sortCount; ++s)
+    {
+        int sx = sortStartX + 40 + s * (sortBtnW + sortBtnSpacing);
+        if (renderer.Button(sortLabels[s], sx, y, sortBtnW, sortBtnH, s))
+        {
+            if (inventorySortMode == s)
+                inventorySortDirection *= -1;
+            else
+                inventorySortDirection = 1;
+            inventorySortMode = s;
+            inventoryPage = 0;
+            inventoryFocusRow = 0;
+        }
+    }
+    y += 24;
+
     // Gold & item count
     renderer.DrawText("Gold: " + std::to_string(inv.GetGold()), xLeft, y, 20, CQColors::TextGold);
     y += 30;
@@ -1577,6 +1611,33 @@ void Game::StateInventory()
             case 5: show = (item->type == ItemType::Resource || item->type == ItemType::QuestItem); break;
         }
         if (show) filteredIndices.push_back(i);
+    }
+
+    // Sort filtered items
+    if (!filteredIndices.empty())
+    {
+        std::sort(filteredIndices.begin(), filteredIndices.end(),
+            [&](size_t a, size_t b)
+            {
+                auto ia = inv.GetItem(a);
+                auto ib = inv.GetItem(b);
+                if (!ia || !ib) return false;
+                int dir = inventorySortDirection;
+                switch (inventorySortMode)
+                {
+                    case 0: // Rarity (highest first, or reversed)
+                        return dir > 0 ? ia->rarity > ib->rarity : ia->rarity < ib->rarity;
+                    case 1: // Name (alphabetical)
+                        return dir > 0 ? ia->name < ib->name : ia->name > ib->name;
+                    case 2: // Required level (highest first)
+                        return dir > 0 ? ia->requiredLevel > ib->requiredLevel : ia->requiredLevel < ib->requiredLevel;
+                    case 3: // Type, then rarity
+                        if (ia->type != ib->type) return static_cast<int>(ia->type) < static_cast<int>(ib->type);
+                        return dir > 0 ? ia->rarity > ib->rarity : ia->rarity < ib->rarity;
+                    default:
+                        return false;
+                }
+            });
     }
 
     int itemCount = static_cast<int>(filteredIndices.size());
@@ -1777,6 +1838,7 @@ void Game::StateInventory()
             {
                 stats = std::string(OffhandTypeName(oh->offhandType));
                 if (oh->defense > 0) stats += " | DEF:" + std::to_string(oh->defense);
+                if (oh->damageBonus > 0) stats += " | DMG:" + std::to_string(oh->damageBonus);
                 if (oh->manaBonus > 0) stats += " | MP:" + std::to_string(oh->manaBonus);
                 if (oh->arcaneDamage > 0) stats += " | Arcane:" + std::to_string(oh->arcaneDamage);
             }
@@ -1863,6 +1925,7 @@ void Game::StateInventory()
                 else if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
                 {
                     if (oh->defense > 0) tip += "\nDefense: " + std::to_string(oh->defense);
+                    if (oh->damageBonus > 0) tip += "\nDamage: +" + std::to_string(oh->damageBonus);
                     if (oh->manaBonus > 0) tip += "\n+" + std::to_string(oh->manaBonus) + " MP";
                     if (oh->arcaneDamage > 0) tip += "\nArcane: " + std::to_string(oh->arcaneDamage);
                 }
@@ -2074,6 +2137,7 @@ void Game::StateInventory()
             {
                 std::string info = equippedItem->name;
                 if (eoh->defense > 0) info += " - DEF:" + std::to_string(eoh->defense);
+                if (eoh->damageBonus > 0) info += " DMG:" + std::to_string(eoh->damageBonus);
                 if (eoh->manaBonus > 0) info += " MP:" + std::to_string(eoh->manaBonus);
                 if (eoh->arcaneDamage > 0) info += " [Arcane:" + std::to_string(eoh->arcaneDamage) + "]";
                 renderer.DrawText(info, compX, compY, 14, RarityColor(static_cast<Rarity>(equippedItem->rarity)));
@@ -2118,6 +2182,7 @@ void Game::StateInventory()
             {
                 std::string info = selectedItem->name;
                 if (noh->defense > 0) info += " - DEF:" + std::to_string(noh->defense);
+                if (noh->damageBonus > 0) info += " DMG:" + std::to_string(noh->damageBonus);
                 if (noh->manaBonus > 0) info += " MP:" + std::to_string(noh->manaBonus);
                 if (noh->arcaneDamage > 0) info += " [Arcane:" + std::to_string(noh->arcaneDamage) + "]";
                 renderer.DrawText(info, compX + 300, newCompY, 14, selectedRarityColor);
@@ -2164,6 +2229,7 @@ void Game::StateInventory()
             {
                 std::string info = "New: " + selectedItem->name;
                 if (noh->defense > 0) info += " - DEF:" + std::to_string(noh->defense);
+                if (noh->damageBonus > 0) info += " DMG:" + std::to_string(noh->damageBonus);
                 if (noh->manaBonus > 0) info += " MP:" + std::to_string(noh->manaBonus);
                 if (noh->arcaneDamage > 0) info += " [Arcane:" + std::to_string(noh->arcaneDamage) + "]";
                 renderer.DrawText(info, compX, compY, 14, selectedRarityColor);
@@ -2282,6 +2348,7 @@ void Game::StateInventory()
             else if (auto oh = std::dynamic_pointer_cast<Offhand>(s.item))
             {
                 if (oh->defense > 0) line += " DEF:" + std::to_string(oh->defense);
+                if (oh->damageBonus > 0) line += " DMG:" + std::to_string(oh->damageBonus);
                 if (oh->manaBonus > 0) line += " MP:" + std::to_string(oh->manaBonus);
                 if (oh->arcaneDamage > 0) line += " [Arcane:" + std::to_string(oh->arcaneDamage) + "]";
             }
@@ -3313,6 +3380,18 @@ void Game::StateSkillUpgrade()
         if (totalXpBonus > 0.0f) summary += "XP Gain: +" + std::to_string(static_cast<int>(totalXpBonus * 100)) + "%  ";
         if (summary.empty()) summary = "No mastery bonuses unlocked yet.";
         renderer.DrawText(summary, 70, y, 14, CQColors::TextGold);
+        y += 18;
+
+        // Show overflow scaling info when all 15 nodes are unlocked
+        if (player->AllCharMasteryNodesUnlocked())
+        {
+            renderer.DrawText("All nodes unlocked! Overflow: each mastery level grants:",
+                              70, y, 13, CQColors::TextGreen);
+            y += 16;
+            renderer.DrawText("+1% HP  +1 DEF  +0.5% DMG  +0.3% DR  +class bonus",
+                              80, y, 12, CQColors::TextDim);
+            y += 16;
+        }
 
         int backY = std::max(y + 30, GRenderer::H - 100);
         if (renderer.Button("Back to Skills", 70, backY, 160, 36, focusIdx++))
@@ -3780,6 +3859,7 @@ void Game::StateCraft()
             if (item)
             {
                 wiki.MarkItemDiscovered(item->name);
+                jobQuestSystem.UpdateProgress(JobQuestType::Craft, item->name);
                 renderer.DrawText("Crafted: " + item->name + "!", cx, cy + 34, 14, CQColors::TextGreen);
             }
         }
@@ -5624,6 +5704,11 @@ void Game::ProcessVictory(std::shared_ptr<Monster> enemy)
             if (player->GetInventory().AddItem(item))
             {
                 wiki.MarkItemDiscovered(item->name);
+                jobQuestSystem.UpdateProgress(JobQuestType::Collect, item->name);
+                if (item->rarity >= 3)
+                    jobQuestSystem.UpdateProgress(JobQuestType::QualityFind, item->name);
+                if (item->rarity >= 5)
+                    jobQuestSystem.UpdateProgress(JobQuestType::FindRare, item->name);
                 AddCombatLog("Loot: " + item->name);
             }
             else
@@ -5986,6 +6071,7 @@ void Game::StateWiki()
     keyboardNav.Update();
     renderer.SetCurrentFocus(keyboardNav.GetFocus());
     keyboardNav.SetFocusCount(1);
+    wiki.SetPlayer(player.get());
     wiki.Draw(renderer);
     if (renderer.Button("Back", renderer.CenterX(100), GRenderer::H - 48, 100, 36, 0))
         currentState = GameState::Exploring;
@@ -7085,6 +7171,256 @@ void Game::StatePets()
     }
 }
 
+// ---- StateJobQuests ----
+void Game::StateJobQuests()
+{
+    if (!player) { currentState = GameState::Exploring; return; }
+    keyboardNav.Update();
+    renderer.SetCurrentFocus(keyboardNav.GetFocus());
+
+    renderer.DrawPanel(50, 40, GRenderer::W - 100, GRenderer::H - 80, "Job Quests");
+    int y = 90;
+    int focusIdx = 0;
+
+    // Generate daily quests if not done today
+    jobQuestSystem.GenerateDailyQuests(player->GetJobSystem().GetJobs());
+
+    // Tabs: Active | Available | Completed
+    if (renderer.Button("Active", 70, y, 100, 28, focusIdx++))
+        jobQuestPage = 0;
+    if (renderer.Button("Available", 180, y, 100, 28, focusIdx++))
+        jobQuestPage = 1;
+    if (renderer.Button("Completed", 290, y, 100, 28, focusIdx++))
+        jobQuestPage = 2;
+    y += 36;
+
+    renderer.DrawText("Completed total: " + std::to_string(jobQuestSystem.GetTotalQuestsCompleted()),
+                      70, y, 12, CQColors::TextDim);
+    y += 18;
+
+    std::vector<JobQuest> quests;
+    if (jobQuestPage == 0) quests = jobQuestSystem.GetActiveQuests();
+    else if (jobQuestPage == 1) quests = jobQuestSystem.GetAvailableQuests();
+    else quests = jobQuestSystem.GetCompletedQuests();
+
+    if (quests.empty())
+    {
+        renderer.DrawText("No quests in this category.", 70, y, 14, CQColors::TextDim);
+        y += 20;
+    }
+
+    int startIdx = 0;
+    int endIdx = std::min(static_cast<int>(quests.size()), startIdx + JOB_QUESTS_PER_PAGE);
+    for (int qi = startIdx; qi < endIdx; ++qi)
+    {
+        const auto& q = quests[qi];
+        Color statusCol = CQColors::TextDim;
+        std::string statusStr;
+        switch (q.status)
+        {
+            case JobQuestStatus::Available:  statusStr = "Open";    statusCol = CQColors::TextLight; break;
+            case JobQuestStatus::Active:     statusStr = "Active";  statusCol = CQColors::TextGold;   break;
+            case JobQuestStatus::Completed:  statusStr = "Done";    statusCol = CQColors::TextGreen;  break;
+            case JobQuestStatus::Failed:     statusStr = "Failed";  statusCol = CQColors::TextRed;    break;
+        }
+
+        renderer.DrawText("[" + statusStr + "] " + q.title, 80, y, 14, statusCol);
+        y += 18;
+        renderer.DrawText(q.description, 90, y, 12, CQColors::TextDim);
+        y += 16;
+
+        if (q.status == JobQuestStatus::Active)
+        {
+            std::string progressStr = "Progress: " + std::to_string(q.currentCount) + " / " + std::to_string(q.targetCount);
+            renderer.DrawText(progressStr, 90, y, 12, CQColors::TextLight);
+            y += 16;
+        }
+
+        renderer.DrawText("Rewards: " + std::to_string(q.rewardXP) + " XP, "
+                          + std::to_string(q.rewardGold) + " Gold, "
+                          + std::to_string(q.rewardJobPoints) + " JP",
+                          90, y, 11, CQColors::TextGreen);
+        y += 16;
+
+        if (q.status == JobQuestStatus::Available)
+        {
+            if (renderer.Button("Accept", 460, y - 16, 80, 24, focusIdx++))
+                jobQuestSystem.AcceptQuest(q.id);
+        }
+        else if (q.status == JobQuestStatus::Active && q.currentCount >= q.targetCount)
+        {
+            if (renderer.Button("Claim", 460, y - 16, 80, 24, focusIdx++))
+                jobQuestSystem.CompleteQuest(q.id);
+        }
+        y += 12;
+    }
+
+    keyboardNav.SetFocusCount(focusIdx + 1);
+    if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 70, 120, 36, focusIdx++))
+    {
+        currentState = GameState::Exploring;
+        renderer.StartTransition();
+    }
+}
+
+// ---- StateResourceChain ----
+void Game::StateResourceChain()
+{
+    if (!player) { currentState = GameState::Exploring; return; }
+    keyboardNav.Update();
+    renderer.SetCurrentFocus(keyboardNav.GetFocus());
+
+    renderer.DrawPanel(50, 40, GRenderer::W - 100, GRenderer::H - 80, "Chain Crafting");
+    int y = 90;
+    int focusIdx = 0;
+
+    int jobLevel = 1;
+    auto& jobs = player->GetJobSystem().GetJobs();
+    if (!jobs.empty())
+        jobLevel = jobs[0].level;
+
+    renderer.DrawText("Job Level: " + std::to_string(jobLevel), 70, y, 13, CQColors::TextDim);
+    y += 20;
+
+    auto recipes = resourceChain.GetAvailableRecipes(jobLevel);
+
+    if (recipes.empty())
+    {
+        renderer.DrawText("No chain recipes available yet. Level up your jobs!", 70, y, 14, CQColors::TextDim);
+        y += 20;
+    }
+
+    int totalPages = (static_cast<int>(recipes.size()) > CHAIN_PER_PAGE)
+        ? ((static_cast<int>(recipes.size()) - 1) / CHAIN_PER_PAGE + 1) : 1;
+    if (chainPage < 0) chainPage = 0;
+    if (chainPage >= totalPages) chainPage = totalPages - 1;
+
+    int startIdx = chainPage * CHAIN_PER_PAGE;
+    int endIdx = std::min(startIdx + CHAIN_PER_PAGE, static_cast<int>(recipes.size()));
+
+    for (int ri = startIdx; ri < endIdx; ++ri)
+    {
+        const auto& recipe = recipes[ri];
+        bool canCraft = resourceChain.CanCraft(recipe, player->GetInventory(), jobLevel);
+
+        renderer.DrawText(recipe.name + " (Tier " + std::to_string(recipe.resultTier) + ")",
+                          80, y, 14, canCraft ? CQColors::TextGold : CQColors::TextDim);
+        y += 18;
+        renderer.DrawText(recipe.description, 90, y, 12, CQColors::TextDim);
+        y += 16;
+
+        std::string ingStr = "Needs: " + recipe.ingredient1 + " x" + std::to_string(recipe.ingredient1Count);
+        if (!recipe.ingredient2.empty())
+            ingStr += " + " + recipe.ingredient2 + " x" + std::to_string(recipe.ingredient2Count);
+        renderer.DrawText(ingStr, 90, y, 12, canCraft ? CQColors::TextLight : CQColors::TextRed);
+        y += 16;
+        renderer.DrawText("Result: " + recipe.resultName + "  (+" + std::to_string(recipe.bonusXP) + " XP)",
+                          90, y, 12, CQColors::TextGreen);
+        y += 18;
+
+        if (canCraft)
+        {
+            if (renderer.Button("Craft", 460, y - 18, 80, 24, focusIdx++))
+            {
+                auto result = resourceChain.Craft(recipe, player->GetInventory(), jobLevel);
+                if (result)
+                {
+                    player->GetInventory().AddItem(result);
+                    jobQuestSystem.UpdateProgress(JobQuestType::ChainCraft, recipe.name);
+                }
+            }
+        }
+        y += 8;
+    }
+
+    // Pagination
+    if (totalPages > 1)
+    {
+        if (chainPage > 0 && renderer.Button("< Prev", 200, GRenderer::H - 110, 80, 28, focusIdx++))
+            chainPage--;
+        renderer.DrawText(std::to_string(chainPage + 1) + " / " + std::to_string(totalPages),
+                          290, GRenderer::H - 107, 14, CQColors::TextDim);
+        if (chainPage < totalPages - 1 && renderer.Button("Next >", 340, GRenderer::H - 110, 80, 28, focusIdx++))
+            chainPage++;
+    }
+
+    keyboardNav.SetFocusCount(focusIdx + 1);
+    if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 70, 120, 36, focusIdx++))
+    {
+        currentState = GameState::Exploring;
+        renderer.StartTransition();
+    }
+}
+
+// ---- StateMasterClass ----
+void Game::StateMasterClass()
+{
+    // Redirect to Evolution state where Master Class is shown
+    currentState = GameState::Evolution;
+    renderer.StartTransition();
+}
+
+// ---- StateEscort ----
+void Game::StateEscort()
+{
+    if (!player) { currentState = GameState::Exploring; return; }
+    keyboardNav.Update();
+    renderer.SetCurrentFocus(keyboardNav.GetFocus());
+
+    renderer.DrawPanel(50, 40, GRenderer::W - 100, GRenderer::H - 80, "Escort Mission");
+    int y = 90;
+    int focusIdx = 0;
+
+    const Quest* escortQuest = nullptr;
+    for (size_t i = 0; i < player->GetQuestManager().GetQuestCount(); ++i)
+    {
+        Quest* q = player->GetQuestManager().GetQuest(i);
+        if (q && q->type == QuestType::Escort && q->status == QuestStatus::InProgress)
+        {
+            escortQuest = q;
+            break;
+        }
+    }
+
+    if (!escortQuest)
+    {
+        renderer.DrawText("No active escort mission.", 70, y, 14, CQColors::TextDim);
+        y += 20;
+        renderer.DrawText("Find an NPC who needs protection on the road!", 70, y, 13, CQColors::TextLight);
+    }
+    else
+    {
+        renderer.DrawText(escortQuest->title, 70, y, 18, CQColors::TextGold);
+        y += 24;
+        renderer.DrawText(escortQuest->description, 70, y, 13, CQColors::TextLight);
+        y += 20;
+
+        std::string progressStr = "Enemies defeated: "
+            + std::to_string(escortQuest->currentCount) + " / "
+            + std::to_string(escortQuest->targetCount);
+        renderer.DrawText(progressStr, 70, y, 14, CQColors::TextLight);
+        y += 20;
+
+        if (escortQuest->currentCount >= escortQuest->targetCount)
+        {
+            renderer.DrawText("Escort complete! Return to the quest giver.", 70, y, 14, CQColors::TextGreen);
+            y += 20;
+        }
+        else
+        {
+            renderer.DrawText("Keep fighting to protect your charge!", 70, y, 14, CQColors::TextDim);
+            y += 20;
+        }
+    }
+
+    keyboardNav.SetFocusCount(focusIdx + 1);
+    if (renderer.Button("Back", renderer.CenterX(120), GRenderer::H - 70, 120, 36, focusIdx++))
+    {
+        currentState = GameState::Exploring;
+        renderer.StartTransition();
+    }
+}
+
 void Game::StateEvolution()
 {
     if (!player) { currentState = GameState::Exploring; return; }
@@ -7128,6 +7464,47 @@ void Game::StateEvolution()
             default: passive = "Unknown"; break;
         }
         renderer.DrawText("Passive: " + passive, 70, y, 14, CQColors::TextGreen);
+
+        y += 30;
+        if (player->HasMastered())
+        {
+            renderer.DrawText("MASTER CLASS: " + player->GetMasterClassName(), 70, y, 20, CQColors::TextGold);
+            y += 22;
+            renderer.DrawText("+15% all damage, +10% DR, +20% max HP", 70, y, 14, CQColors::TextGreen);
+        }
+        else
+        {
+            renderer.DrawText("Master Class (endgame advancement)", 70, y, 16, CQColors::TextLight);
+            y += 20;
+            renderer.DrawText("New class: " + className + " " + player->GetMasterClassName(),
+                              70, y, 14, CQColors::TextGold);
+            y += 20;
+            renderer.DrawText("Benefits: +15% all damage, +10% DR, +20% max HP",
+                              70, y, 13, CQColors::TextDim);
+            y += 24;
+
+            bool reqMastery = true;
+            for (int b = 0; b < Player::CHAR_MASTERY_BRANCHES && reqMastery; ++b)
+                for (int n = 0; n < Player::CHAR_MASTERY_NODES_PER_BRANCH && reqMastery; ++n)
+                    if (!player->charMasteryNodes[b][n]) reqMastery = false;
+
+            renderer.DrawText(reqMastery ? "[x]" : "[ ]", 80, y, 14, reqMastery ? CQColors::TextGreen : CQColors::TextDim);
+            renderer.DrawText("All 15 Character Mastery nodes unlocked",
+                              110, y, 14, reqMastery ? CQColors::TextLight : CQColors::TextDim);
+            y += 20;
+
+            if (reqMastery)
+            {
+                if (renderer.Button("MASTER CLASS", renderer.CenterX(200), y, 200, 44, focusIdx++))
+                {
+                    player->MasterClass();
+                }
+            }
+            else
+            {
+                renderer.DrawText("Requirements not met", 70, y, 14, CQColors::TextDim);
+            }
+        }
     }
     else
     {

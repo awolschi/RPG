@@ -105,6 +105,8 @@ public:
     float GetMasteryHealingBonus() const { return masteryHealingBonus; }
     float GetMasteryManaCostReduction() const { return masteryManaCostReduction; }
     float GetMasteryDodgeChance() const { return masteryDodgeChance; }
+    float GetMasterClassDamageBonus() const { return masterClassDamageBonus; }
+    float GetMasterClassDamageReduction() const { return masterClassDamageReduction; }
 
     // Status effects
     void ApplyEffect(EffectType type, int duration, int potency = 0, const std::string& source = "");
@@ -157,6 +159,8 @@ protected:
     float masteryHealingBonus = 0.0f;
     float masteryManaCostReduction = 0.0f;
     float masteryDodgeChance = 0.0f;
+    float masterClassDamageReduction = 0.0f;
+    float masterClassDamageBonus = 0.0f;
 
     SkillSet skills;
     Equipment equipment;

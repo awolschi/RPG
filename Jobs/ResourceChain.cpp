@@ -190,7 +190,6 @@ std::shared_ptr<Item> ResourceChainSystem::Craft(const ChainRecipe& recipe, Inve
 
     // Create result
     auto result = std::make_shared<Resource>(recipe.resultName, recipe.resultTier, recipe.resultValue);
-    inventory.AddItem(result);
 
     return result;
 }

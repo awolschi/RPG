@@ -400,6 +400,38 @@ void CraftingManager::InitializeRecipes()
         JobType::Smithing, 5
     });
 
+    recipes.push_back({
+        "Simple Quiver",
+        "A basic leather quiver for holding arrows.",
+        {{"Leather", 2}, {"Wood", 2}},
+        []() { return std::make_shared<Offhand>("Simple Quiver", OffhandType::Quiver, 2, 0, 0, 1, ItemPassive::None, ItemPassive::None, 5); },
+        JobType::Smithing, 5
+    });
+
+    recipes.push_back({
+        "Hardened Quiver",
+        "A reinforced quiver lined with iron studs.",
+        {{"Leather", 2}, {"Iron Ingot", 1}},
+        []() { return std::make_shared<Offhand>("Hardened Quiver", OffhandType::Quiver, 4, 0, 0, 2, ItemPassive::None, ItemPassive::None, 12); },
+        JobType::Smithing, 5
+    });
+
+    recipes.push_back({
+        "Ranger's Quiver",
+        "A finely crafted quiver blessed by forest spirits.",
+        {{"Ebony Wood", 2}, {"Silver Ingot", 1}},
+        []() { return std::make_shared<Offhand>("Ranger's Quiver", OffhandType::Quiver, 6, 0, 0, 3, ItemPassive::None, ItemPassive::None, 22); },
+        JobType::Smithing, 7
+    });
+
+    recipes.push_back({
+        "Mythril Quiver",
+        "A legendary quiver forged from mythril threads.",
+        {{"Mythril Ingot", 2}, {"Ebony Wood", 1}},
+        []() { return std::make_shared<Offhand>("Mythril Quiver", OffhandType::Quiver, 8, 0, 0, 4, ItemPassive::None, ItemPassive::None, 35); },
+        JobType::Smithing, 9
+    });
+
     // === SET ITEM CRAFTING (Archmage's Regalia — Epic Set) ===
 
     recipes.push_back({

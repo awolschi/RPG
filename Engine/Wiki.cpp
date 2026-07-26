@@ -3,6 +3,7 @@
 #include "../Graphics/IconRenderer.hpp"
 #include "../Items/SetBonuses.hpp"
 #include "../Items/Uniques/UniqueItems.hpp"
+#include "../Characters/Player.hpp"
 #include <algorithm>
 #include <sstream>
 #include <cstring>
@@ -806,6 +807,48 @@ void Wiki::BuildUniqueDatabase()
         uniqueEntries.push_back({ac.name, cat, stats + "  " + passives, source, static_cast<int>(ac.rarity)});
     }
 
+    // Offhands
+    for (const auto& oh : UniqueItemRegistry::GetAllOffhands())
+    {
+        std::string cat;
+        if (oh.rarity == Rarity::Epic) cat = "Epic Offhand";
+        else cat = "Legendary Offhand";
+
+        std::string ohType;
+        switch (oh.offhandType)
+        {
+            case OffhandType::Shield: ohType = "Shield"; break;
+            case OffhandType::Orb:    ohType = "Orb"; break;
+            case OffhandType::Book:   ohType = "Book"; break;
+            case OffhandType::Quiver: ohType = "Quiver"; break;
+            case OffhandType::Bag:    ohType = "Bag"; break;
+        }
+
+        std::string stats = "DEF:" + std::to_string(oh.baseDefense)
+            + " MP:" + std::to_string(oh.baseManaBonus);
+        if (oh.baseArcaneDamage > 0)
+            stats += " Arc:" + std::to_string(oh.baseArcaneDamage);
+        if (oh.baseDamageBonus > 0)
+            stats += " Dmg:" + std::to_string(oh.baseDamageBonus);
+
+        std::string passives;
+        if (oh.passive1 != ItemPassive::None) passives += passiveToStr(oh.passive1);
+        if (oh.passive2 != ItemPassive::None)
+        {
+            if (!passives.empty()) passives += ", ";
+            passives += passiveToStr(oh.passive2);
+        }
+
+        std::string source = oh.dropSource;
+        if (oh.setId >= 0)
+        {
+            const SetInfo* set = SetBonuses::FindSetById(oh.setId);
+            if (set) source += " [" + set->name + "]";
+        }
+
+        uniqueEntries.push_back({oh.name, ohType + " (" + cat + ")", stats + "  " + passives, source, static_cast<int>(oh.rarity)});
+    }
+
     std::sort(uniqueEntries.begin(), uniqueEntries.end(),
         [](const WikiEntry& a, const WikiEntry& b) {
             if (a.rarity != b.rarity) return a.rarity > b.rarity;
@@ -1195,10 +1238,10 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
     }
     else if (currentTab == WikiTab::Uniques)
     {
-        colX[0] = 40;   colW[0] = 210;
-        colX[1] = 260;  colW[1] = 120;
-        colX[2] = 390;  colW[2] = 310;
-        colX[3] = 710;  colW[3] = 210;
+        colX[0] = 40;   colW[0] = 200;
+        colX[1] = 250;  colW[1] = 100;
+        colX[2] = 360;  colW[2] = 280;
+        colX[3] = 650;  colW[3] = 160;
     }
     else
     {
@@ -1258,6 +1301,7 @@ void Wiki::DrawTabPage(GRenderer& renderer, std::vector<WikiEntry>& entries, con
             renderer.DrawText("Type", colX[1], y, 14, headerColor);
             renderer.DrawText("Stats / Passives", colX[2], y, 14, headerColor);
             renderer.DrawText("Source / Set", colX[3], y, 14, headerColor);
+            if (player) renderer.DrawText("Action", 820, y, 14, headerColor);
             break;
         case WikiTab::Pets:
             renderer.DrawText("Pet", colX[0], y, 14, headerColor);
@@ -1399,6 +1443,29 @@ Color textColor = RarityColor(static_cast<Rarity>(e.rarity));
             while (!hint.empty() && MeasureText(hint.c_str(), 12) > maxHintW)
                 hint.pop_back();
             renderer.DrawText(hint, colX[3], y, 12, CQColors::TextDim);
+        }
+
+        // Equip button for Uniques tab if player has this item in inventory
+        if (isDiscovered && currentTab == WikiTab::Uniques && player)
+        {
+            auto& inv = player->GetInventory();
+            std::shared_ptr<Item> ownedItem;
+            for (size_t ii = 0; ii < inv.GetItemCount(); ++ii)
+            {
+                auto invItem = inv.GetItem(ii);
+                if (invItem && invItem->name == e.name)
+                {
+                    ownedItem = invItem;
+                    break;
+                }
+            }
+            if (ownedItem && player->CanEquip(ownedItem))
+            {
+                if (renderer.Button("Equip", 820, y - 2, 50, 18))
+                {
+                    player->EquipItem(ownedItem);
+                }
+            }
         }
 
         // Handle click or Enter on enemy/pet row

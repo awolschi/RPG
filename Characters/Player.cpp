@@ -250,10 +250,13 @@ bool Player::CanEquip(const std::shared_ptr<Item>& item) const
         switch (oh->offhandType)
         {
             case OffhandType::Shield:
-                return characterClass == CharacterClass::Warrior || characterClass == CharacterClass::Archer;
+                return characterClass == CharacterClass::Warrior;
             case OffhandType::Orb:
+                return characterClass == CharacterClass::Mage;
             case OffhandType::Book:
-                return characterClass == CharacterClass::Mage || characterClass == CharacterClass::Priest;
+                return characterClass == CharacterClass::Priest;
+            case OffhandType::Quiver:
+                return characterClass == CharacterClass::Archer;
             case OffhandType::Bag:
                 return true;
         }
@@ -297,15 +300,11 @@ bool Player::EquipItem(std::shared_ptr<Item> item)
         {
             equipment.weapon = std::dynamic_pointer_cast<Weapon>(item->Clone());
         }
-        else if (!equipment.offhand)
-        {
-            equipment.offhand = std::dynamic_pointer_cast<Weapon>(item->Clone());
-        }
         else
         {
-            if (equipment.offhand)
-                inventory.AddItem(equipment.offhand);
-            equipment.offhand = std::dynamic_pointer_cast<Weapon>(item->Clone());
+            // Replace existing weapon — old weapon goes back to inventory
+            inventory.AddItem(equipment.weapon);
+            equipment.weapon = std::dynamic_pointer_cast<Weapon>(item->Clone());
         }
         inventory.RemoveOneItem(idx);
         return true;
@@ -711,6 +710,61 @@ float Player::GetEvolvedGoldFind() const
     return 0.25f;
 }
 
+// ---- Master Class ----
+
+bool Player::CanMaster() const
+{
+    if (!evolved) return false;
+    if (mastered) return false;
+    if (level < Character::MAX_LEVEL) return false;
+    // Requires all 15 character mastery nodes unlocked
+    for (int b = 0; b < CHAR_MASTERY_BRANCHES; ++b)
+        for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
+            if (!charMasteryNodes[b][n]) return false;
+    return true;
+}
+
+void Player::MasterClass()
+{
+    if (!CanMaster()) return;
+    mastered = true;
+
+    // +15% base stats on top of evolved stats
+    Stats s = GetStats();
+    s.health       = s.health       * 115 / 100;
+    s.mana         = s.mana         * 115 / 100;
+    s.strength     = s.strength     * 115 / 100;
+    s.vitality     = s.vitality     * 115 / 100;
+    s.intelligence = s.intelligence * 115 / 100;
+    s.wisdom       = s.wisdom       * 115 / 100;
+    s.dexterity    = s.dexterity    * 115 / 100;
+    s.defense      = s.defense      * 115 / 100;
+    SetStats(s);
+
+    masterClassDamageReduction = 0.10f;
+    masterClassDamageBonus = 0.15f;
+    SetCurrentHealth(GetMaxHealth());
+    SetCurrentMana(GetMaxMana());
+    RecalcMasteryBonuses();
+}
+
+std::string Player::GetMasterClassName() const
+{
+    switch (characterClass)
+    {
+        case CharacterClass::Warrior:  return "Champion";
+        case CharacterClass::Priest:   return "Archon";
+        case CharacterClass::Mage:     return "Grand Arcanist";
+        case CharacterClass::Archer:   return "Deadeye";
+        case CharacterClass::Merchant: return "Mogul";
+        default: return "";
+    }
+}
+
+float Player::GetMasterClassBonus() const { return mastered ? 0.15f : 0.0f; }
+float Player::GetMasterClassDR() const { return mastered ? 0.10f : 0.0f; }
+int Player::GetMasterClassHP() const { return mastered ? GetMaxHealth() * 20 / 100 : 0; }
+
 // ---- Character Mastery ----
 
 void Player::OnOverflowXP(int xp) { GainCharMasteryXP(xp); }
@@ -756,6 +810,13 @@ bool Player::UnlockCharMasteryNode(int branch, int node) {
     return true;
 }
 
+bool Player::AllCharMasteryNodesUnlocked() const {
+    for (int b = 0; b < CHAR_MASTERY_BRANCHES; ++b)
+        for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
+            if (!charMasteryNodes[b][n]) return false;
+    return true;
+}
+
 void Player::RecalcMasteryBonuses() {
     int hpBonus = (stats.health * GetCharMasteryBonusHP()) / 100;
     int mpBonus = 0;
@@ -769,12 +830,15 @@ int Player::GetCharMasteryBonusHP() const {
     int bonus = 0;
     for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
         if (charMasteryNodes[0][n]) bonus += 5;
-    // Overflow: +1% HP per level beyond node tree (level 20+)
+    // Per-branch overflow: +1% HP per level beyond node tree
     int nodesComplete = 0;
     for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
         if (charMasteryNodes[0][n]) nodesComplete++;
     if (nodesComplete == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
         bonus += (charMasteryLevel - 20);
+    // Universal overflow: +1% HP per overflow point after all 15 nodes
+    if (AllCharMasteryNodesUnlocked() && charMasteryPoints > 0)
+        bonus += charMasteryPoints;
     return bonus;
 }
 
@@ -783,9 +847,12 @@ int Player::GetCharMasteryBonusDEF() const {
     for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
         if (charMasteryNodes[0][n]) count++;
     int def = count * 2;
-    // Overflow: +1 DEF per level beyond node tree
+    // Per-branch overflow: +1 DEF per level beyond node tree
     if (count == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
         def += (charMasteryLevel - 20);
+    // Universal overflow: +1 DEF per overflow point after all 15 nodes
+    if (AllCharMasteryNodesUnlocked() && charMasteryPoints > 0)
+        def += charMasteryPoints;
     return def;
 }
 
@@ -796,9 +863,12 @@ float Player::GetCharMasteryDamageBonus() const {
     for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
         if (charMasteryNodes[1][n]) count++;
     float bonus = count * 0.05f;
-    // Overflow: +1% damage per level beyond node tree
+    // Per-branch overflow: +1% damage per level beyond node tree
     if (count == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
         bonus += (charMasteryLevel - 20) * 0.01f;
+    // Universal overflow: +0.5% damage per overflow point after all 15 nodes
+    if (AllCharMasteryNodesUnlocked() && charMasteryPoints > 0)
+        bonus += charMasteryPoints * 0.005f;
     return bonus;
 }
 
@@ -808,8 +878,12 @@ float Player::GetCharMasteryDamageReduction() const {
     for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
         if (charMasteryNodes[2][n]) count++;
     float bonus = count * 0.02f;
+    // Per-branch overflow
     if (count == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
         bonus += (charMasteryLevel - 20) * 0.01f;
+    // Universal overflow: +0.3% DR per overflow point after all 15 nodes
+    if (AllCharMasteryNodesUnlocked() && charMasteryPoints > 0)
+        bonus += charMasteryPoints * 0.003f;
     return bonus;
 }
 
@@ -819,8 +893,12 @@ float Player::GetCharMasteryHealingBonus() const {
     for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
         if (charMasteryNodes[2][n]) count++;
     float bonus = count * 0.05f;
+    // Per-branch overflow
     if (count == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
         bonus += (charMasteryLevel - 20) * 0.02f;
+    // Universal overflow: +1% healing per overflow point after all 15 nodes
+    if (AllCharMasteryNodesUnlocked() && charMasteryPoints > 0)
+        bonus += charMasteryPoints * 0.01f;
     return bonus;
 }
 
@@ -830,8 +908,12 @@ float Player::GetCharMasteryManaCostReduction() const {
     for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
         if (charMasteryNodes[2][n]) count++;
     float bonus = count * 0.03f;
+    // Per-branch overflow
     if (count == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
         bonus += (charMasteryLevel - 20) * 0.01f;
+    // Universal overflow: +0.5% mana cost reduction per overflow point after all 15 nodes
+    if (AllCharMasteryNodesUnlocked() && charMasteryPoints > 0)
+        bonus += charMasteryPoints * 0.005f;
     return bonus;
 }
 
@@ -841,8 +923,12 @@ float Player::GetCharMasteryDodgeChance() const {
     for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
         if (charMasteryNodes[2][n]) count++;
     float bonus = count * 0.03f;
+    // Per-branch overflow
     if (count == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
         bonus += (charMasteryLevel - 20) * 0.01f;
+    // Universal overflow: +0.5% dodge per overflow point after all 15 nodes
+    if (AllCharMasteryNodesUnlocked() && charMasteryPoints > 0)
+        bonus += charMasteryPoints * 0.005f;
     return bonus;
 }
 
@@ -852,8 +938,12 @@ float Player::GetCharMasteryGoldFind() const {
     for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
         if (charMasteryNodes[1][n]) count++;
     float bonus = count * 0.05f;
+    // Per-branch overflow
     if (count == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
         bonus += (charMasteryLevel - 20) * 0.02f;
+    // Universal overflow: +1% gold find per overflow point after all 15 nodes
+    if (AllCharMasteryNodesUnlocked() && charMasteryPoints > 0)
+        bonus += charMasteryPoints * 0.01f;
     return bonus;
 }
 
@@ -863,7 +953,11 @@ float Player::GetCharMasteryXPBonus() const {
     for (int n = 0; n < CHAR_MASTERY_NODES_PER_BRANCH; ++n)
         if (charMasteryNodes[2][n]) count++;
     float bonus = count * 0.03f;
+    // Per-branch overflow
     if (count == CHAR_MASTERY_NODES_PER_BRANCH && charMasteryLevel > 20)
         bonus += (charMasteryLevel - 20) * 0.01f;
+    // Universal overflow: +0.5% XP per overflow point after all 15 nodes
+    if (AllCharMasteryNodesUnlocked() && charMasteryPoints > 0)
+        bonus += charMasteryPoints * 0.005f;
     return bonus;
 }

@@ -19,6 +19,7 @@
 #include "../World/NPCs/NPC.hpp"
 #include "../Items/Crafting/Crafting.hpp"
 #include "../Jobs/JobQuest.hpp"
+#include "../Jobs/ResourceChain.hpp"
 #include "../Achievements/Achievement.hpp"
 #include "../Factions/FactionReputation.hpp"
 #include "../Factions/Pet.hpp"
@@ -117,6 +118,10 @@ enum class GameState
     JobUpgrades,
     Evolution,
     PetDetail,
+    JobQuests,
+    ResourceChain,
+    MasterClass,
+    Escort,
     Exit
 };
 
@@ -154,6 +159,7 @@ private:
     ReputationSystem reputationSystem;
     PetManager petManager;
     JobQuestSystem jobQuestSystem;
+    ResourceChainSystem resourceChain;
     std::vector<std::shared_ptr<Item>> shopItems;
 
     // Combat log
@@ -236,6 +242,8 @@ private:
     // Inventory UI state
     int inventoryTab;
     int inventoryPage = 0;
+    int inventorySortMode = 0; // 0=Rarity, 1=Name, 2=Level, 3=Type
+    int inventorySortDirection = 1; // 1=normal, -1=reversed
     static constexpr int INVENTORY_ITEMS_PER_PAGE = 8;
 
     // Stats UI state (skill list pagination for high-level mages)
@@ -255,6 +263,18 @@ private:
     int petListPage = 0;
     int viewingPetIdx = -1;
     static constexpr int PETS_PER_PAGE = 9;
+
+    // Job quest UI state
+    int jobQuestPage = 0;
+    static constexpr int JOB_QUESTS_PER_PAGE = 6;
+
+    // Resource chain UI state
+    int chainPage = 0;
+    static constexpr int CHAIN_PER_PAGE = 8;
+
+    // Escort quest state
+    int escortTargetIdx = -1;
+    bool escortActive = false;
 
     // Main game states
     void StateMainMenu();
@@ -280,6 +300,10 @@ private:
     void StatePets();
     void StateEvolution();
     void StatePetDetail();
+    void StateJobQuests();
+    void StateResourceChain();
+    void StateMasterClass();
+    void StateEscort();
     void StateCombat();
     void StateDungeonSelect();
     void StateDungeonExplore();

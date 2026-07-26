@@ -332,7 +332,8 @@ enum class OffhandType
     Shield,
     Orb,
     Book,
-    Bag
+    Bag,
+    Quiver
 };
 
 inline const char* OffhandTypeName(OffhandType t)
@@ -343,6 +344,7 @@ inline const char* OffhandTypeName(OffhandType t)
         case OffhandType::Orb:    return "Orb";
         case OffhandType::Book:   return "Book";
         case OffhandType::Bag:    return "Bag";
+        case OffhandType::Quiver: return "Quiver";
     }
     return "Unknown";
 }
@@ -352,15 +354,16 @@ class Offhand : public Item
 public:
     Offhand(const std::string& name, OffhandType offhandType, int defense, int manaBonus,
             int arcaneDamage = 0, int rarity = 1,
-            ItemPassive passive1 = ItemPassive::None, ItemPassive passive2 = ItemPassive::None)
+            ItemPassive passive1 = ItemPassive::None, ItemPassive passive2 = ItemPassive::None,
+            int damageBonus = 0)
         : Item(name, ItemType::Offhand, rarity, passive1, passive2), offhandType(offhandType),
-          defense(defense), manaBonus(manaBonus), arcaneDamage(arcaneDamage)
+          defense(defense), manaBonus(manaBonus), arcaneDamage(arcaneDamage), damageBonus(damageBonus)
     {
     }
 
     std::shared_ptr<Item> Clone() const override
     {
-        auto c = std::make_shared<Offhand>(name, offhandType, defense, manaBonus, arcaneDamage, rarity, passive1, passive2);
+        auto c = std::make_shared<Offhand>(name, offhandType, defense, manaBonus, arcaneDamage, rarity, passive1, passive2, damageBonus);
         c->setId = setId;
         c->count = 1;
         c->requiredLevel = requiredLevel;
@@ -371,6 +374,7 @@ public:
     int defense;
     int manaBonus;
     int arcaneDamage;
+    int damageBonus;
 };
 
 inline bool Item::IsSameAs(const Item& other) const
@@ -388,7 +392,7 @@ inline bool Item::IsSameAs(const Item& other) const
             return ac->bonusHealth == oac->bonusHealth && ac->bonusMana == oac->bonusMana;
     if (auto oh = dynamic_cast<const Offhand*>(this))
         if (auto ooh = dynamic_cast<const Offhand*>(&other))
-            return oh->offhandType == ooh->offhandType && oh->defense == ooh->defense && oh->manaBonus == ooh->manaBonus;
+            return oh->offhandType == ooh->offhandType && oh->defense == ooh->defense && oh->manaBonus == ooh->manaBonus && oh->damageBonus == ooh->damageBonus;
     return true;
 }
 

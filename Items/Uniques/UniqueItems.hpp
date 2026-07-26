@@ -57,6 +57,25 @@ struct UniqueAccessoryDef
     ItemPassive passive2 = ItemPassive::None;
 };
 
+struct UniqueOffhandDef
+{
+    std::string name;
+    Rarity rarity = Rarity::Epic;
+    OffhandType offhandType = OffhandType::Shield;
+    int baseDefense = 0;
+    int defensePerDiff = 0;
+    int baseManaBonus = 0;
+    int manaBonusPerDiff = 0;
+    int baseArcaneDamage = 0;
+    int arcaneDamagePerDiff = 0;
+    int baseDamageBonus = 0;
+    int damageBonusPerDiff = 0;
+    std::string dropSource;
+    int setId = -1;
+    ItemPassive passive1 = ItemPassive::None;
+    ItemPassive passive2 = ItemPassive::None;
+};
+
 class UniqueItemRegistry
 {
 public:
@@ -65,25 +84,30 @@ public:
     static const UniqueWeaponDef* FindWeapon(const std::string& name);
     static const UniqueArmorDef* FindArmor(const std::string& name);
     static const UniqueAccessoryDef* FindAccessory(const std::string& name);
+    static const UniqueOffhandDef* FindOffhand(const std::string& name);
 
     static std::shared_ptr<Item> Create(const std::string& name, int difficulty);
 
     static std::vector<const UniqueWeaponDef*> GetWeaponsByDropSource(const std::string& enemyName);
     static std::vector<const UniqueArmorDef*> GetArmorByDropSource(const std::string& enemyName);
     static std::vector<const UniqueAccessoryDef*> GetAccessoriesByDropSource(const std::string& enemyName);
+    static std::vector<const UniqueOffhandDef*> GetOffhandsByDropSource(const std::string& enemyName);
 
     static std::vector<const UniqueWeaponDef*> GetWeaponsByRarity(Rarity r);
     static std::vector<const UniqueArmorDef*> GetArmorByRarity(Rarity r);
     static std::vector<const UniqueAccessoryDef*> GetAccessoriesByRarity(Rarity r);
+    static std::vector<const UniqueOffhandDef*> GetOffhandsByRarity(Rarity r);
 
     static const std::vector<UniqueWeaponDef>& GetAllWeapons() { return s_weapons; }
     static const std::vector<UniqueArmorDef>& GetAllArmor() { return s_armor; }
     static const std::vector<UniqueAccessoryDef>& GetAllAccessories() { return s_accessories; }
+    static const std::vector<UniqueOffhandDef>& GetAllOffhands() { return s_offhands; }
 
 private:
     static std::vector<UniqueWeaponDef> s_weapons;
     static std::vector<UniqueArmorDef> s_armor;
     static std::vector<UniqueAccessoryDef> s_accessories;
+    static std::vector<UniqueOffhandDef> s_offhands;
     static bool s_initialized;
 
     static void RegisterMageEpics();
@@ -98,6 +122,8 @@ private:
     static void RegisterPriestLegendaries();
     static void RegisterPriestEpics();
     static void RegisterAchievementItems();
+    static void RegisterCitadelLegendaries();
+    static void RegisterOffhands();
 };
 
 #endif

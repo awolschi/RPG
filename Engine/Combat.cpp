@@ -115,6 +115,19 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
 
                 attacker->GetSkills().UpdateCooldowns();
                 int dmg = hpBefore - defender->GetCurrentHealth();
+
+                // Master class damage bonus (+15% all damage)
+                if (dmg > 0 && attacker->GetMasterClassDamageBonus() > 0.0f)
+                {
+                    int masterBonus = dmg * static_cast<int>(attacker->GetMasterClassDamageBonus() * 100) / 100;
+                    if (masterBonus > 0)
+                    {
+                        defender->TakeDamage(masterBonus, ElementType::Physical);
+                        actionMsg += " (MASTER +" + std::to_string(masterBonus) + ")";
+                    }
+                }
+
+                dmg = hpBefore - defender->GetCurrentHealth();
                 ElementType effective = attacker->GetEffectiveElement(attackSkill->element);
                 std::string elemStr = (effective != ElementType::Physical)
                     ? " [" + std::string(ElementName(effective)) + "]" : "";
@@ -228,6 +241,20 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
                 if (heal < 1) heal = 1;
                 attacker->RestoreHealth(heal);
                 actionMsg += " (+" + std::to_string(heal) + " lifesteal)";
+            }
+
+            // Master class damage bonus (+15% all damage)
+            {
+                int totalDmg = hpBefore - defender->GetCurrentHealth();
+                if (totalDmg > 0 && attacker->GetMasterClassDamageBonus() > 0.0f)
+                {
+                    int masterBonus = totalDmg * static_cast<int>(attacker->GetMasterClassDamageBonus() * 100) / 100;
+                    if (masterBonus > 0)
+                    {
+                        defender->TakeDamage(masterBonus, effective);
+                        actionMsg += " (MASTER +" + std::to_string(masterBonus) + ")";
+                    }
+                }
             }
             break;
         }

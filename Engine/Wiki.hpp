@@ -8,6 +8,8 @@
 #include "../World/Areas/Area.hpp"
 #include "../Characters/Classes/Classes.hpp"
 
+class Player;
+
 enum class WikiTab
 {
     Equipment,
@@ -29,6 +31,7 @@ public:
 
     void Draw(GRenderer& renderer);
     void SetAreas(const std::vector<Area>& areaList);
+    void SetPlayer(Player* p) { player = p; }
     void MarkEnemyDefeated(const std::string& name);
     bool IsEnemyDefeated(const std::string& name) const;
     void MarkPetObtained(const std::string& id);
@@ -46,6 +49,7 @@ private:
     int page;
     int maxPage;
     const std::vector<Area>* areas;
+    Player* player = nullptr;
 
     std::string searchQuery;
     char searchBuf[64];

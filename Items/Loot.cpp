@@ -170,6 +170,14 @@ std::vector<std::shared_ptr<Item>> LootTable::GenerateLoot(int difficulty, int d
         item->requiredLevel = reqLevel;
         loot.push_back(item);
     }
+    // Slot 4: class-appropriate offhand (10% + difficulty*1.5%)
+    roll = RNG::Percent();
+    if (roll < 10 + static_cast<int>(difficulty * 1.5))
+    {
+        auto item = CreateOffhand(difficulty, cc);
+        item->requiredLevel = reqLevel;
+        loot.push_back(item);
+    }
     return loot;
 }
 
@@ -203,6 +211,14 @@ std::vector<std::shared_ptr<Item>> LootTable::GenerateBossLoot(int difficulty, i
         auto acc = CreateAccessory(difficulty);
         acc->requiredLevel = reqLevel;
         loot.push_back(acc);
+    }
+
+    // Boss also drops a class-appropriate offhand (40% chance)
+    if (RNG::Percent() < 40)
+    {
+        auto oh = CreateOffhand(difficulty, cc);
+        oh->requiredLevel = reqLevel;
+        loot.push_back(oh);
     }
 
     return loot;
@@ -597,6 +613,70 @@ std::shared_ptr<Item> LootTable::CreateAccessory(int difficulty)
     }
 }
 
+std::shared_ptr<Item> LootTable::CreateOffhand(int difficulty, CharacterClass cc)
+{
+    int rarity = 2 + (difficulty > 3 ? 1 : 0) + (difficulty > 7 ? 1 : 0);
+
+    switch (cc)
+    {
+        case CharacterClass::Warrior:
+        {
+            // Shields: high defense, no damage
+            int def = 5 + difficulty * 2;
+            switch (RNG::Next(4))
+            {
+                case 0: return std::make_shared<Offhand>("Iron Buckler", OffhandType::Shield, def, 0, 0, rarity);
+                case 1: return std::make_shared<Offhand>("Steel Guard", OffhandType::Shield, def + 3, 0, 0, rarity);
+                case 2: return std::make_shared<Offhand>("Battle Aegis", OffhandType::Shield, def + 6, 0, 0, rarity + 1);
+                default: return std::make_shared<Offhand>("War Sentinel", OffhandType::Shield, def + 10, 0, 0, rarity + 1);
+            }
+        }
+        case CharacterClass::Mage:
+        {
+            // Orbs: arcane damage + small defense
+            int mana = 10 + difficulty * 5;
+            int arcDmg = 4 + difficulty * 3;
+            int def = 1 + difficulty / 2;
+            switch (RNG::Next(4))
+            {
+                case 0: return std::make_shared<Offhand>("Mana Focus Orb", OffhandType::Orb, def, mana, arcDmg, rarity);
+                case 1: return std::make_shared<Offhand>("Arcane Sphere", OffhandType::Orb, def + 1, mana + 10, arcDmg + 5, rarity);
+                case 2: return std::make_shared<Offhand>("Void Core", OffhandType::Orb, def + 2, mana + 20, arcDmg + 10, rarity + 1);
+                default: return std::make_shared<Offhand>("Celestial Orb", OffhandType::Orb, def + 3, mana + 30, arcDmg + 15, rarity + 1);
+            }
+        }
+        case CharacterClass::Priest:
+        {
+            // Books: arcane damage + small defense
+            int mana = 10 + difficulty * 5;
+            int arcDmg = 3 + difficulty * 2;
+            int def = 1 + difficulty / 2;
+            switch (RNG::Next(4))
+            {
+                case 0: return std::make_shared<Offhand>("Holy Tome", OffhandType::Book, def, mana, arcDmg, rarity);
+                case 1: return std::make_shared<Offhand>("Prayer Book", OffhandType::Book, def + 1, mana + 10, arcDmg + 4, rarity);
+                case 2: return std::make_shared<Offhand>("Divine Scripture", OffhandType::Book, def + 2, mana + 20, arcDmg + 8, rarity + 1);
+                default: return std::make_shared<Offhand>("Gospel of the Faithful", OffhandType::Book, def + 3, mana + 30, arcDmg + 12, rarity + 1);
+            }
+        }
+        case CharacterClass::Archer:
+        {
+            // Quivers: physical damage boost + small defense
+            int dmg = 4 + difficulty * 3;
+            int def = 2 + difficulty / 2;
+            switch (RNG::Next(4))
+            {
+                case 0: return std::make_shared<Offhand>("Simple Quiver", OffhandType::Quiver, def, 0, 0, rarity, ItemPassive::None, ItemPassive::None, dmg);
+                case 1: return std::make_shared<Offhand>("Ranger's Quiver", OffhandType::Quiver, def + 1, 0, 0, rarity, ItemPassive::None, ItemPassive::None, dmg + 4);
+                case 2: return std::make_shared<Offhand>("Huntmaster Quiver", OffhandType::Quiver, def + 2, 0, 0, rarity + 1, ItemPassive::None, ItemPassive::None, dmg + 8);
+                default: return std::make_shared<Offhand>("Windrunner Quiver", OffhandType::Quiver, def + 3, 0, 0, rarity + 1, ItemPassive::None, ItemPassive::None, dmg + 12);
+            }
+        }
+        default:
+            return std::make_shared<Offhand>("Leather Satchel", OffhandType::Bag, 0, 0, 0, 1);
+    }
+}
+
 // ---- Potions ----
 
 std::shared_ptr<Item> LootTable::CreatePotion(int difficulty)
@@ -698,6 +778,24 @@ std::shared_ptr<Item> LootTable::GenerateUniqueDrop(
     auto weapons = UniqueItemRegistry::GetWeaponsByDropSource(enemyName);
     auto armor = UniqueItemRegistry::GetArmorByDropSource(enemyName);
     auto accessories = UniqueItemRegistry::GetAccessoriesByDropSource(enemyName);
+    auto offhands = UniqueItemRegistry::GetOffhandsByDropSource(enemyName);
+
+    // Chronos Depths (difficulty 10+): all legendaries can drop at difficulty 10 stats
+    if (difficulty >= 10)
+    {
+        for (const auto& w : UniqueItemRegistry::GetAllWeapons())
+            if (w.rarity == Rarity::Legendary)
+                weapons.push_back(&w);
+        for (const auto& a : UniqueItemRegistry::GetAllArmor())
+            if (a.rarity == Rarity::Legendary)
+                armor.push_back(&a);
+        for (const auto& ac : UniqueItemRegistry::GetAllAccessories())
+            if (ac.rarity == Rarity::Legendary)
+                accessories.push_back(&ac);
+        for (const auto& oh : UniqueItemRegistry::GetAllOffhands())
+            if (oh.rarity == Rarity::Legendary)
+                offhands.push_back(&oh);
+    }
 
     ClassData classData = ClassDatabase::Get(cc);
 
@@ -724,6 +822,22 @@ std::shared_ptr<Item> LootTable::GenerateUniqueDrop(
     // Accessories can be used by anyone — count as class-appropriate
     for (auto* ac : accessories)
         classPool.push_back(ac->name);
+
+    // Offhands: class-appropriate by type
+    for (auto* oh : offhands)
+    {
+        bool ok = false;
+        switch (oh->offhandType)
+        {
+            case OffhandType::Shield:  ok = (cc == CharacterClass::Warrior); break;
+            case OffhandType::Orb:     ok = (cc == CharacterClass::Mage); break;
+            case OffhandType::Book:    ok = (cc == CharacterClass::Priest); break;
+            case OffhandType::Quiver:  ok = (cc == CharacterClass::Archer); break;
+            case OffhandType::Bag:     ok = true; break;
+        }
+        if (ok) classPool.push_back(oh->name);
+        else otherPool.push_back(oh->name);
+    }
 
     // Bias toward class-appropriate: 70% chance to pick from class pool
     std::vector<std::string>& pickFrom = (!classPool.empty() && RNG::Percent() < 70)
