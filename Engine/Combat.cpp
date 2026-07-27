@@ -2,11 +2,8 @@
 #include "../Items/Passives.hpp"
 #include "../Characters/Character.hpp"
 #include "../Engine/RNG.hpp"
-#include <sstream>
 
 namespace {
-    // Roll a critical hit using the attacker's pet bonus crit chance.
-    // Returns the crit damage multiplier (e.g. 1.0 normal, 1.5 crit w/ 50% bonus).
     float PetCritMultiplier(const Character& attacker)
     {
         float chance = attacker.GetPetBonusCritChance();
@@ -16,10 +13,41 @@ namespace {
             return 1.5f + attacker.GetPetBonusCritDamage();
         return 1.0f;
     }
+
+    struct BonusResult {
+        int critBonus = 0;
+        bool didCrit = false;
+        bool didDoubleStrike = false;
+    };
+
+    BonusResult ApplyEquipmentBonuses(Character& attacker, Character& defender,
+                                       int baseDmg, ElementType effective,
+                                       std::string& actionMsg)
+    {
+        BonusResult result;
+        if (baseDmg <= 0) return result;
+
+        int critChance = Passives::GetCritChancePercent(attacker.GetEquipment());
+        if (critChance > 0 && Passives::RollProc(critChance))
+        {
+            result.critBonus = baseDmg;
+            result.didCrit = true;
+            defender.TakeDamageRaw(result.critBonus);
+            actionMsg += " (CRITICAL +" + std::to_string(result.critBonus) + ")";
+        }
+
+        int atkSpeed = Passives::GetAttackSpeedPercent(attacker.GetEquipment());
+        if (atkSpeed > 0 && Passives::RollProc(atkSpeed))
+        {
+            result.didDoubleStrike = true;
+        }
+
+        return result;
+    }
 }
 
-bool CombatSystem::StartCombat(std::shared_ptr<Character> player,
-                               std::shared_ptr<Character> enemy)
+bool CombatSystem::StartCombat(const std::shared_ptr<Character>& player,
+                               const std::shared_ptr<Character>& enemy)
 {
     if (!player || !enemy || !player->IsAlive() || !enemy->IsAlive())
         return false;
@@ -29,19 +57,17 @@ bool CombatSystem::StartCombat(std::shared_ptr<Character> player,
     return true;
 }
 
-std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
-                                       std::shared_ptr<Character> defender,
+std::string CombatSystem::ExecuteTurn(const std::shared_ptr<Character>& attacker,
+                                       const std::shared_ptr<Character>& defender,
                                        CombatAction action,
                                        int skillIndex)
 {
     if (!attacker || !defender)
         return "Invalid combatants.";
 
-    // Process effects on both characters
     std::string effectLog = attacker->ProcessEffects();
     effectLog += defender->ProcessEffects();
 
-    // Turn start: Mana regen from passives
     int manaRegen = Passives::GetManaRegenBonus(attacker->GetEquipment());
     if (manaRegen > 0)
     {
@@ -49,7 +75,6 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
         effectLog += attacker->GetName() + " regenerates " + std::to_string(manaRegen) + " mana. ";
     }
 
-    // Check if attacker is stunned (immune check)
     if (attacker->IsStunned())
     {
         if (!Passives::IsStunImmune(attacker->GetEquipment()))
@@ -69,7 +94,6 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
     {
         case CombatAction::Attack:
         {
-            // Dodge check (equipment passives + mastery dodge)
             {
                 int totalDodge = Passives::GetDodgePercent(defender->GetEquipment());
                 int masteryDodge = static_cast<int>(defender->GetMasteryDodgeChance() * 100);
@@ -88,27 +112,29 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
                 int hpBefore = defender->GetCurrentHealth();
                 attackSkill->Use(*attacker, *defender);
 
-                // Apply physical damage boost
-                int physBoost = Passives::GetPhysicalDamageBoostPercent(attacker->GetEquipment());
                 int baseDmg = hpBefore - defender->GetCurrentHealth();
+
+                int physBoost = Passives::GetPhysicalDamageBoostPercent(attacker->GetEquipment());
                 if (physBoost > 0 && baseDmg > 0)
                 {
                     int bonusDmg = baseDmg * physBoost / 100;
-                    defender->TakeDamage(bonusDmg, ElementType::Physical);
+                    defender->TakeDamageRaw(bonusDmg);
                 }
 
-                // Pet damage bonus + crit roll (applied as bonus hit)
+                ElementType effective = attacker->GetEffectiveElement(attackSkill->element);
+                auto bonus = ApplyEquipmentBonuses(*attacker, *defender, baseDmg, effective, actionMsg);
+
                 float petDmgPct = attacker->GetPetBonusDamage();
-                float critMult = PetCritMultiplier(*attacker);
+                float petCritMult = PetCritMultiplier(*attacker);
                 int afterPhys = defender->GetCurrentHealth();
                 int dealtSoFar = hpBefore - afterPhys;
-                if (dealtSoFar > 0 && (petDmgPct > 0.0f || critMult > 1.0f))
+                if (dealtSoFar > 0 && (petDmgPct > 0.0f || petCritMult > 1.0f))
                 {
-                    int bonusDmg = static_cast<int>(dealtSoFar * petDmgPct * critMult);
+                    int bonusDmg = static_cast<int>(dealtSoFar * petDmgPct * petCritMult);
                     if (bonusDmg > 0)
                     {
-                        defender->TakeDamage(bonusDmg, ElementType::Physical);
-                        if (critMult > 1.0f)
+                        defender->TakeDamageRaw(bonusDmg);
+                        if (petCritMult > 1.0f)
                             actionMsg += " (CRITICAL pet strike +" + std::to_string(bonusDmg) + ")";
                     }
                 }
@@ -116,32 +142,48 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
                 attacker->GetSkills().UpdateCooldowns();
                 int dmg = hpBefore - defender->GetCurrentHealth();
 
-                // Master class damage bonus (+15% all damage)
                 if (dmg > 0 && attacker->GetMasterClassDamageBonus() > 0.0f)
                 {
-                    int masterBonus = dmg * static_cast<int>(attacker->GetMasterClassDamageBonus() * 100) / 100;
+                    int masterBonus = dmg * 15 / 100;
                     if (masterBonus > 0)
                     {
-                        defender->TakeDamage(masterBonus, ElementType::Physical);
+                        defender->TakeDamageRaw(masterBonus);
                         actionMsg += " (MASTER +" + std::to_string(masterBonus) + ")";
                     }
                 }
 
                 dmg = hpBefore - defender->GetCurrentHealth();
-                ElementType effective = attacker->GetEffectiveElement(attackSkill->element);
                 std::string elemStr = (effective != ElementType::Physical)
                     ? " [" + std::string(ElementName(effective)) + "]" : "";
                 if (dmg > 0)
                     actionMsg = attacker->GetName() + " attacks " + defender->GetName()
-                        + elemStr + " (" + std::to_string(dmg) + " damage)!";
+                        + elemStr + " (" + std::to_string(dmg) + " damage)!" + actionMsg;
                 else
                     actionMsg = attacker->GetName() + " attacks " + defender->GetName() + elemStr + "!";
 
-                // Lifesteal
-                int lifestealPct = Passives::GetLifestealPercent(attacker->GetEquipment());
-                if (lifestealPct > 0 && dmg > 0)
+                if (bonus.didDoubleStrike && defender->IsAlive())
                 {
-                    int heal = dmg * lifestealPct / 100;
+                    int hpBefore2 = defender->GetCurrentHealth();
+                    attackSkill->Use(*attacker, *defender);
+                    int dmg2 = hpBefore2 - defender->GetCurrentHealth();
+                    if (dmg2 > 0)
+                    {
+                        int physBoost2 = Passives::GetPhysicalDamageBoostPercent(attacker->GetEquipment());
+                        if (physBoost2 > 0)
+                        {
+                            int bonusDmg2 = dmg2 * physBoost2 / 100;
+                            defender->TakeDamageRaw(bonusDmg2);
+                        }
+                        ApplyEquipmentBonuses(*attacker, *defender, dmg2, effective, actionMsg);
+                        actionMsg += " (DOUBLE STRIKE +" + std::to_string(hpBefore2 - defender->GetCurrentHealth()) + ")";
+                    }
+                }
+
+                int lifestealPct = Passives::GetLifestealPercent(attacker->GetEquipment());
+                int totalDmg = hpBefore - defender->GetCurrentHealth();
+                if (lifestealPct > 0 && totalDmg > 0)
+                {
+                    int heal = totalDmg * lifestealPct / 100;
                     if (heal < 1) heal = 1;
                     attacker->RestoreHealth(heal);
                     actionMsg += " (" + std::to_string(heal) + " lifesteal)";
@@ -176,19 +218,16 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
             skill->Use(*attacker, *defender);
             attacker->ReduceMana(effectiveManaCost);
 
-            // Cooldown reduction from passives
             int cdReduction = Passives::GetCooldownReductionTurns(attacker->GetEquipment());
             for (int i = 0; i < cdReduction; ++i)
                 attacker->GetSkills().GetSkill(skillIndex)->ReduceCooldown();
 
             attacker->GetSkills().UpdateCooldowns();
 
-            // Mana on skill use
             int manaOnSkill = Passives::GetManaOnSkillUseAmount(attacker->GetEquipment());
             if (manaOnSkill > 0)
                 attacker->RestoreMana(manaOnSkill);
 
-            // HP on skill use
             int hpOnSkill = Passives::GetHpOnSkillUseAmount(attacker->GetEquipment());
             if (hpOnSkill > 0)
                 attacker->RestoreHealth(hpOnSkill);
@@ -207,53 +246,66 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
             else
                 actionMsg = attacker->GetName() + " uses " + skill->name + elemStr + "!";
 
-            // Spell damage boost
-            int spellBoost = Passives::GetSpellDamageBoostPercent(attacker->GetEquipment());
-            if (spellBoost > 0 && diff < 0)
-            {
-                int bonusDmg = (-diff) * spellBoost / 100;
-                defender->TakeDamage(bonusDmg, effective);
-                actionMsg += " (+" + std::to_string(bonusDmg) + " spell boost)";
-            }
+            int baseSkillDmg = (diff < 0) ? -diff : 0;
 
-            // Pet damage bonus + crit roll for damage-dealing skills
-            float petDmgPct = attacker->GetPetBonusDamage();
-            float critMult = PetCritMultiplier(*attacker);
-            if (diff < 0 && (petDmgPct > 0.0f || critMult > 1.0f))
+            if (baseSkillDmg > 0)
             {
-                int baseSkillDmg = -diff;
-                int bonusDmg = static_cast<int>(baseSkillDmg * petDmgPct * critMult);
-                if (bonusDmg > 0)
+                if (effective == ElementType::Physical)
                 {
-                    defender->TakeDamage(bonusDmg, effective);
-                    if (critMult > 1.0f)
-                        actionMsg += " (CRITICAL pet +" + std::to_string(bonusDmg) + ")";
-                    else
-                        actionMsg += " (pet +" + std::to_string(bonusDmg) + ")";
+                    int physBoost = Passives::GetPhysicalDamageBoostPercent(attacker->GetEquipment());
+                    if (physBoost > 0)
+                    {
+                        int bonusDmg = baseSkillDmg * physBoost / 100;
+                        defender->TakeDamageRaw(bonusDmg);
+                        actionMsg += " (+" + std::to_string(bonusDmg) + " phys boost)";
+                    }
+                }
+                else
+                {
+                    int spellBoost = Passives::GetSpellDamageBoostPercent(attacker->GetEquipment());
+                    if (spellBoost > 0)
+                    {
+                        int bonusDmg = baseSkillDmg * spellBoost / 100;
+                        defender->TakeDamageRaw(bonusDmg);
+                        actionMsg += " (+" + std::to_string(bonusDmg) + " spell boost)";
+                    }
+                }
+
+                ApplyEquipmentBonuses(*attacker, *defender, baseSkillDmg, effective, actionMsg);
+
+                float petDmgPct = attacker->GetPetBonusDamage();
+                float petCritMult = PetCritMultiplier(*attacker);
+                if (petDmgPct > 0.0f || petCritMult > 1.0f)
+                {
+                    int bonusDmg = static_cast<int>(baseSkillDmg * petDmgPct * petCritMult);
+                    if (bonusDmg > 0)
+                    {
+                        defender->TakeDamageRaw(bonusDmg);
+                        if (petCritMult > 1.0f)
+                            actionMsg += " (CRITICAL pet +" + std::to_string(bonusDmg) + ")";
+                        else
+                            actionMsg += " (pet +" + std::to_string(bonusDmg) + ")";
+                    }
                 }
             }
 
-            // Lifesteal on skill
             int lifestealPct = Passives::GetLifestealPercent(attacker->GetEquipment());
-            if (lifestealPct > 0 && diff < 0)
+            int totalDmg = hpBefore - defender->GetCurrentHealth();
+            if (lifestealPct > 0 && totalDmg > 0)
             {
-                int heal = (-diff) * lifestealPct / 100;
+                int heal = totalDmg * lifestealPct / 100;
                 if (heal < 1) heal = 1;
                 attacker->RestoreHealth(heal);
                 actionMsg += " (+" + std::to_string(heal) + " lifesteal)";
             }
 
-            // Master class damage bonus (+15% all damage)
+            if (totalDmg > 0 && attacker->GetMasterClassDamageBonus() > 0.0f)
             {
-                int totalDmg = hpBefore - defender->GetCurrentHealth();
-                if (totalDmg > 0 && attacker->GetMasterClassDamageBonus() > 0.0f)
+                int masterBonus = totalDmg * static_cast<int>(attacker->GetMasterClassDamageBonus() * 100) / 100;
+                if (masterBonus > 0)
                 {
-                    int masterBonus = totalDmg * static_cast<int>(attacker->GetMasterClassDamageBonus() * 100) / 100;
-                    if (masterBonus > 0)
-                    {
-                        defender->TakeDamage(masterBonus, effective);
-                        actionMsg += " (MASTER +" + std::to_string(masterBonus) + ")";
-                    }
+                    defender->TakeDamageRaw(masterBonus);
+                    actionMsg += " (MASTER +" + std::to_string(masterBonus) + ")";
                 }
             }
             break;
@@ -280,45 +332,4 @@ std::string CombatSystem::ExecuteTurn(std::shared_ptr<Character> attacker,
     }
 
     return effectLog + actionMsg;
-}
-
-std::string CombatSystem::GetStatusLine(std::shared_ptr<Character> c)
-{
-    if (!c) return "";
-    std::ostringstream os;
-    os << c->GetName() << " HP:" << c->GetCurrentHealth()
-       << "/" << c->GetStats().health
-       << " MP:" << c->GetCurrentMana()
-       << "/" << c->GetStats().mana;
-    for (const auto& e : c->GetEffects())
-    {
-        switch (e.type)
-        {
-            case EffectType::Poison: os << " [Poison " << e.duration << "]"; break;
-            case EffectType::Burn:   os << " [Burn " << e.duration << "]"; break;
-            case EffectType::Stun:   os << " [Stunned]"; break;
-            case EffectType::Freeze: os << " [Frozen]"; break;
-            default: break;
-        }
-    }
-    return os.str();
-}
-
-std::vector<std::string> CombatSystem::GetSkillOptions(std::shared_ptr<Character> c)
-{
-    std::vector<std::string> opts;
-    if (!c) return opts;
-    for (size_t i = 0; i < c->GetSkills().GetSkillCount(); ++i)
-    {
-        auto s = c->GetSkills().GetSkill(i);
-        if (s)
-        {
-            std::string entry = std::to_string(i) + ". " + s->name
-                + " (Mana:" + std::to_string(s->GetEffectiveManaCost())
-                + " CD:" + std::to_string(s->currentCooldown) + "/" + std::to_string(s->GetEffectiveCooldown())
-                + " Req:" + std::to_string(s->requiredLevel) + ")";
-            opts.push_back(entry);
-        }
-    }
-    return opts;
 }

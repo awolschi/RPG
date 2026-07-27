@@ -7,6 +7,7 @@
 class Consumable : public Item
 {
 public:
+    static constexpr ItemType ClassType = ItemType::Consumable;
     Consumable(const std::string& name, int healAmount, int manaAmount = 0, int rarity = 1)
         : Item(name, ItemType::Consumable, rarity), healAmount(healAmount), manaAmount(manaAmount)
     {

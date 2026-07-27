@@ -3,38 +3,38 @@
 #include "../Engine/RNG.hpp"
 #include <functional>
 
-static void CollectFromItem(std::vector<ItemPassive>& out, const std::shared_ptr<Item>& item)
+static void CollectFromItem(std::vector<ItemPassive>& out, const Item* item)
 {
     if (!item) return;
     if (item->passive1 != ItemPassive::None) out.push_back(item->passive1);
     if (item->passive2 != ItemPassive::None) out.push_back(item->passive2);
 }
 
-static void ForEachEquipped(const Equipment& equip, std::function<void(const std::shared_ptr<Item>&)> fn)
+static void ForEachEquipped(const Equipment& equip, std::function<void(const Item*)> fn)
 {
-    fn(equip.weapon);
-    fn(equip.offhand);
-    fn(equip.helmet);
-    fn(equip.chest);
-    fn(equip.gloves);
-    fn(equip.pants);
-    fn(equip.boots);
-    fn(equip.ring1);
-    fn(equip.ring2);
-    fn(equip.amulet);
+    fn(equip.weapon.get());
+    fn(equip.offhand.get());
+    fn(equip.helmet.get());
+    fn(equip.chest.get());
+    fn(equip.gloves.get());
+    fn(equip.pants.get());
+    fn(equip.boots.get());
+    fn(equip.ring1.get());
+    fn(equip.ring2.get());
+    fn(equip.amulet.get());
 }
 
 std::vector<ItemPassive> Passives::Collect(const Equipment& equip)
 {
     std::vector<ItemPassive> result;
-    ForEachEquipped(equip, [&](const std::shared_ptr<Item>& item) { CollectFromItem(result, item); });
+    ForEachEquipped(equip, [&](const Item* item) { CollectFromItem(result, item); });
     return result;
 }
 
 bool Passives::Has(const Equipment& equip, ItemPassive p)
 {
     bool found = false;
-    ForEachEquipped(equip, [&](const std::shared_ptr<Item>& item)
+    ForEachEquipped(equip, [&](const Item* item)
     {
         if (found) return;
         if (item && (item->passive1 == p || item->passive2 == p)) found = true;
@@ -45,7 +45,7 @@ bool Passives::Has(const Equipment& equip, ItemPassive p)
 int Passives::Count(const Equipment& equip, ItemPassive p)
 {
     int c = 0;
-    ForEachEquipped(equip, [&](const std::shared_ptr<Item>& item)
+    ForEachEquipped(equip, [&](const Item* item)
     {
         if (!item) return;
         if (item->passive1 == p) c++;
@@ -59,7 +59,7 @@ int Passives::FlatBonus(const Equipment& equip, ItemPassive target,
                         ItemPassive match2, int val2)
 {
     int total = 0;
-    ForEachEquipped(equip, [&](const std::shared_ptr<Item>& item)
+    ForEachEquipped(equip, [&](const Item* item)
     {
         if (!item) return;
         if (item->passive1 == target || item->passive2 == target)

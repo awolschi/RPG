@@ -2,20 +2,157 @@
 #include "Uniques/UniqueItems.hpp"
 #include "Consumable.hpp"
 #include "../Engine/RNG.hpp"
+#include <set>
 
 static int RequiredLevelForDifficulty(int d)
 {
     return std::max(1, (d - 1) * 5 + 1);
 }
+static ElementType RandomElement();
 
-static bool WeaponAllowedForClass(const std::shared_ptr<Item>& item, CharacterClass cc)
+struct WeaponTemplate
 {
-    auto w = std::dynamic_pointer_cast<Weapon>(item);
-    if (!w) return true;
+    const char* name;
+    WeaponType type;
+    int dmgOff;
+    int manaOff;
+    ElementType elem;
+    int elemDmgOff;
+};
+
+static const WeaponTemplate kCommonWeapons[] = {
+    {"Iron Sword",      WeaponType::Sword,   0,  0,  ElementType::Physical, 0},
+    {"Steel Axe",       WeaponType::Axe,     2,  0,  ElementType::Physical, 0},
+    {"Wooden Staff",    WeaponType::Staff,   -2, 5,  ElementType::Physical, 0},
+    {"Dagger",          WeaponType::Dagger,  -5, 0,  ElementType::Physical, 0},
+    {"Apprentice Wand", WeaponType::Wand,    -3, 8,  ElementType::Physical, 0},
+    {"Training Staff",  WeaponType::Staff,   -1, 6,  ElementType::Physical, 0},
+    {"Shortbow",        WeaponType::Bow,     -2, 0,  ElementType::Physical, 0},
+    {"Spellbook",       WeaponType::Wand,    -4, 12, ElementType::Physical, 0},
+};
+static constexpr int kNumCommonWeapons = sizeof(kCommonWeapons) / sizeof(kCommonWeapons[0]);
+
+static const WeaponTemplate kRareWeapons[] = {
+    {"Enchanted Blade",        WeaponType::Sword,    0,   0,  ElementType::Physical, 0},
+    {"Mithril Mace",           WeaponType::Mace,     5,   0,  ElementType::Physical, 0},
+    {"Crystal Staff",          WeaponType::Staff,    0,   10, ElementType::Physical, 0},
+    {"Shadowfang",             WeaponType::Dagger,   8,  -2,  ElementType::Physical, 0},
+    {"Thunder Bow",            WeaponType::Bow,      3,   5,  ElementType::Physical, 0},
+    {"Runed Greatsword",       WeaponType::Sword,    10,  0,  ElementType::Physical, 0},
+    {"Arcane Wand",            WeaponType::Wand,    -2,  15,  ElementType::Physical, 0},
+    {"Frost Staff",            WeaponType::Staff,    2,   8,  ElementType::Ice,      0},
+    {"Fire Staff",             WeaponType::Staff,    5,   5,  ElementType::Fire,     0},
+    {"Storm Caller's Staff",   WeaponType::Staff,    3,   12, ElementType::Lightning, 0},
+    {"Venomfang Dagger",       WeaponType::Dagger,   2,   3,  ElementType::Poison,   2},
+    {"Holy Scepter",           WeaponType::Scepter,  4,   8,  ElementType::Holy,     1},
+    {"Inferno Axe",            WeaponType::Axe,      8,   0,  ElementType::Fire,     3},
+    {"Glacial Bow",            WeaponType::Bow,      3,   6,  ElementType::Ice,      2},
+    {"Thunderstrike Hammer",   WeaponType::Hammer,   10, -3,  ElementType::Lightning, 2},
+};
+static constexpr int kNumRareWeapons = sizeof(kRareWeapons) / sizeof(kRareWeapons[0]);
+
+static const WeaponTemplate kBossWeapons[] = {
+    {"Flamebrand",          WeaponType::Sword,    0,   0,  ElementType::Fire,     0},
+    {"Frostbite",           WeaponType::Sword,    3,   5,  ElementType::Ice,      0},
+    {"Thunderstrike",       WeaponType::Hammer,   5,   0,  ElementType::Lightning, 0},
+    {"Doomhammer",          WeaponType::Hammer,   10, -5,  ElementType::Poison,   0},
+    {"Arcane Staff",        WeaponType::Staff,   -5,  20,  ElementType::Arcane,   0},
+    {"Voidreaver",          WeaponType::Axe,      15, 10,  ElementType::Arcane,   0},
+    {"Celestial Bow",       WeaponType::Bow,      8,  15,  ElementType::Holy,     0},
+    {"Soul Reaper",         WeaponType::Axe,      20, -10, ElementType::Poison,   0},
+    {"Staff of Ages",       WeaponType::Staff,    0,  25,  ElementType::Fire,     0},
+    {"Wand of the Void",    WeaponType::Wand,    -3,  30,  ElementType::Arcane,   0},
+    {"Scepter of Stars",    WeaponType::Scepter,  5,  20,  ElementType::Holy,     0},
+    {"Tome of Elements",    WeaponType::Wand,    -8,  40,  ElementType::Ice,      0},
+};
+static constexpr int kNumBossWeapons = sizeof(kBossWeapons) / sizeof(kBossWeapons[0]);
+
+static const WeaponTemplate kEpicWeapons[] = {
+    {"Inferno Greatsword",       WeaponType::Sword,    10,  0,  ElementType::Fire,     0},
+    {"Glacial Halberd",          WeaponType::Sword,    8,   10, ElementType::Ice,      0},
+    {"Stormcaller's Hammer",     WeaponType::Hammer,   15,  5,  ElementType::Lightning, 0},
+    {"Plaguebringer's Scythe",   WeaponType::Axe,      20, -5,  ElementType::Poison,   5},
+    {"Arcane Dominance Staff",   WeaponType::Staff,   -2,  40,  ElementType::Arcane,   0},
+    {"Celestial Longbow",        WeaponType::Bow,      12, 20,  ElementType::Holy,     0},
+    {"Soulreaver",               WeaponType::Axe,      25, -10, ElementType::Fire,     3},
+    {"Eternal Frost Staff",      WeaponType::Staff,    0,   35, ElementType::Ice,      2},
+    {"Thunderfury",              WeaponType::Sword,    18, 15,  ElementType::Lightning, 0},
+    {"Wand of Worlds",           WeaponType::Wand,    -5,  50,  ElementType::Arcane,   3},
+    {"Scepter of Dawn",          WeaponType::Scepter,  5,  30,  ElementType::Holy,     2},
+    {"Venomstrike Dagger",       WeaponType::Dagger,   6,   8,  ElementType::Poison,   5},
+    {"Tome of Arcane Secrets",   WeaponType::Wand,    -8,  60,  ElementType::Arcane,   0},
+};
+static constexpr int kNumEpicWeapons = sizeof(kEpicWeapons) / sizeof(kEpicWeapons[0]);
+
+static const WeaponTemplate kLegendaryWeapons[] = {
+    {"Worldsplitter",              WeaponType::Sword,    20, 10,  ElementType::Fire,     5},
+    {"Frostmourne's Echo",         WeaponType::Sword,    15, 20,  ElementType::Ice,      8},
+    {"Stormbringer",               WeaponType::Hammer,   25, 15,  ElementType::Lightning, 3},
+    {"Pestilence",                 WeaponType::Axe,      30, 0,   ElementType::Poison,   10},
+    {"Staff of Creation",          WeaponType::Staff,    5,  60,  ElementType::Arcane,   5},
+    {"Dawnbreaker",                WeaponType::Bow,      18, 25,  ElementType::Holy,     7},
+    {"Doomhammer's Legacy",        WeaponType::Hammer,   35, -8,  ElementType::Fire,     6},
+    {"Scepter of the Ancients",    WeaponType::Scepter,  8,  45,  ElementType::Arcane,   4},
+    {"Voidrender",                 WeaponType::Axe,      40, 5,   ElementType::Poison,   8},
+    {"Tome of Infinite Wisdom",    WeaponType::Wand,    -5,  80,  ElementType::Arcane,   3},
+    {"Frostfire Blade",            WeaponType::Sword,    22, 18,  ElementType::Ice,      10},
+    {"Celestial Judgement",        WeaponType::Scepter,  28, 30,  ElementType::Holy,     6},
+};
+static constexpr int kNumLegendaryWeapons = sizeof(kLegendaryWeapons) / sizeof(kLegendaryWeapons[0]);
+
+static const WeaponTemplate* GetWeaponPool(int rarity, int& outSize)
+{
+    switch (rarity)
+    {
+        case 1: outSize = kNumCommonWeapons;   return kCommonWeapons;
+        case 2: outSize = kNumRareWeapons;     return kRareWeapons;
+        case 3: outSize = kNumBossWeapons;     return kBossWeapons;
+        case 4: outSize = kNumEpicWeapons;     return kEpicWeapons;
+        case 5: outSize = kNumLegendaryWeapons; return kLegendaryWeapons;
+        default: outSize = kNumCommonWeapons;   return kCommonWeapons;
+    }
+}
+
+static std::shared_ptr<Item> CreateWeaponFromTemplate(const WeaponTemplate& t, int rarity, int difficulty)
+{
+    int baseDmg, baseMana, baseElemDmg;
+    switch (rarity)
+    {
+        case 1:  baseDmg = 10 + difficulty * 4;  baseMana = RNG::Next(difficulty * 2); baseElemDmg = (t.elem != ElementType::Physical) ? 2 + difficulty + RNG::Next(difficulty + 2) : 0; break;
+        case 2:  baseDmg = 8 + difficulty * 12;  baseMana = 3 + difficulty * 2;        baseElemDmg = 3 + difficulty * 2 + RNG::Next(difficulty * 2 + 3); break;
+        case 3:  baseDmg = 20 + difficulty * 16; baseMana = 10 + difficulty * 3;       baseElemDmg = 5 + difficulty * 4; break;
+        case 4:  baseDmg = 35 + difficulty * 28; baseMana = 15 + difficulty * 5;       baseElemDmg = 10 + difficulty * 6; break;
+        case 5:  baseDmg = 55 + difficulty * 40; baseMana = 25 + difficulty * 8;       baseElemDmg = 15 + difficulty * 8; break;
+        default: baseDmg = 10 + difficulty * 4;  baseMana = RNG::Next(difficulty * 2); baseElemDmg = 0; break;
+    }
+    ElementType elem = t.elem;
+    if (elem == ElementType::Physical)
+        elem = (rarity == 1 && RNG::Next(3) != 0) ? ElementType::Physical : ((rarity == 1) ? RandomElement() : RandomElement());
+    int elemDmg = baseElemDmg + t.elemDmgOff;
+    if (elem == ElementType::Physical && rarity == 1) elemDmg = 0;
+    return std::make_shared<Weapon>(t.name, baseDmg + t.dmgOff, baseMana + t.manaOff, rarity, elem, elemDmg, t.type);
+}
+
+static std::shared_ptr<Weapon> CreateRandomWeaponFromPool(const WeaponTemplate* pool, int poolSize, int rarity, int difficulty)
+{
+    int idx = RNG::Next(poolSize);
+    return item_cast<Weapon>(CreateWeaponFromTemplate(pool[idx], rarity, difficulty));
+}
+
+static std::shared_ptr<Item> CreateClassAppropriateWeapon(int rarity, int difficulty, CharacterClass cc)
+{
     ClassData classData = ClassDatabase::Get(cc);
-    for (auto wt : classData.allowedWeaponTypes)
-        if (wt == w->weaponType) return true;
-    return false;
+    std::set<WeaponType> allowed(classData.allowedWeaponTypes.begin(), classData.allowedWeaponTypes.end());
+    int poolSize = 0;
+    const WeaponTemplate* pool = GetWeaponPool(rarity, poolSize);
+    std::vector<int> validIndices;
+    for (int i = 0; i < poolSize; ++i)
+        if (allowed.count(pool[i].type))
+            validIndices.push_back(i);
+    if (validIndices.empty())
+        return CreateWeaponFromTemplate(pool[RNG::Next(poolSize)], rarity, difficulty);
+    int idx = validIndices[RNG::Next((int)validIndices.size())];
+    return CreateWeaponFromTemplate(pool[idx], rarity, difficulty);
 }
 
 static ElementType RandomElement()
@@ -105,33 +242,15 @@ static std::shared_ptr<Item> CreateArmorOfRarity(int rarity, int difficulty)
     }
 }
 
-static bool ArmorAllowedForClass(const std::shared_ptr<Item>& item, CharacterClass cc)
-{
-    auto a = std::dynamic_pointer_cast<Armor>(item);
-    if (!a) return true;
-    ClassData classData = ClassDatabase::Get(cc);
-    for (auto at : classData.allowedArmorTypes)
-        if (at == a->armorType) return true;
-    return false;
-}
-
-static std::shared_ptr<Item> CreateClassAppropriateWeapon(int rarity, int difficulty, CharacterClass cc)
-{
-    for (int attempt = 0; attempt < 8; ++attempt)
-    {
-        auto item = CreateWeaponOfRarity(rarity, difficulty);
-        if (WeaponAllowedForClass(item, cc))
-            return item;
-    }
-    return CreateWeaponOfRarity(rarity, difficulty);
-}
-
 static std::shared_ptr<Item> CreateClassAppropriateArmor(int rarity, int difficulty, CharacterClass cc)
 {
-    for (int attempt = 0; attempt < 8; ++attempt)
+    ClassData classData = ClassDatabase::Get(cc);
+    std::set<ArmorType> allowed(classData.allowedArmorTypes.begin(), classData.allowedArmorTypes.end());
+    for (int attempt = 0; attempt < 50; ++attempt)
     {
         auto item = CreateArmorOfRarity(rarity, difficulty);
-        if (ArmorAllowedForClass(item, cc))
+        auto a = item_cast<Armor>(item);
+        if (!a || allowed.count(a->armorType))
             return item;
     }
     return CreateArmorOfRarity(rarity, difficulty);
@@ -599,15 +718,15 @@ std::shared_ptr<Item> LootTable::CreateAccessory(int difficulty)
         case 5: return std::make_shared<Accessory>("Pendant of Wisdom", 0, mana + 20, rarity);
         case 6: return std::make_shared<Accessory>("Tears of Eluna", hp + 15, mana + 15, rarity + 1);
         case 7: return std::make_shared<Accessory>("Orb of Focus", 0, mana + 30, rarity);
-        case 8: return std::make_shared<Accessory>("Ring of Spellpower", hp - 10, mana + 25, rarity);
+        case 8: return std::make_shared<Accessory>("Ring of Spellpower", std::max(1, hp - 10), mana + 25, rarity);
         case 9: return std::make_shared<Accessory>("Amulet of the Sage", hp / 2, mana * 2, rarity);
         case 10: return std::make_shared<Accessory>("Arcane Core", hp / 3, mana + 35, rarity + 1);
-        case 11: return std::make_shared<Accessory>("Ember Ring", hp - 5, mana + 10, rarity, ElementType::Fire, elemDmg);
+        case 11: return std::make_shared<Accessory>("Ember Ring", std::max(1, hp - 5), mana + 10, rarity, ElementType::Fire, elemDmg);
         case 12: return std::make_shared<Accessory>("Frost Pendant", hp, mana + 15, rarity, ElementType::Ice, elemDmg);
         case 13: return std::make_shared<Accessory>("Storm Amulet", hp + 5, mana + 20, rarity, ElementType::Lightning, elemDmg);
         case 14: return std::make_shared<Accessory>("Venom Band", hp + 10, mana, rarity, ElementType::Poison, elemDmg);
         case 15: return std::make_shared<Accessory>("Holy Charm", hp + 5, mana + 15, rarity, ElementType::Holy, elemDmg);
-        case 16: return std::make_shared<Accessory>("Arcane Signet", hp - 5, mana + 30, rarity, ElementType::Arcane, elemDmg);
+        case 16: return std::make_shared<Accessory>("Arcane Signet", std::max(1, hp - 5), mana + 30, rarity, ElementType::Arcane, elemDmg);
         case 17: return std::make_shared<Accessory>("Elemental Loop", hp, mana + 10, rarity + 1, RandomElement(), elemDmg + 2);
         default: return std::make_shared<Accessory>("Mystic Ring", hp, mana, rarity);
     }
@@ -673,7 +792,7 @@ std::shared_ptr<Item> LootTable::CreateOffhand(int difficulty, CharacterClass cc
             }
         }
         default:
-            return std::make_shared<Offhand>("Leather Satchel", OffhandType::Bag, 0, 0, 0, 1);
+            return std::make_shared<Offhand>("Leather Satchel", OffhandType::Bag, 2 + difficulty / 2, 0, 0, rarity);
     }
 }
 

@@ -37,6 +37,7 @@ inline float ResourceQualityMultiplier(ResourceQuality q)
 class Resource : public Item
 {
 public:
+    static constexpr ItemType ClassType = ItemType::Resource;
     Resource(const std::string& name, int tier, int sellValue = 5,
              int healAmount = 0, int manaAmount = 0,
              ResourceQuality quality = ResourceQuality::Normal);

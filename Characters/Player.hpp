@@ -32,7 +32,6 @@ public:
     // Equipment management
     bool EquipItem(std::shared_ptr<Item> item);
     bool UnequipItem(const std::string& slotName);
-    void ListEquipment() const;
     bool CanEquip(const std::shared_ptr<Item>& item) const;
 
     // Skill loadout (max 4 skills carried into combat, 6 when evolved)

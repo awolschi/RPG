@@ -184,17 +184,17 @@ void BattleRenderer::DrawBattleScreen(GRenderer& renderer,
             if (petLvl < Pet::MAX_PET_LEVEL)
             {
                 int petXpBarX = petInfoX;
-                int petXpBarY = petInfoY + 22;
+                int petXpBarY = petInfoY + 24;
                 int petXpBarW = 200;
                 int petXpCurrent = pet->experience;
                 int petXpMax = Pet::CalculateRequiredXP(petLvl);
                 if (petXpMax > 0)
-                    renderer.DrawBarLabeled(petXpCurrent, petXpMax, petXpBarX, petXpBarY, petXpBarW, 12,
+                    renderer.DrawBarLabeled(petXpCurrent, petXpMax, petXpBarX, petXpBarY, petXpBarW, 14,
                                             CQColors::XpFg, CQColors::XpBg, "Lv." + std::to_string(petLvl));
             }
             else
             {
-                DrawText(("Lv." + std::to_string(petLvl) + " MAX").c_str(), petInfoX, petInfoY + 22, 10, CQColors::TextGold);
+                DrawText(("Lv." + std::to_string(petLvl) + " MAX").c_str(), petInfoX, petInfoY + 24, 10, CQColors::TextGold);
             }
         }
     }
@@ -203,9 +203,9 @@ void BattleRenderer::DrawBattleScreen(GRenderer& renderer,
     if (reputationMax > 0)
     {
         int repBarX = 30;
-        int repBarY = layout.playerBarY + 64;
+        int repBarY = layout.playerBarY + 100;
         int repBarW = GRenderer::W - 60;
-        renderer.DrawBarLabeled(reputationValue, reputationMax, repBarX, repBarY, repBarW, 14,
+        renderer.DrawBarLabeled(reputationValue, reputationMax, repBarX, repBarY, repBarW, 16,
                                 CQColors::RepFg, CQColors::RepBg, repLabel);
     }
 
@@ -272,7 +272,7 @@ void BattleRenderer::DrawPlayerBar(GRenderer& renderer,
 {
     int barX = 30;
     int barW = GRenderer::W - 60;
-    int barH = 76;
+    int barH = 116;
 
     DrawRectangle(barX, y, barW, barH, {15, 15, 20, 240});
     DrawRectangleLines(barX, y, barW, barH, {60, 60, 80, 200});
@@ -282,35 +282,35 @@ void BattleRenderer::DrawPlayerBar(GRenderer& renderer,
     int hpBarX = barX + 10;
     int hpBarY = y + 24;
     int hpBarW = 160;
-    renderer.DrawBarLabeled(currentHP, maxHP, hpBarX, hpBarY, hpBarW, 16,
+    renderer.DrawBarLabeled(currentHP, maxHP, hpBarX, hpBarY, hpBarW, 18,
                             CQColors::HpFg, CQColors::HpBg, "HP");
 
     int mpBarX = hpBarX + hpBarW + 10;
-    renderer.DrawBarLabeled(currentMP, maxMP, mpBarX, hpBarY, hpBarW, 16,
+    renderer.DrawBarLabeled(currentMP, maxMP, mpBarX, hpBarY, hpBarW, 18,
                             CQColors::ManaFg, CQColors::ManaBg, "MP");
 
     // XP bar
     int xpBarX = barX + 10;
-    int xpBarY = y + 44;
+    int xpBarY = y + 46;
     int xpBarW = barW - 20;
     if (maxXP > 0)
-        renderer.DrawBarLabeled(currentXP, maxXP, xpBarX, xpBarY, xpBarW, 14,
+        renderer.DrawBarLabeled(currentXP, maxXP, xpBarX, xpBarY, xpBarW, 18,
                                 CQColors::XpFg, CQColors::XpBg, "XP");
     else
         renderer.DrawText("MAX LEVEL", xpBarX, xpBarY, 12, CQColors::TextGold);
 
     // Mastery bar
-    int masteryBarY = y + 60;
+    int masteryBarY = y + 68;
     if (masteryMaxXP > 0)
-        renderer.DrawBarLabeled(masteryXP, masteryMaxXP, barX + 10, masteryBarY, barW - 20, 12,
+        renderer.DrawBarLabeled(masteryXP, masteryMaxXP, barX + 10, masteryBarY, barW - 20, 14,
                                 CQColors::Gold, CQColors::GoldDim, "Mastery Lv" + std::to_string(masteryLevel) + " - " + masterySkillName);
     else if (masteryLevel > 0)
         DrawText(("Mastery Lv" + std::to_string(masteryLevel) + " - " + masterySkillName).c_str(), barX + 10, masteryBarY, 12, CQColors::TextGold);
 
     // Character Mastery bar
     if (charMasteryMaxXP > 0)
-        renderer.DrawBarLabeled(charMasteryXP, charMasteryMaxXP, barX + 10, masteryBarY + 14, barW - 20, 12,
+        renderer.DrawBarLabeled(charMasteryXP, charMasteryMaxXP, barX + 10, y + 84, barW - 20, 14,
                                 {180, 140, 220, 255}, {60, 40, 80, 255}, "Char Mastery Lv" + std::to_string(charMasteryLevel));
     else if (charMasteryLevel > 0)
-        DrawText(("Char Mastery Lv" + std::to_string(charMasteryLevel)).c_str(), barX + 10, masteryBarY + 14, 12, {180, 140, 220, 255});
+        DrawText(("Char Mastery Lv" + std::to_string(charMasteryLevel)).c_str(), barX + 10, y + 84, 12, {180, 140, 220, 255});
 }

@@ -4,6 +4,12 @@ project(RPG)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Default to Release build for performance
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
+
 # Disable PIE to avoid linker issues with raylib static library
 set(CMAKE_POSITION_INDEPENDENT_CODE OFF)
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -no-pie")

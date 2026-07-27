@@ -14,6 +14,7 @@ void HolySmite::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().wisdom / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(1);
     ResetCooldown();
@@ -77,6 +78,7 @@ void Smite::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().wisdom / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
@@ -110,6 +112,7 @@ void HolyNova::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().wisdom) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     caster.RestoreHealth(50 + caster.GetStats().wisdom / 2 + GetTotalHealBonus());
     GainXP(3);
@@ -129,6 +132,7 @@ void DivineWrath::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().wisdom * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(4);
     ResetCooldown();
@@ -177,6 +181,7 @@ void HolySmiteII::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().wisdom / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(1);
     ResetCooldown();
@@ -210,6 +215,7 @@ void SmiteUndead::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().wisdom / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
@@ -258,6 +264,7 @@ void Purify::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().wisdom / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     caster.RestoreHealth(25 + (caster.GetStats().wisdom / 3) + GetTotalHealBonus());
     GainXP(2);
@@ -292,6 +299,7 @@ void HolyFire::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + caster.GetStats().wisdom + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
@@ -310,6 +318,7 @@ void ConsecratedGround::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().wisdom / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     caster.RestoreHealth(35 + (caster.GetStats().wisdom / 3) + GetTotalHealBonus());
     GainXP(3);
@@ -359,6 +368,7 @@ void Judgement::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().wisdom * 3 / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -393,6 +403,7 @@ void Exorcism::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().wisdom * 3 / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -411,6 +422,7 @@ void DivineHurricane::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().wisdom * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -429,6 +441,7 @@ void Penance::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().wisdom * 3 / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     caster.RestoreHealth(50 + (caster.GetStats().wisdom / 2) + GetTotalHealBonus());
     GainXP(3);
@@ -464,6 +477,7 @@ void HolyPrism::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().wisdom * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -497,6 +511,7 @@ void CelestialJudgment::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().wisdom * 5 / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();

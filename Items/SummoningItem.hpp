@@ -11,6 +11,7 @@
 class SummoningItem : public Item
 {
 public:
+    static constexpr ItemType ClassType = ItemType::Summoning;
     SummoningItem(const std::string& name, const std::string& bossName,
                   std::function<std::shared_ptr<Monster>()> factory, int rarity = 5)
         : Item(name, ItemType::Summoning, rarity), bossName(bossName),

@@ -246,7 +246,7 @@ void Game::InitializeAreas()
 
         areas.emplace_back("Chronos Depths",
             "The final frontier — a wound in reality where time itself has been broken.",
-            10, std::vector<Dungeon>{ chronos }, std::vector<int>{8});
+            10, std::vector<Dungeon>{ chronos }, std::vector<int>{8, 10});
     }
 
     // ---- Forbidden Citadel (Area 11) — Boss-only gauntlet, requires Chronos defeated ----
@@ -392,6 +392,8 @@ void Game::Run()
 
 void Game::AddFloatingText(const std::string& text, float x, float y, Color color, int fontSize)
 {
+    constexpr int MAX_FLOATING_TEXTS = 50;
+    if (static_cast<int>(floatingTexts.size()) >= MAX_FLOATING_TEXTS) return;
     floatingTexts.emplace_back(text, x, y, color, fontSize);
 }
 
@@ -406,7 +408,8 @@ void Game::DrawFloatingTexts()
 
         if (ft.life <= 0.0f)
         {
-            floatingTexts.erase(floatingTexts.begin() + i);
+            floatingTexts[i] = std::move(floatingTexts.back());
+            floatingTexts.pop_back();
             continue;
         }
 
@@ -432,6 +435,10 @@ void Game::DrawFloatingTexts()
 
 void Game::AddParticleBurst(float x, float y, Color color, int count)
 {
+    constexpr int MAX_PARTICLES = 200;
+    int space = MAX_PARTICLES - static_cast<int>(particles.size());
+    if (space <= 0) return;
+    count = std::min(count, space);
     for (int i = 0; i < count; ++i)
     {
         float angle = static_cast<float>(GetRandomValue(0, 360)) * DEG2RAD;
@@ -479,7 +486,8 @@ void Game::DrawParticles()
 
         if (p.life <= 0.0f)
         {
-            particles.erase(particles.begin() + i);
+            particles[i] = std::move(particles.back());
+            particles.pop_back();
             continue;
         }
 
@@ -528,7 +536,8 @@ void Game::DrawAchievementNotifications()
 
         if (n.life <= 0.0f)
         {
-            achNotifications.erase(achNotifications.begin() + i);
+            achNotifications[i] = std::move(achNotifications.back());
+            achNotifications.pop_back();
             continue;
         }
 
@@ -583,7 +592,8 @@ void Game::DrawTutorialHints()
 
         if (h.life <= 0.0f)
         {
-            tutorialHints.erase(tutorialHints.begin() + i);
+            tutorialHints[i] = std::move(tutorialHints.back());
+            tutorialHints.pop_back();
             continue;
         }
 
@@ -630,7 +640,8 @@ void Game::DrawQuestRewardNotifications()
 
         if (n.life <= 0.0f)
         {
-            questRewardNotifications.erase(questRewardNotifications.begin() + i);
+            questRewardNotifications[i] = std::move(questRewardNotifications.back());
+            questRewardNotifications.pop_back();
             continue;
         }
 
@@ -875,12 +886,21 @@ void Game::StateExplore()
     renderer.DrawText("Difficulty: " + std::to_string(areas[currentAreaIndex].difficulty),
                       20, 180, 14, CQColors::TextDim);
 
+    std::vector<std::string> labels = {
+        "Explore Area", "Travel", "Quests",
+        "Inventory", "Stats", "Jobs",
+        "Skills", "Skill Upgrades", "Crafting", "Pray",
+        "Shop", "Rest at Inn", "Evolution", "Codex", "Achievements", "Reputation", "Pets", "Job Quests", "Chain Crafting", "Escort", "Save Game", "Main Menu"
+    };
+    const int dungeonFocusId = static_cast<int>(labels.size());
+    const int npcFocusId = dungeonFocusId + 1;
+
     // Dungeon button if available
     int extraButtons = 0;
     if (currentAreaIndex == 10 && chronosDefeated)
     {
         // Forbidden Citadel — boss select
-        if (renderer.Button("Face the Citadel", GRenderer::W - 240, 60, 220, 38, 15))
+        if (renderer.Button("Face the Citadel", GRenderer::W - 240, 60, 220, 38, dungeonFocusId))
         {
             citadelSelectedBoss = -1;
             currentState = GameState::CitadelBossSelect;
@@ -889,13 +909,13 @@ void Game::StateExplore()
     }
     else if (!areas[currentAreaIndex].dungeons.empty())
     {
-        if (renderer.Button("Enter Dungeon", GRenderer::W - 240, 60, 220, 38, 15))
+        if (renderer.Button("Enter Dungeon", GRenderer::W - 240, 60, 220, 38, dungeonFocusId))
             currentState = GameState::DungeonSelect;
         extraButtons++;
     }
 
     // NPC button
-    if (renderer.Button("Talk to NPC", 20, 220, 150, 36, 15 + extraButtons))
+    if (renderer.Button("Talk to NPC", 20, 220, 150, 36, npcFocusId))
     {
         // Get NPCs for current area (up to 3 NPCs per area)
         NPC npc("", NPCDialogue{}, -1);
@@ -912,18 +932,11 @@ void Game::StateExplore()
         StartNPCDialogue(npc);
     }
 
-    std::vector<std::string> labels = {
-        "Explore Area", "Travel", "Quests",
-        "Inventory", "Stats", "Jobs",
-        "Skills", "Skill Upgrades", "Crafting", "Pray",
-        "Shop", "Rest at Inn", "Evolution", "Codex", "Achievements", "Reputation", "Pets", "Job Quests", "Chain Crafting", "Escort", "Save Game", "Main Menu"
-    };
-
     int bx = GRenderer::W - 240;
     int by = 100;
     int btnH = 34;
     int btnSpacing = 36;
-    keyboardNav.SetFocusCount(static_cast<int>(labels.size()) + extraButtons);
+    keyboardNav.SetFocusCount(static_cast<int>(labels.size()) + extraButtons + 1);
     for (size_t i = 0; i < labels.size(); ++i)
     {
         if (renderer.Button(labels[i], bx, by + static_cast<int>(i) * btnSpacing, 220, btnH, static_cast<int>(i)))
@@ -1253,6 +1266,7 @@ void Game::StateDungeonComplete()
     {
         questsChecked = false;
         dungeonCompleted = false;
+        keyboardNav.SetFocus(22);
         currentState = GameState::Exploring;
     }
 }
@@ -1461,7 +1475,7 @@ static std::string SlotLabel(const std::string& slot, const std::shared_ptr<Item
     if (!setName.empty())
         s += " [" + setName + "]";
 
-    if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
+    if (auto oh = item_cast<Offhand>(item))
     {
         s += " (" + std::string(OffhandTypeName(oh->offhandType)) + ")";
         if (oh->defense > 0) s += " DEF:" + std::to_string(oh->defense);
@@ -1469,19 +1483,19 @@ static std::string SlotLabel(const std::string& slot, const std::shared_ptr<Item
         if (oh->manaBonus > 0) s += " MP:" + std::to_string(oh->manaBonus);
         if (oh->arcaneDamage > 0) s += " [Arcane:" + std::to_string(oh->arcaneDamage) + "]";
     }
-    else if (auto w = std::dynamic_pointer_cast<Weapon>(item))
+    else if (auto w = item_cast<Weapon>(item))
     {
         s += " (DMG:" + std::to_string(w->damage) + ")";
         if (w->element != ElementType::Physical)
             s += " [" + std::string(ElementName(w->element)) + ":" + std::to_string(w->elementDamage) + "]";
     }
-    else if (auto a = std::dynamic_pointer_cast<Armor>(item))
+    else if (auto a = item_cast<Armor>(item))
     {
         s += " (DEF:" + std::to_string(a->defense) + ")";
         for (const auto& [elem, val] : a->elementalResist)
             s += " [" + std::string(ElementName(elem)) + "Res:" + std::to_string(val) + "]";
     }
-    else if (auto ac = std::dynamic_pointer_cast<Accessory>(item))
+    else if (auto ac = item_cast<Accessory>(item))
     {
         s += " (HP:" + std::to_string(ac->bonusHealth) + " MP:" + std::to_string(ac->bonusMana) + ")";
         if (ac->element != ElementType::Physical)
@@ -1737,7 +1751,7 @@ void Game::StateInventory()
         }
         else if (item->type == ItemType::Resource)
         {
-            auto res = std::dynamic_pointer_cast<Resource>(item);
+            auto res = item_cast<Resource>(item);
             actionCountPerItem[idx] = (res && res->healAmount > 0) ? 2 : 1; // Eat+D or D
         }
     }
@@ -1827,14 +1841,14 @@ void Game::StateInventory()
 
             // Line 2: Stats summary (dim)
             std::string stats;
-            if (auto w = std::dynamic_pointer_cast<Weapon>(item))
+            if (auto w = item_cast<Weapon>(item))
             {
                 stats = std::string(WeaponTypeName(w->weaponType)) + " | DMG:" + std::to_string(w->damage);
                 if (w->element != ElementType::Physical)
                     stats += " | " + std::string(ElementName(w->element)) + ":" + std::to_string(w->elementDamage);
                 if (w->manaCost > 0) stats += " | MP:" + std::to_string(w->manaCost);
             }
-            else if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
+            else if (auto oh = item_cast<Offhand>(item))
             {
                 stats = std::string(OffhandTypeName(oh->offhandType));
                 if (oh->defense > 0) stats += " | DEF:" + std::to_string(oh->defense);
@@ -1842,7 +1856,7 @@ void Game::StateInventory()
                 if (oh->manaBonus > 0) stats += " | MP:" + std::to_string(oh->manaBonus);
                 if (oh->arcaneDamage > 0) stats += " | Arcane:" + std::to_string(oh->arcaneDamage);
             }
-            else if (auto a = std::dynamic_pointer_cast<Armor>(item))
+            else if (auto a = item_cast<Armor>(item))
             {
                 std::string pn;
                 switch (a->piece) {
@@ -1856,7 +1870,7 @@ void Game::StateInventory()
                 for (const auto& [elem, val] : a->elementalResist)
                     stats += " | " + std::string(ElementName(elem)) + " Res:" + std::to_string(val);
             }
-            else if (auto ac = std::dynamic_pointer_cast<Accessory>(item))
+            else if (auto ac = item_cast<Accessory>(item))
             {
                 stats = "Accessory";
                 if (ac->bonusHealth > 0) stats += " | HP:" + std::to_string(ac->bonusHealth);
@@ -1864,15 +1878,15 @@ void Game::StateInventory()
                 if (ac->element != ElementType::Physical)
                     stats += " | " + std::string(ElementName(ac->element)) + ":" + std::to_string(ac->elementDamage);
             }
-            else if (auto con = std::dynamic_pointer_cast<Consumable>(item))
+            else if (auto con = item_cast<Consumable>(item))
             {
                 stats = con->GetDescription();
             }
-            else if (auto sum = std::dynamic_pointer_cast<SummoningItem>(item))
+            else if (auto sum = item_cast<SummoningItem>(item))
             {
                 stats = "Summon " + sum->bossName;
             }
-            else if (auto res = std::dynamic_pointer_cast<Resource>(item))
+            else if (auto res = item_cast<Resource>(item))
             {
                 stats = "Resource";
                 if (res->healAmount > 0) stats += " | Heals:" + std::to_string(res->healAmount);
@@ -1902,43 +1916,43 @@ void Game::StateInventory()
                 tip += "\nRarity: " + std::string(RarityName(static_cast<Rarity>(item->rarity)));
                 if (item->requiredLevel > 1)
                     tip += "\nReq. Level: " + std::to_string(item->requiredLevel);
-                if (auto w = std::dynamic_pointer_cast<Weapon>(item))
+                if (auto w = item_cast<Weapon>(item))
                 {
                     tip += "\nDamage: " + std::to_string(w->damage);
                     tip += "\nWeapon: " + std::string(WeaponTypeName(w->weaponType));
                     if (w->element != ElementType::Physical)
                         tip += "\n" + std::string(ElementName(w->element)) + " Damage: " + std::to_string(w->elementDamage);
                 }
-                else if (auto a = std::dynamic_pointer_cast<Armor>(item))
+                else if (auto a = item_cast<Armor>(item))
                 {
                     tip += "\nDefense: " + std::to_string(a->defense);
                     for (const auto& [elem, val] : a->elementalResist)
                         if (val > 0) tip += "\n" + std::string(ElementName(elem)) + " Resist: " + std::to_string(val);
                 }
-                else if (auto ac = std::dynamic_pointer_cast<Accessory>(item))
+                else if (auto ac = item_cast<Accessory>(item))
                 {
                     if (ac->bonusHealth > 0) tip += "\n+" + std::to_string(ac->bonusHealth) + " HP";
                     if (ac->bonusMana > 0) tip += "\n+" + std::to_string(ac->bonusMana) + " MP";
                     if (ac->element != ElementType::Physical)
                         tip += "\n" + std::string(ElementName(ac->element)) + " Damage: " + std::to_string(ac->elementDamage);
                 }
-                else if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
+                else if (auto oh = item_cast<Offhand>(item))
                 {
                     if (oh->defense > 0) tip += "\nDefense: " + std::to_string(oh->defense);
                     if (oh->damageBonus > 0) tip += "\nDamage: +" + std::to_string(oh->damageBonus);
                     if (oh->manaBonus > 0) tip += "\n+" + std::to_string(oh->manaBonus) + " MP";
                     if (oh->arcaneDamage > 0) tip += "\nArcane: " + std::to_string(oh->arcaneDamage);
                 }
-                else if (auto con = std::dynamic_pointer_cast<Consumable>(item))
+                else if (auto con = item_cast<Consumable>(item))
                 {
                     tip += "\n" + con->GetDescription();
                 }
-                else if (auto sum = std::dynamic_pointer_cast<SummoningItem>(item))
+                else if (auto sum = item_cast<SummoningItem>(item))
                 {
                     tip += "\n" + sum->GetDescription();
                     tip += "\nUse from Explore to start the fight";
                 }
-                else if (auto res = std::dynamic_pointer_cast<Resource>(item))
+                else if (auto res = item_cast<Resource>(item))
                 {
                     if (res->healAmount > 0) tip += "\nHeals: " + std::to_string(res->healAmount) + " HP";
                     if (res->manaAmount > 0) tip += "\nRestores: " + std::to_string(res->manaAmount) + " MP";
@@ -1982,7 +1996,7 @@ void Game::StateInventory()
             }
             else if (item->type == ItemType::Consumable)
             {
-                auto con = std::dynamic_pointer_cast<Consumable>(item);
+                auto con = item_cast<Consumable>(item);
                 if (con && renderer.Button("Use", btnX, btnY, 50, 22, itemFocusIdx++))
                 {
                     con->Use(*player);
@@ -1997,7 +2011,7 @@ void Game::StateInventory()
             }
             else if (item->type == ItemType::Summoning)
             {
-                auto sum = std::dynamic_pointer_cast<SummoningItem>(item);
+                auto sum = item_cast<SummoningItem>(item);
                 if (sum && renderer.Button("Summon", btnX, btnY, 60, 22, itemFocusIdx++))
                 {
                     auto boss = sum->bossFactory();
@@ -2015,7 +2029,7 @@ void Game::StateInventory()
             else if (item->type == ItemType::Resource)
             {
                 // Check if this resource is edible (has healing properties, e.g. fish)
-                auto res = std::dynamic_pointer_cast<Resource>(item);
+                auto res = item_cast<Resource>(item);
                 if (res && res->healAmount > 0)
                 {
                     if (renderer.Button("Eat", btnX, btnY, 50, 22, itemFocusIdx++))
@@ -2088,17 +2102,17 @@ void Game::StateInventory()
         std::shared_ptr<Item> equippedItem = nullptr;
         std::string slotName;
 
-        if (auto w = std::dynamic_pointer_cast<Weapon>(selectedItem))
+        if (auto w = item_cast<Weapon>(selectedItem))
         {
             equippedItem = eq.weapon;
             slotName = "Weapon";
         }
-        else if (auto oh = std::dynamic_pointer_cast<Offhand>(selectedItem))
+        else if (auto oh = item_cast<Offhand>(selectedItem))
         {
             equippedItem = eq.offhand;
             slotName = "Offhand";
         }
-        else if (auto a = std::dynamic_pointer_cast<Armor>(selectedItem))
+        else if (auto a = item_cast<Armor>(selectedItem))
         {
             switch (a->piece) {
                 case ArmorPiece::Helmet: equippedItem = eq.helmet; slotName = "Helmet"; break;
@@ -2108,7 +2122,7 @@ void Game::StateInventory()
                 case ArmorPiece::Boots:  equippedItem = eq.boots;  slotName = "Boots"; break;
             }
         }
-        else if (auto ac = std::dynamic_pointer_cast<Accessory>(selectedItem))
+        else if (auto ac = item_cast<Accessory>(selectedItem))
         {
             // Check which ring slot or amulet
             if (!eq.ring1) { equippedItem = nullptr; slotName = "Ring 1 (empty)"; }
@@ -2126,14 +2140,14 @@ void Game::StateInventory()
             compY += 20;
 
             // Show equipped item stats
-            if (auto ew = std::dynamic_pointer_cast<Weapon>(equippedItem))
+            if (auto ew = item_cast<Weapon>(equippedItem))
             {
                 std::string info = equippedItem->name + " - DMG:" + std::to_string(ew->damage);
                 if (ew->element != ElementType::Physical)
                     info += " [" + std::string(ElementName(ew->element)) + ":" + std::to_string(ew->elementDamage) + "]";
                 renderer.DrawText(info, compX, compY, 14, RarityColor(static_cast<Rarity>(equippedItem->rarity)));
             }
-            else if (auto eoh = std::dynamic_pointer_cast<Offhand>(equippedItem))
+            else if (auto eoh = item_cast<Offhand>(equippedItem))
             {
                 std::string info = equippedItem->name;
                 if (eoh->defense > 0) info += " - DEF:" + std::to_string(eoh->defense);
@@ -2142,14 +2156,14 @@ void Game::StateInventory()
                 if (eoh->arcaneDamage > 0) info += " [Arcane:" + std::to_string(eoh->arcaneDamage) + "]";
                 renderer.DrawText(info, compX, compY, 14, RarityColor(static_cast<Rarity>(equippedItem->rarity)));
             }
-            else if (auto ea = std::dynamic_pointer_cast<Armor>(equippedItem))
+            else if (auto ea = item_cast<Armor>(equippedItem))
             {
                 std::string info = equippedItem->name + " - DEF:" + std::to_string(ea->defense);
                 for (const auto& [elem, val] : ea->elementalResist)
                     info += " [" + std::string(ElementName(elem)) + "Res:" + std::to_string(val) + "]";
                 renderer.DrawText(info, compX, compY, 14, RarityColor(static_cast<Rarity>(equippedItem->rarity)));
             }
-            else if (auto eac = std::dynamic_pointer_cast<Accessory>(equippedItem))
+            else if (auto eac = item_cast<Accessory>(equippedItem))
             {
                 std::string info = equippedItem->name + " - HP:" + std::to_string(eac->bonusHealth)
                     + " MP:" + std::to_string(eac->bonusMana);
@@ -2171,14 +2185,14 @@ void Game::StateInventory()
             // Show new item stats
             renderer.DrawText("New Item:", compX + 300, panelY + 35, 14, CQColors::TextDim);
             int newCompY = panelY + 55;
-            if (auto nw = std::dynamic_pointer_cast<Weapon>(selectedItem))
+            if (auto nw = item_cast<Weapon>(selectedItem))
             {
                 std::string info = selectedItem->name + " - DMG:" + std::to_string(nw->damage);
                 if (nw->element != ElementType::Physical)
                     info += " [" + std::string(ElementName(nw->element)) + ":" + std::to_string(nw->elementDamage) + "]";
                 renderer.DrawText(info, compX + 300, newCompY, 14, selectedRarityColor);
             }
-            else if (auto noh = std::dynamic_pointer_cast<Offhand>(selectedItem))
+            else if (auto noh = item_cast<Offhand>(selectedItem))
             {
                 std::string info = selectedItem->name;
                 if (noh->defense > 0) info += " - DEF:" + std::to_string(noh->defense);
@@ -2187,14 +2201,14 @@ void Game::StateInventory()
                 if (noh->arcaneDamage > 0) info += " [Arcane:" + std::to_string(noh->arcaneDamage) + "]";
                 renderer.DrawText(info, compX + 300, newCompY, 14, selectedRarityColor);
             }
-            else if (auto na = std::dynamic_pointer_cast<Armor>(selectedItem))
+            else if (auto na = item_cast<Armor>(selectedItem))
             {
                 std::string info = selectedItem->name + " - DEF:" + std::to_string(na->defense);
                 for (const auto& [elem, val] : na->elementalResist)
                     info += " [" + std::string(ElementName(elem)) + "Res:" + std::to_string(val) + "]";
                 renderer.DrawText(info, compX + 300, newCompY, 14, selectedRarityColor);
             }
-            else if (auto nac = std::dynamic_pointer_cast<Accessory>(selectedItem))
+            else if (auto nac = item_cast<Accessory>(selectedItem))
             {
                 std::string info = selectedItem->name + " - HP:" + std::to_string(nac->bonusHealth)
                     + " MP:" + std::to_string(nac->bonusMana);
@@ -2218,14 +2232,14 @@ void Game::StateInventory()
             compY += 20;
 
             // Show new item stats
-            if (auto nw = std::dynamic_pointer_cast<Weapon>(selectedItem))
+            if (auto nw = item_cast<Weapon>(selectedItem))
             {
                 std::string info = "New: " + selectedItem->name + " - DMG:" + std::to_string(nw->damage);
                 if (nw->element != ElementType::Physical)
                     info += " [" + std::string(ElementName(nw->element)) + ":" + std::to_string(nw->elementDamage) + "]";
                 renderer.DrawText(info, compX, compY, 14, selectedRarityColor);
             }
-            else if (auto noh = std::dynamic_pointer_cast<Offhand>(selectedItem))
+            else if (auto noh = item_cast<Offhand>(selectedItem))
             {
                 std::string info = "New: " + selectedItem->name;
                 if (noh->defense > 0) info += " - DEF:" + std::to_string(noh->defense);
@@ -2234,14 +2248,14 @@ void Game::StateInventory()
                 if (noh->arcaneDamage > 0) info += " [Arcane:" + std::to_string(noh->arcaneDamage) + "]";
                 renderer.DrawText(info, compX, compY, 14, selectedRarityColor);
             }
-            else if (auto na = std::dynamic_pointer_cast<Armor>(selectedItem))
+            else if (auto na = item_cast<Armor>(selectedItem))
             {
                 std::string info = "New: " + selectedItem->name + " - DEF:" + std::to_string(na->defense);
                 for (const auto& [elem, val] : na->elementalResist)
                     info += " [" + std::string(ElementName(elem)) + "Res:" + std::to_string(val) + "]";
                 renderer.DrawText(info, compX, compY, 14, selectedRarityColor);
             }
-            else if (auto nac = std::dynamic_pointer_cast<Accessory>(selectedItem))
+            else if (auto nac = item_cast<Accessory>(selectedItem))
             {
                 std::string info = "New: " + selectedItem->name + " - HP:" + std::to_string(nac->bonusHealth)
                     + " MP:" + std::to_string(nac->bonusMana);
@@ -2339,26 +2353,26 @@ void Game::StateInventory()
         {
             line += s.item->name;
             // Append key stat inline
-            if (auto w = std::dynamic_pointer_cast<Weapon>(s.item))
+            if (auto w = item_cast<Weapon>(s.item))
             {
                 line += " DMG:" + std::to_string(w->damage);
                 if (w->element != ElementType::Physical)
                     line += " " + std::string(ElementName(w->element)) + ":" + std::to_string(w->elementDamage);
             }
-            else if (auto oh = std::dynamic_pointer_cast<Offhand>(s.item))
+            else if (auto oh = item_cast<Offhand>(s.item))
             {
                 if (oh->defense > 0) line += " DEF:" + std::to_string(oh->defense);
                 if (oh->damageBonus > 0) line += " DMG:" + std::to_string(oh->damageBonus);
                 if (oh->manaBonus > 0) line += " MP:" + std::to_string(oh->manaBonus);
                 if (oh->arcaneDamage > 0) line += " [Arcane:" + std::to_string(oh->arcaneDamage) + "]";
             }
-            else if (auto a = std::dynamic_pointer_cast<Armor>(s.item))
+            else if (auto a = item_cast<Armor>(s.item))
             {
                 line += " DEF:" + std::to_string(a->defense);
                 for (const auto& [elem, val] : a->elementalResist)
                     line += " " + std::string(ElementName(elem)) + ":" + std::to_string(val);
             }
-            else if (auto ac = std::dynamic_pointer_cast<Accessory>(s.item))
+            else if (auto ac = item_cast<Accessory>(s.item))
             {
                 line += " HP:" + std::to_string(ac->bonusHealth) + " MP:" + std::to_string(ac->bonusMana);
                 if (ac->element != ElementType::Physical)
@@ -3137,7 +3151,7 @@ void Game::StateSkillLoadout()
             skillIndices.push_back(static_cast<int>(i));
     }
 
-    const int skillsPerPage = 10;
+    const int skillsPerPage = 7;
     int totalSkills = static_cast<int>(skillIndices.size());
     int maxPage = (totalSkills > 0) ? ((totalSkills - 1) / skillsPerPage) : 0;
     if (skillLoadoutPage < 0) skillLoadoutPage = 0;
@@ -4075,20 +4089,20 @@ void Game::StateShop()
             if (item->requiredLevel > 1)
                 tip += "\nReq. Level: " + std::to_string(item->requiredLevel);
             tip += "\nPrice: " + std::to_string(price) + "g";
-            if (auto w = std::dynamic_pointer_cast<Weapon>(item))
+            if (auto w = item_cast<Weapon>(item))
             {
                 tip += "\nDamage: " + std::to_string(w->damage);
                 tip += "\nWeapon: " + std::string(WeaponTypeName(w->weaponType));
                 if (w->element != ElementType::Physical)
                     tip += "\n" + std::string(ElementName(w->element)) + " Damage: " + std::to_string(w->elementDamage);
             }
-            else if (auto a = std::dynamic_pointer_cast<Armor>(item))
+            else if (auto a = item_cast<Armor>(item))
             {
                 tip += "\nDefense: " + std::to_string(a->defense);
                 for (const auto& [elem, val] : a->elementalResist)
                     if (val > 0) tip += "\n" + std::string(ElementName(elem)) + " Resist: " + std::to_string(val);
             }
-            else if (auto con = std::dynamic_pointer_cast<Consumable>(item))
+            else if (auto con = item_cast<Consumable>(item))
             {
                 tip += "\n" + con->GetDescription();
             }
@@ -4248,7 +4262,7 @@ void Game::StateAreaSelect()
     positions[9] = { 824, 580 };
     // Row 4: node 10 (Forbidden Citadel)
     if (static_cast<int>(areas.size()) > 10)
-        positions[10] = { 512, 700 };
+        positions[10] = { 512, 660 };
 
     float nodeRadius = 28.0f;
     int currentNode = currentAreaIndex;
@@ -4584,7 +4598,8 @@ void Game::StateCombat()
 
     // Draw the new photo-based battle screen
     bool isBoss = false;
-    auto mon = std::dynamic_pointer_cast<Monster>(currentEnemy);
+    // Already verified Monster type
+    auto mon = std::static_pointer_cast<Monster>(currentEnemy);
     if (mon && mon->IsBoss())
         isBoss = true;
 
@@ -4656,7 +4671,7 @@ void Game::StateCombat()
         else
             roomInfo += " (Enemy " + std::to_string(currentRoomEnemyIndex + 1)
                 + "/" + std::to_string(roomQueue.size()) + ")";
-        renderer.DrawText(roomInfo, 30, layout.playerBarY - 16, 14, CQColors::TextGold);
+        renderer.DrawText(roomInfo, 30, layout.abilityY - 18, 14, CQColors::TextGold);
     }
 
     // Actions - draw on top of the battle screen
@@ -4778,7 +4793,7 @@ void Game::StateCombat()
                 itemFocusCount++;
             else if (item->type == ItemType::Resource)
             {
-                auto res = std::dynamic_pointer_cast<Resource>(item);
+                auto res = item_cast<Resource>(item);
                 if (res && res->healAmount > 0)
                     itemFocusCount++;
             }
@@ -4799,7 +4814,7 @@ void Game::StateCombat()
             }
             else if (item->type == ItemType::Resource)
             {
-                auto res = std::dynamic_pointer_cast<Resource>(item);
+                auto res = item_cast<Resource>(item);
                 if (res && res->healAmount > 0)
                 {
                     usable = true;
@@ -4816,7 +4831,7 @@ void Game::StateCombat()
                 }
                 else if (item->type == ItemType::Resource)
                 {
-                    auto res = std::dynamic_pointer_cast<Resource>(item);
+                    auto res = item_cast<Resource>(item);
                     if (res)
                     {
                         if (res->healAmount > 0) player->RestoreHealth(res->healAmount);
@@ -5042,7 +5057,8 @@ void Game::DoPlayerAttack(CombatAction action, int skillIdx)
         AddFloatingText("DEFEATED!", 680.0f, 110.0f, GOLD, 28);
         AddParticleBurst(680.0f, 140.0f, GOLD, 20);
         AddParticleBurst(GRenderer::W - 134.0f, 52.0f, GOLD, 15);
-        auto mon = std::dynamic_pointer_cast<Monster>(currentEnemy);
+        // Already verified Monster type
+        auto mon = std::static_pointer_cast<Monster>(currentEnemy);
         if (mon)
             ProcessVictory(mon);
         combatPhase = CombatPhase::Victory;
@@ -5081,7 +5097,8 @@ void Game::DoPlayerAttack(CombatAction action, int skillIdx)
                 AddCombatLog(currentEnemy->GetName() + " has been defeated by your pet!");
                 AddFloatingText("DEFEATED!", 680.0f, 110.0f, GOLD, 28);
                 AddParticleBurst(680.0f, 140.0f, GOLD, 20);
-                auto mon = std::dynamic_pointer_cast<Monster>(currentEnemy);
+                // Already verified Monster type
+                auto mon = std::static_pointer_cast<Monster>(currentEnemy);
                 if (mon)
                     ProcessVictory(mon);
                 combatPhase = CombatPhase::Victory;
@@ -5102,7 +5119,7 @@ void Game::DoPlayerUseItem(int inventoryIndex)
     auto item = inv.GetItem(inventoryIndex);
     if (!item || item->type != ItemType::Consumable) return;
 
-    auto con = std::dynamic_pointer_cast<Consumable>(item);
+    auto con = item_cast<Consumable>(item);
     if (!con) return;
 
     int hpBefore = player->GetCurrentHealth();
@@ -5132,7 +5149,8 @@ void Game::DoPlayerUseItem(int inventoryIndex)
     if (!currentEnemy->IsAlive())
     {
         AddCombatLog(currentEnemy->GetName() + " has been defeated!");
-        auto mon = std::dynamic_pointer_cast<Monster>(currentEnemy);
+        // Already verified Monster type
+        auto mon = std::static_pointer_cast<Monster>(currentEnemy);
         if (mon)
             ProcessVictory(mon);
         combatPhase = CombatPhase::Victory;
@@ -5189,7 +5207,8 @@ void Game::DoPlayerUseItem(int inventoryIndex)
             if (!currentEnemy->IsAlive())
             {
                 AddCombatLog(currentEnemy->GetName() + " has been defeated by your pet!");
-                auto mon = std::dynamic_pointer_cast<Monster>(currentEnemy);
+                // Already verified Monster type
+                auto mon = std::static_pointer_cast<Monster>(currentEnemy);
                 if (mon)
                     ProcessVictory(mon);
                 combatPhase = CombatPhase::Victory;
@@ -5229,11 +5248,11 @@ void Game::DoPlayerGodAbility(int abilityIndex)
     if (!currentEnemy->IsAlive())
     {
         AddCombatLog(currentEnemy->GetName() + " has been defeated!");
-        auto mon = std::dynamic_pointer_cast<Monster>(currentEnemy);
+        // Already verified Monster type
+        auto mon = std::static_pointer_cast<Monster>(currentEnemy);
         if (mon)
             ProcessVictory(mon);
         combatPhase = CombatPhase::Victory;
-        return;
     }
 
     // Pet auto-attack after god ability
@@ -5286,7 +5305,8 @@ void Game::DoPlayerGodAbility(int abilityIndex)
             if (!currentEnemy->IsAlive())
         {
             AddCombatLog(currentEnemy->GetName() + " has been defeated by your pet!");
-            auto mon = std::dynamic_pointer_cast<Monster>(currentEnemy);
+            // Already verified Monster type
+            auto mon = std::static_pointer_cast<Monster>(currentEnemy);
         if (mon)
             ProcessVictory(mon);
         lastUsedSkillIdx = -1;
@@ -5306,7 +5326,8 @@ void Game::DoEnemyTurn()
     int playerHpBefore = player->GetCurrentHealth();
     int enemyHpBefore = currentEnemy->GetCurrentHealth();
 
-    auto monster = std::dynamic_pointer_cast<Monster>(currentEnemy);
+    // Already verified Monster type
+    auto monster = std::static_pointer_cast<Monster>(currentEnemy);
     EnemyAIType aiType = monster ? monster->GetAIType() : EnemyAIType::Balanced;
     
     CombatAction ea = CombatAction::Attack;
@@ -5409,7 +5430,8 @@ void Game::DoEnemyTurn()
         AddCombatLog(currentEnemy->GetName() + " has been defeated by poison!");
         AddFloatingText("DEFEATED!", 680.0f, 110.0f, GOLD, 28);
         AddParticleBurst(680.0f, 140.0f, GOLD, 20);
-        auto mon = std::dynamic_pointer_cast<Monster>(currentEnemy);
+        // Already verified Monster type
+        auto mon = std::static_pointer_cast<Monster>(currentEnemy);
         if (mon)
             ProcessVictory(mon);
         combatPhase = CombatPhase::Victory;
@@ -5876,13 +5898,13 @@ void Game::SaveGamePrompt()
     for (int i = 0; i < SaveGameManager::SLOT_COUNT; ++i)
     {
         bool focused = keyboardNav.IsFocused(i);
-        bool hover = renderer.IsMouseInRect(200, sy, GRenderer::W - 400, 60);
+        bool hover = renderer.IsMouseInRect(200, sy, GRenderer::W - 400, 50);
         Color bg = (hover || focused) ? CQColors::BtnHover : CQColors::BgPanel;
-        renderer.DrawRect(200, sy, GRenderer::W - 400, 60, bg);
-        renderer.DrawRectLines(200, sy, GRenderer::W - 400, 60, slots[i].occupied ? CQColors::Gold : CQColors::BorderLight, 1);
+        renderer.DrawRect(200, sy, GRenderer::W - 400, 50, bg);
+        renderer.DrawRectLines(200, sy, GRenderer::W - 400, 50, slots[i].occupied ? CQColors::Gold : CQColors::BorderLight, 1);
         if (focused)
-            renderer.DrawFocusHighlight(200, sy, GRenderer::W - 400, 60);
-        renderer.DrawText("Slot " + std::to_string(i + 1), 215, sy + 5, 18, CQColors::TextGold);
+            renderer.DrawFocusHighlight(200, sy, GRenderer::W - 400, 50);
+        renderer.DrawText("Slot " + std::to_string(i + 1), 215, sy + 3, 16, CQColors::TextGold);
         if (slots[i].occupied)
         {
             std::string cn;
@@ -5894,13 +5916,13 @@ void Game::SaveGamePrompt()
                 case CharacterClass::Merchant: cn = "Merchant"; break;
             }
             renderer.DrawText(slots[i].playerName + " - Lv." + std::to_string(slots[i].level) + " " + cn,
-                              215, sy + 30, 14, CQColors::TextLight);
+                              215, sy + 25, 13, CQColors::TextLight);
         }
         else
         {
-            renderer.DrawText("Empty", 215, sy + 30, 14, CQColors::TextDim);
+            renderer.DrawText("Empty", 215, sy + 25, 13, CQColors::TextDim);
         }
-        if ((hover && renderer.IsMouseClickedOn(200, sy, GRenderer::W - 400, 60))
+        if ((hover && renderer.IsMouseClickedOn(200, sy, GRenderer::W - 400, 50))
             || (focused && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE))))
         {
             if (slots[i].occupied)
@@ -5925,9 +5947,9 @@ void Game::SaveGamePrompt()
         }
         if (saveConfirmSlot == i + 1)
         {
-            renderer.DrawText("Click again to OVERWRITE", 215 + 300, sy + 30, 12, CQColors::TextRed);
+            renderer.DrawText("Click again to OVERWRITE", 215 + 300, sy + 25, 11, CQColors::TextRed);
         }
-        sy += 68;
+        sy += 55;
     }
     if (renderer.Button("Cancel", renderer.CenterX(120), sy + 10, 120, 40, SaveGameManager::SLOT_COUNT))
     {
@@ -5947,13 +5969,13 @@ void Game::LoadGamePrompt()
     for (int i = 0; i < SaveGameManager::SLOT_COUNT; ++i)
     {
         bool focused = keyboardNav.IsFocused(i);
-        bool hover = renderer.IsMouseInRect(200, sy, GRenderer::W - 400, 60);
+        bool hover = renderer.IsMouseInRect(200, sy, GRenderer::W - 400, 50);
         Color bg = (hover || focused) ? CQColors::BtnHover : CQColors::BgPanel;
-        renderer.DrawRect(200, sy, GRenderer::W - 400, 60, bg);
-        renderer.DrawRectLines(200, sy, GRenderer::W - 400, 60, slots[i].occupied ? CQColors::Gold : CQColors::BorderLight, 1);
+        renderer.DrawRect(200, sy, GRenderer::W - 400, 50, bg);
+        renderer.DrawRectLines(200, sy, GRenderer::W - 400, 50, slots[i].occupied ? CQColors::Gold : CQColors::BorderLight, 1);
         if (focused)
-            renderer.DrawFocusHighlight(200, sy, GRenderer::W - 400, 60);
-        renderer.DrawText("Slot " + std::to_string(i + 1), 215, sy + 5, 18, CQColors::TextGold);
+            renderer.DrawFocusHighlight(200, sy, GRenderer::W - 400, 50);
+        renderer.DrawText("Slot " + std::to_string(i + 1), 215, sy + 3, 16, CQColors::TextGold);
         if (slots[i].occupied)
         {
             std::string cn;
@@ -5965,8 +5987,8 @@ void Game::LoadGamePrompt()
                 case CharacterClass::Merchant: cn = "Merchant"; break;
             }
             renderer.DrawText(slots[i].playerName + " - Lv." + std::to_string(slots[i].level) + " " + cn,
-                              215, sy + 30, 14, CQColors::TextLight);
-            if ((hover && renderer.IsMouseClickedOn(200, sy, GRenderer::W - 400, 60))
+                              215, sy + 25, 13, CQColors::TextLight);
+            if ((hover && renderer.IsMouseClickedOn(200, sy, GRenderer::W - 400, 50))
                 || (focused && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_SPACE))))
             {
                 LoadFromSlot(i + 1);
@@ -5975,9 +5997,9 @@ void Game::LoadGamePrompt()
         }
         else
         {
-            renderer.DrawText("Empty", 215, sy + 30, 14, CQColors::TextDim);
+            renderer.DrawText("Empty", 215, sy + 25, 13, CQColors::TextDim);
         }
-        sy += 68;
+        sy += 55;
     }
     if (renderer.Button("Back", renderer.CenterX(120), sy + 10, 120, 40, SaveGameManager::SLOT_COUNT))
         currentState = GameState::MainMenu;
@@ -5986,7 +6008,7 @@ void Game::LoadGamePrompt()
 void Game::SaveToSlot(int slot)
 {
     if (!player) { currentState = GameState::Exploring; return; }
-    if (saveManager.SaveGame(player, slot, currentAreaIndex, religion, achievementSystem, reputationSystem, petManager, wiki, chronosDefeated, citadelBossKillCounts, legendaryRecipesUnlocked))
+    if (saveManager.SaveGame(player, slot, currentAreaIndex, religion, achievementSystem, reputationSystem, petManager, wiki, chronosDefeated, citadelBossKillCounts.data(), legendaryRecipesUnlocked))
         renderer.DrawCenteredText("Game saved to Slot " + std::to_string(slot) + "!", 350, 24, CQColors::TextGreen);
     currentState = GameState::Exploring;
 }
@@ -5994,7 +6016,7 @@ void Game::SaveToSlot(int slot)
 void Game::LoadFromSlot(int slot)
 {
     bool loadedChronos = false;
-    auto loaded = saveManager.LoadGame(slot, currentAreaIndex, religion, achievementSystem, reputationSystem, petManager, wiki, loadedChronos, citadelBossKillCounts, legendaryRecipesUnlocked);
+    auto loaded = saveManager.LoadGame(slot, currentAreaIndex, religion, achievementSystem, reputationSystem, petManager, wiki, loadedChronos, citadelBossKillCounts.data(), legendaryRecipesUnlocked);
     if (loaded)
     {
         player = loaded;
@@ -7721,7 +7743,7 @@ void Game::StatePetDetail()
                 if (unlocked)
                 {
                     renderer.DrawText("[x] " + nodeName + " — " + nodeDesc, 90, y, 11, CQColors::TextGreen);
-                    y += 14;
+                    y += 16;
                 }
                 else if (pet.CanSpendSkillPoint(b, n))
                 {
@@ -7730,15 +7752,15 @@ void Game::StatePetDetail()
                     {
                         pet.SpendSkillPoint(b, n);
                     }
-                    y += 18;
+                    y += 20;
                 }
                 else
                 {
                     renderer.DrawText("[ ] " + nodeName + " — locked", 90, y, 11, CQColors::TextDim);
-                    y += 14;
+                    y += 16;
                 }
             }
-            y += 4;
+            y += 6;
         }
     }
 

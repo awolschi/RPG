@@ -243,6 +243,7 @@ public:
 class Weapon : public Item
 {
 public:
+    static constexpr ItemType ClassType = ItemType::Weapon;
     Weapon(const std::string& name, int damage, int manaCost = 0, int rarity = 1,
            ElementType element = ElementType::Physical, int elementDamage = 0,
            WeaponType weaponType = WeaponType::Sword,
@@ -271,6 +272,7 @@ public:
 class Armor : public Item
 {
 public:
+    static constexpr ItemType ClassType = ItemType::Armor;
     Armor(const std::string& name, ArmorType armorType, ArmorPiece piece, int defense, int rarity = 1,
           const std::map<ElementType, int>& elementalResist = {},
           ItemPassive passive1 = ItemPassive::None, ItemPassive passive2 = ItemPassive::None)
@@ -304,6 +306,7 @@ public:
 class Accessory : public Item
 {
 public:
+    static constexpr ItemType ClassType = ItemType::Accessory;
     Accessory(const std::string& name, int bonusHealth = 0, int bonusMana = 0, int rarity = 1,
               ElementType element = ElementType::Physical, int elementDamage = 0,
               ItemPassive passive1 = ItemPassive::None, ItemPassive passive2 = ItemPassive::None)
@@ -352,6 +355,7 @@ inline const char* OffhandTypeName(OffhandType t)
 class Offhand : public Item
 {
 public:
+    static constexpr ItemType ClassType = ItemType::Offhand;
     Offhand(const std::string& name, OffhandType offhandType, int defense, int manaBonus,
             int arcaneDamage = 0, int rarity = 1,
             ItemPassive passive1 = ItemPassive::None, ItemPassive passive2 = ItemPassive::None,
@@ -381,19 +385,43 @@ inline bool Item::IsSameAs(const Item& other) const
 {
     if (name != other.name || type != other.type || rarity != other.rarity)
         return false;
-    if (auto w = dynamic_cast<const Weapon*>(this))
-        if (auto ow = dynamic_cast<const Weapon*>(&other))
-            return w->damage == ow->damage && w->manaCost == ow->manaCost;
-    if (auto a = dynamic_cast<const Armor*>(this))
-        if (auto oa = dynamic_cast<const Armor*>(&other))
-            return a->armorType == oa->armorType && a->piece == oa->piece && a->defense == oa->defense;
-    if (auto ac = dynamic_cast<const Accessory*>(this))
-        if (auto oac = dynamic_cast<const Accessory*>(&other))
-            return ac->bonusHealth == oac->bonusHealth && ac->bonusMana == oac->bonusMana;
-    if (auto oh = dynamic_cast<const Offhand*>(this))
-        if (auto ooh = dynamic_cast<const Offhand*>(&other))
-            return oh->offhandType == ooh->offhandType && oh->defense == ooh->defense && oh->manaBonus == ooh->manaBonus && oh->damageBonus == ooh->damageBonus;
+    if (type == ItemType::Weapon)
+    {
+        auto w = static_cast<const Weapon*>(this);
+        auto ow = static_cast<const Weapon*>(&other);
+        return w->damage == ow->damage && w->manaCost == ow->manaCost;
+    }
+    if (type == ItemType::Armor)
+    {
+        auto a = static_cast<const Armor*>(this);
+        auto oa = static_cast<const Armor*>(&other);
+        return a->armorType == oa->armorType && a->piece == oa->piece && a->defense == oa->defense;
+    }
+    if (type == ItemType::Accessory)
+    {
+        auto ac = static_cast<const Accessory*>(this);
+        auto oac = static_cast<const Accessory*>(&other);
+        return ac->bonusHealth == oac->bonusHealth && ac->bonusMana == oac->bonusMana;
+    }
+    if (type == ItemType::Offhand)
+    {
+        auto oh = static_cast<const Offhand*>(this);
+        auto ooh = static_cast<const Offhand*>(&other);
+        return oh->offhandType == ooh->offhandType && oh->defense == ooh->defense && oh->manaBonus == ooh->manaBonus && oh->damageBonus == ooh->damageBonus;
+    }
     return true;
+}
+
+template<typename T>
+inline std::shared_ptr<T> item_cast(const std::shared_ptr<Item>& item)
+{
+    return (item && item->type == T::ClassType) ? std::static_pointer_cast<T>(item) : nullptr;
+}
+
+template<typename T>
+inline std::shared_ptr<const T> item_cast(const std::shared_ptr<const Item>& item)
+{
+    return (item && item->type == T::ClassType) ? std::static_pointer_cast<const T>(item) : nullptr;
 }
 
 #endif

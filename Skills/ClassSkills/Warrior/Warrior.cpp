@@ -13,6 +13,8 @@ void PowerStrike::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().strength / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 150 / 100; // 1.5x multiplier for skill vs basic attack
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(1);
     ResetCooldown();
@@ -30,8 +32,10 @@ void Whirlwind::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().strength / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 130 / 100; // 1.3x multiplier per hit
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
-    target.TakeDamage(damage / 2, caster.GetEffectiveElement(element));
+    target.TakeDamage(damage / 2, caster.GetEffectiveElement(element)); // 2nd hit at 50%
     GainXP(2);
     ResetCooldown();
 }
@@ -78,6 +82,8 @@ void ShieldBash::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().strength / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 140 / 100; // 1.4x multiplier
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
@@ -110,6 +116,8 @@ void Execute::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().strength * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 170 / 100; // 1.7x multiplier
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -127,22 +135,24 @@ void WarStomp::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().strength) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 160 / 100; // 1.6x multiplier
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.ReduceMana(25);
     GainXP(3);
     ResetCooldown();
 }
 
-std::string PowerStrike::GetDamageFormula() const { return "base/4 + STR/2 + Weapon"; }
+std::string PowerStrike::GetDamageFormula() const { return "base/4 + STR/2 + Weapon (x1.5)"; }
 int PowerStrike::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
-    return ApplyDamageBonus((baseDamage / 4) + (stats.strength / 2) + weaponDamage + elementalBonus);
+    return ApplyDamageBonus(((baseDamage / 4) + (stats.strength / 2) + weaponDamage + elementalBonus) * 150 / 100);
 }
 
-std::string Whirlwind::GetDamageFormula() const { return "base/4 + STR/3 + Weapon (2 hits, 2nd at 50%)"; }
+std::string Whirlwind::GetDamageFormula() const { return "base/4 + STR/3 + Weapon (x1.3, 2 hits, 2nd at 50%)"; }
 int Whirlwind::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
-    int hit = ApplyDamageBonus((baseDamage / 4) + (stats.strength / 3) + weaponDamage + elementalBonus);
+    int hit = ApplyDamageBonus(((baseDamage / 4) + (stats.strength / 3) + weaponDamage + elementalBonus) * 130 / 100);
     return hit + hit / 2;
 }
 
@@ -158,16 +168,16 @@ int ShieldBash::EstimateDamage(const Stats& stats, int weaponDamage, int element
 
 std::string BattleCry::GetDamageFormula() const { return "+DEF & Heal (self)"; }
 
-std::string Execute::GetDamageFormula() const { return "base/4 + STR*2 + Weapon"; }
+std::string Execute::GetDamageFormula() const { return "base/4 + STR*2 + Weapon (x1.7)"; }
 int Execute::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
-    return ApplyDamageBonus((baseDamage / 4) + (stats.strength * 2) + weaponDamage + elementalBonus);
+    return ApplyDamageBonus(((baseDamage / 4) + (stats.strength * 2) + weaponDamage + elementalBonus) * 170 / 100);
 }
 
-std::string WarStomp::GetDamageFormula() const { return "base/4 + STR + Weapon, drains 25 mana"; }
+std::string WarStomp::GetDamageFormula() const { return "base/4 + STR + Weapon (x1.6), drains 25 mana"; }
 int WarStomp::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
-    return ApplyDamageBonus((baseDamage / 4) + stats.strength + weaponDamage + elementalBonus);
+    return ApplyDamageBonus(((baseDamage / 4) + stats.strength + weaponDamage + elementalBonus) * 160 / 100);
 }
 
 Cleave::Cleave() : Skill("Cleave", 10, 1, 45, 2)
@@ -182,15 +192,17 @@ void Cleave::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().strength / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 135 / 100; // 1.35x multiplier
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(1);
     ResetCooldown();
 }
 
-std::string Cleave::GetDamageFormula() const { return "base/4 + STR/3 + Weapon"; }
+std::string Cleave::GetDamageFormula() const { return "base/4 + STR/3 + Weapon (x1.35)"; }
 int Cleave::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
-    return ApplyDamageBonus((baseDamage / 4) + (stats.strength / 3) + weaponDamage + elementalBonus);
+    return ApplyDamageBonus(((baseDamage / 4) + (stats.strength / 3) + weaponDamage + elementalBonus) * 135 / 100);
 }
 
 ShieldWall::ShieldWall() : Skill("Shield Wall", 12, 3, 0, 5)
@@ -239,15 +251,17 @@ void HammerSlam::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().strength / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 140 / 100; // 1.4x multiplier
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
 }
 
-std::string HammerSlam::GetDamageFormula() const { return "base/4 + STR/2 + Weapon"; }
+std::string HammerSlam::GetDamageFormula() const { return "base/4 + STR/2 + Weapon (x1.4)"; }
 int HammerSlam::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
-    return ApplyDamageBonus((baseDamage / 4) + (stats.strength / 2) + weaponDamage + elementalBonus);
+    return ApplyDamageBonus(((baseDamage / 4) + (stats.strength / 2) + weaponDamage + elementalBonus) * 140 / 100);
 }
 
 VictoryRush::VictoryRush() : Skill("Victory Rush", 15, 2, 50, 12)
@@ -262,16 +276,18 @@ void VictoryRush::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().strength / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 140 / 100; // 1.4x multiplier
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     caster.RestoreHealth(20 + caster.GetStats().vitality / 3 + GetTotalHealBonus());
     GainXP(2);
     ResetCooldown();
 }
 
-std::string VictoryRush::GetDamageFormula() const { return "base/4 + STR/3 + Weapon + Heal"; }
+std::string VictoryRush::GetDamageFormula() const { return "base/4 + STR/3 + Weapon (x1.4) + Heal"; }
 int VictoryRush::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
-    return ApplyDamageBonus((baseDamage / 4) + (stats.strength / 3) + weaponDamage + elementalBonus);
+    return ApplyDamageBonus(((baseDamage / 4) + (stats.strength / 3) + weaponDamage + elementalBonus) * 140 / 100);
 }
 
 Charge::Charge() : Skill("Charge", 18, 3, 65, 14)
@@ -286,15 +302,17 @@ void Charge::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().strength / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 155 / 100; // 1.55x multiplier
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
 }
 
-std::string Charge::GetDamageFormula() const { return "base/4 + STR/2 + Weapon"; }
+std::string Charge::GetDamageFormula() const { return "base/4 + STR/2 + Weapon (x1.55)"; }
 int Charge::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
-    return ApplyDamageBonus((baseDamage / 4) + (stats.strength / 2) + weaponDamage + elementalBonus);
+    return ApplyDamageBonus(((baseDamage / 4) + (stats.strength / 2) + weaponDamage + elementalBonus) * 155 / 100);
 }
 
 CleaveStrike::CleaveStrike() : Skill("Cleave Strike", 22, 2, 75, 16)
@@ -309,15 +327,17 @@ void CleaveStrike::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().strength / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 150 / 100; // 1.5x multiplier
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
 }
 
-std::string CleaveStrike::GetDamageFormula() const { return "base/4 + STR/2 + Weapon"; }
+std::string CleaveStrike::GetDamageFormula() const { return "base/4 + STR/2 + Weapon (x1.5)"; }
 int CleaveStrike::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
-    return ApplyDamageBonus((baseDamage / 4) + (stats.strength / 2) + weaponDamage + elementalBonus);
+    return ApplyDamageBonus(((baseDamage / 4) + (stats.strength / 2) + weaponDamage + elementalBonus) * 150 / 100);
 }
 
 Intimidate::Intimidate() : Skill("Intimidate", 20, 4, 0, 18)
@@ -349,15 +369,17 @@ void BerserkerRage::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().strength * 3 / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 180 / 100; // 1.8x multiplier
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
 }
 
-std::string BerserkerRage::GetDamageFormula() const { return "base/4 + STR*1.5 + Weapon"; }
+std::string BerserkerRage::GetDamageFormula() const { return "base/4 + STR*1.5 + Weapon (x1.8)"; }
 int BerserkerRage::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
-    return ApplyDamageBonus((baseDamage / 4) + (stats.strength * 3 / 2) + weaponDamage + elementalBonus);
+    return ApplyDamageBonus(((baseDamage / 4) + (stats.strength * 3 / 2) + weaponDamage + elementalBonus) * 180 / 100);
 }
 
 Intercept::Intercept() : Skill("Intercept", 25, 3, 80, 24)
@@ -372,15 +394,17 @@ void Intercept::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + caster.GetStats().strength + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 165 / 100; // 1.65x multiplier
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
 }
 
-std::string Intercept::GetDamageFormula() const { return "base/4 + STR + Weapon"; }
+std::string Intercept::GetDamageFormula() const { return "base/4 + STR + Weapon (x1.65)"; }
 int Intercept::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
-    return ApplyDamageBonus((baseDamage / 4) + stats.strength + weaponDamage + elementalBonus);
+    return ApplyDamageBonus(((baseDamage / 4) + stats.strength + weaponDamage + elementalBonus) * 165 / 100);
 }
 
 Fortress::Fortress() : Skill("Fortress", 30, 5, 0, 26)
@@ -412,15 +436,17 @@ void ShieldCharge::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + caster.GetStats().strength + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 170 / 100; // 1.7x multiplier
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
 }
 
-std::string ShieldCharge::GetDamageFormula() const { return "base/4 + STR + Weapon"; }
+std::string ShieldCharge::GetDamageFormula() const { return "base/4 + STR + Weapon (x1.7)"; }
 int ShieldCharge::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
-    return ApplyDamageBonus((baseDamage / 4) + stats.strength + weaponDamage + elementalBonus);
+    return ApplyDamageBonus(((baseDamage / 4) + stats.strength + weaponDamage + elementalBonus) * 170 / 100);
 }
 
 Devastate::Devastate() : Skill("Devastate", 40, 4, 120, 32)
@@ -435,15 +461,17 @@ void Devastate::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().strength * 3 / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 190 / 100; // 1.9x multiplier
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
 }
 
-std::string Devastate::GetDamageFormula() const { return "base/4 + STR*1.5 + Weapon"; }
+std::string Devastate::GetDamageFormula() const { return "base/4 + STR*1.5 + Weapon (x1.9)"; }
 int Devastate::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
-    return ApplyDamageBonus((baseDamage / 4) + (stats.strength * 3 / 2) + weaponDamage + elementalBonus);
+    return ApplyDamageBonus(((baseDamage / 4) + (stats.strength * 3 / 2) + weaponDamage + elementalBonus) * 190 / 100);
 }
 
 Warbanner::Warbanner() : Skill("Warbanner", 35, 5, 0, 34)
@@ -475,15 +503,17 @@ void ColossusStrike::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().strength * 3 / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 200 / 100; // 2.0x multiplier
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
 }
 
-std::string ColossusStrike::GetDamageFormula() const { return "base/4 + STR*1.5 + Weapon"; }
+std::string ColossusStrike::GetDamageFormula() const { return "base/4 + STR*1.5 + Weapon (x2.0)"; }
 int ColossusStrike::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
-    return ApplyDamageBonus((baseDamage / 4) + (stats.strength * 3 / 2) + weaponDamage + elementalBonus);
+    return ApplyDamageBonus(((baseDamage / 4) + (stats.strength * 3 / 2) + weaponDamage + elementalBonus) * 200 / 100);
 }
 
 Rampage::Rampage() : Skill("Rampage", 50, 5, 160, 38)
@@ -498,15 +528,17 @@ void Rampage::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().strength * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 220 / 100; // 2.2x multiplier
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
 }
 
-std::string Rampage::GetDamageFormula() const { return "base/4 + STR*2 + Weapon"; }
+std::string Rampage::GetDamageFormula() const { return "base/4 + STR*2 + Weapon (x2.2)"; }
 int Rampage::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
-    return ApplyDamageBonus((baseDamage / 4) + (stats.strength * 2) + weaponDamage + elementalBonus);
+    return ApplyDamageBonus(((baseDamage / 4) + (stats.strength * 2) + weaponDamage + elementalBonus) * 220 / 100);
 }
 
 TitansGrip::TitansGrip() : Skill("Titan's Grip", 65, 6, 250, 50)
@@ -521,13 +553,15 @@ void TitansGrip::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().strength * 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
+    damage = damage * 250 / 100; // 2.5x multiplier
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
 }
 
-std::string TitansGrip::GetDamageFormula() const { return "base/4 + STR*3 + Weapon"; }
+std::string TitansGrip::GetDamageFormula() const { return "base/4 + STR*3 + Weapon (x2.5)"; }
 int TitansGrip::EstimateDamage(const Stats& stats, int weaponDamage, int elementalBonus) const
 {
-    return ApplyDamageBonus((baseDamage / 4) + (stats.strength * 3) + weaponDamage + elementalBonus);
+    return ApplyDamageBonus(((baseDamage / 4) + (stats.strength * 3) + weaponDamage + elementalBonus) * 250 / 100);
 }

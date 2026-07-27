@@ -14,7 +14,7 @@ namespace RNG
     inline int Next(int n)
     {
         if (n <= 0) return 0;
-        return std::uniform_int_distribution<int>(0, n - 1)(Engine());
+        return static_cast<int>(Engine()() % static_cast<unsigned>(n));
     }
 
     inline int Percent()

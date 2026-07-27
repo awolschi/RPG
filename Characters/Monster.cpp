@@ -30,7 +30,8 @@ void Monster::ScaleStats(int multiplier)
     stats.intelligence *= multiplier;
     stats.wisdom *= multiplier;
     stats.dexterity *= multiplier;
-    stats.defense *= multiplier;
+    float defScale = 1.0f + (multiplier - 1) * 0.3f;
+    stats.defense = static_cast<int>(stats.defense * defScale);
     currentHealth = stats.health;
     currentMana = stats.mana;
     experienceReward *= multiplier;

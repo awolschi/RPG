@@ -45,8 +45,6 @@ public:
     int GetElementalDamage(ElementType element) const;
     int GetElementalReduction(ElementType element) const;
 
-    // List equipment into a vector of strings (for display)
-    void ListEquipment(std::vector<std::string>& out) const;
 };
 
 #endif

@@ -1,0 +1,259 @@
+SAVE_VERSION 15
+TestHero_Merchant
+4
+0
+50 0
+698 404
+698 404 53 104 104 106 54 54
+206 999999
+1|0|Overseer's Cleaver|5|250|-1|6|0|W|335|5|0|60|1|1
+1|0|Pitchfork of the Fields|5|250|-1|19|0|W|330|0|0|60|5|1
+1|0|Rusty Spellgrimoire|5|250|-1|32|0|W|340|30|0|60|6|1
+1|0|Briarwood Staff|5|250|1|1|0|W|360|60|1|90|3|1
+1|0|Thornwhip|5|250|-1|5|0|W|350|10|5|85|4|1
+1|0|Living Root Bow|5|250|-1|28|0|W|355|15|5|80|2|1
+1|0|Tidecaller's Staff|5|250|2|2|0|W|380|70|2|95|3|1
+1|0|Kraken's Grip|5|250|2|45|0|W|365|40|2|90|5|1
+1|0|Inkshot Longbow|5|250|-1|10|0|W|370|20|0|60|2|1
+1|0|Staff of the Eternal Flame|5|250|3|1|0|W|420|90|1|110|3|1
+1|0|Dragonbone Wand|5|250|3|41|0|W|400|100|1|105|6|1
+1|0|Fang of the Elder|5|250|3|10|0|W|430|10|1|90|0|1
+1|0|Drake's Eye Scepter|5|250|-1|45|0|W|390|80|6|100|8|1
+1|0|Warlord's Decree|5|250|-1|3|0|W|430|80|3|100|3|1
+1|0|Blade of the Aran|5|250|4|7|0|W|450|5|0|60|0|1
+1|0|Warbringer's Mace|5|250|4|23|0|W|410|60|6|95|5|1
+1|0|Siegebow of Aran|5|250|-1|8|0|W|435|20|0|60|2|1
+1|0|Wand of the Void|5|250|5|34|32|W|480|120|4|120|6|1
+1|0|Null-Staff|5|250|5|4|0|W|465|100|4|115|3|1
+1|0|Soulreaper's Scythe|5|250|5|12|0|W|500|15|4|90|1|1
+1|0|Voidchaser Bow|5|250|-1|10|0|W|485|25|4|85|2|1
+1|0|Staff of Radiant Truth|5|250|6|41|45|W|535|110|6|115|3|1
+1|0|Scepter of Judgment|5|250|6|45|0|W|510|100|6|120|8|1
+1|0|Blade of Dawn|5|250|6|7|21|W|550|15|6|95|0|1
+1|0|Celestial Longbow|5|250|-1|10|0|W|530|30|6|90|2|1
+1|0|Archmage Staff|5|250|7|0|0|W|600|100|4|110|3|1
+1|0|Titan's Greatsword|5|250|7|0|0|W|650|20|0|90|0|1
+1|0|Divine Scepter|5|250|7|0|0|W|580|80|6|100|8|1
+1|0|Shadowstrike Bow|5|250|7|0|0|W|620|30|5|95|2|1
+1|0|Gilded Blade|5|250|7|0|0|W|600|40|1|85|0|1
+1|0|Archmage Orb|5|250|7|33|0|W|530|200|4|110|8|1
+1|0|Tome of Infinite Spells|5|250|8|42|0|W|560|150|4|105|6|1
+1|0|Construct's Core Staff|5|250|8|4|33|W|610|130|4|125|3|1
+1|0|Arcane Shard Dagger|5|250|-1|10|0|W|590|20|4|100|4|1
+1|0|Staff of Collapsed Timelines|5|250|9|44|41|W|640|150|4|135|3|1
+1|0|Chronoweaver Wand|5|250|9|2|35|W|620|160|2|120|6|1
+1|0|Temporal Greatsword|5|250|-1|10|7|W|680|20|0|100|0|1
+1|0|Epoch Bow|5|250|-1|8|10|W|650|35|3|105|2|1
+1|0|Coinlord's Cudgel|5|250|17|51|0|W|340|15|0|70|5|1
+1|0|Auctioneer's Blade|5|250|-1|9|51|W|440|25|0|80|0|1
+1|0|Ledger of Endless Wealth|5|250|-1|33|50|W|500|140|4|100|6|1
+1|0|Ironclad Warblade|5|250|14|7|19|W|460|20|0|60|0|1
+1|0|Abyssal Cleaver|5|250|-1|18|7|W|445|15|2|80|1|1
+1|0|Thunderstrike Mace|5|250|-1|23|20|W|450|25|3|75|5|1
+1|0|Earthenbreaker|5|250|-1|7|18|W|600|30|0|70|7|1
+1|0|Arbiter's Mace|5|250|15|45|22|W|500|35|6|90|5|1
+1|0|Scepter of the Faithful|5|250|-1|33|31|W|400|60|6|105|8|1
+1|0|Staff of Benediction|5|250|-1|41|14|W|530|80|6|110|3|1
+1|0|Mace of the Penance|5|250|-1|18|11|W|580|40|6|95|5|1
+1|0|Windrunner's Bow|5|250|16|10|8|W|450|10|0|60|2|1
+1|0|Venomfang Recurve|5|250|-1|5|8|W|435|15|5|90|2|1
+1|0|Nightblade's Fang|5|250|-1|10|16|W|480|20|4|80|4|1
+1|0|Stormstring Longbow|5|250|-1|7|8|W|445|12|3|80|2|1
+1|0|Innkeeper's Key|5|250|-1|22|51|W|570|20|6|75|4|1
+1|0|Abyssal Sentinel's Edge|5|250|-1|10|16|W|400|20|4|125|0|1
+1|0|Void Empress's Grimoire|5|250|-1|42|33|W|365|50|4|160|6|1
+1|0|Colossus Breaker|5|250|-1|7|18|W|440|15|1|95|5|1
+1|0|Frostbound Requiem|5|250|-1|2|14|W|340|60|2|135|3|1
+1|0|Thunderlord's Decree|5|250|-1|8|3|W|370|10|3|150|2|1
+1|0|Plaguebearer's Kiss|5|250|-1|5|12|W|365|5|5|155|4|1
+1|0|Radiant Arbiter's Blade|5|250|-1|45|22|W|395|25|6|130|5|1
+1|0|Chrono Shatter|5|250|-1|41|44|W|390|65|4|185|3|1
+1|0|Monarch's Ruin|5|250|-1|7|10|W|475|20|4|120|1|1
+1|0|The Unbroken Oath|5|250|-1|31|18|W|445|30|6|155|5|1
+1|1|Scarecrow's Hood|5|250|-1|15|0|A|0|0|62|1|1|25|1
+1|1|Straw-Filled Vest|5|250|-1|17|0|A|0|1|65|1|2|23|1
+1|1|Work-Worn Gloves|5|250|-1|9|0|A|0|2|58|0|1
+1|1|Fieldwalker Boots|5|250|-1|21|0|A|0|4|57|0|1
+1|1|Crown of Thorns|5|250|1|20|0|A|0|0|68|1|1|28|1
+1|1|Barkheart Chestguard|5|250|1|18|0|A|2|1|75|1|2|26|1
+1|1|Mantle of the Wild|5|250|1|13|0|A|0|1|66|1|1|30|1
+1|1|Sapweave Gloves|5|250|-1|11|0|A|0|2|60|1|5|28|1
+1|1|Rootwalker Leggings|5|250|-1|15|0|A|0|3|62|1|2|25|1
+1|1|Seedkeeper Boots|5|250|1|21|0|A|0|4|59|1|5|26|1
+1|1|Abyssal Helm|5|250|2|17|0|A|2|0|72|1|2|32|1
+1|1|Tide-Sworn Robes|5|250|2|34|0|A|0|1|68|1|2|34|1
+1|1|Mantle of the Deep|5|250|-1|22|0|A|0|1|67|1|2|30|1
+1|1|Tentacle-Woven Bracers|5|250|-1|9|0|A|0|2|61|1|3|28|1
+1|1|Pressure-Tossed Leggings|5|250|-1|15|0|A|0|3|64|1|2|26|1
+1|1|Coral Stalkers|5|250|2|24|0|A|0|4|60|1|2|28|1
+1|1|Dragonhide Helm|5|250|3|18|0|A|2|0|88|1|1|45|1
+1|1|Drakefire Cowl|5|250|3|14|0|A|0|0|78|1|1|42|1
+1|1|Scales of the Eternal|5|250|3|20|0|A|2|1|95|2|1|40|2|35|1
+1|1|Mantle of Living Flame|5|250|-1|46|0|A|0|1|80|1|1|44|1
+1|1|Gauntlets of the Brood|5|250|-1|7|0|A|2|2|74|1|1|38|1
+1|1|Dragonclaw Boots|5|250|-1|16|0|A|0|4|72|1|1|36|1
+1|1|Warlord's Helm|5|250|4|27|0|A|2|0|100|1|3|40|1
+1|1|Mantle of the Battle-Mage|5|250|-1|35|0|A|0|1|92|1|3|42|1
+1|1|Battle-Hardened Plate|5|250|4|18|0|A|2|1|110|1|3|38|1
+1|1|Bracers of Command|5|250|-1|9|0|A|2|2|83|1|3|36|1
+1|1|Greaves of Conquest|5|250|4|6|0|A|2|3|85|0|1
+1|1|Warboots of the Vanguard|5|250|4|22|0|A|2|4|81|0|1
+1|1|Void-Touched Hood|5|250|5|36|0|A|0|0|100|1|4|58|1
+1|1|Helm of the Null Knight|5|250|5|18|0|A|2|0|112|1|4|54|1
+1|1|Void Shroud|5|250|5|14|0|A|0|1|104|1|4|56|1
+1|1|Voidforged Plate|5|250|-1|20|0|A|2|1|122|1|4|50|1
+1|1|Null-Grip Gauntlets|5|250|5|16|0|A|0|2|94|1|4|48|1
+1|1|Shadowthread Leggings|5|250|-1|43|0|A|0|3|96|1|4|46|1
+1|1|Voidstep Treads|5|250|5|24|0|A|0|4|93|1|4|50|1
+1|1|Halo of Ascension|5|250|6|14|0|A|0|0|112|1|6|56|1
+1|1|Helm of the Fallen Seraph|5|250|6|18|27|A|2|0|124|1|6|52|1
+1|1|Raiment of the Celestial Choir|5|250|6|22|0|A|0|1|116|1|6|58|1
+1|1|Mantle of Divine Light|5|250|-1|35|0|A|0|1|114|1|6|54|1
+1|1|Seraphim's Grace Gloves|5|250|6|11|0|A|0|2|105|1|6|50|1
+1|1|Sandals of the Ascended|5|250|6|31|0|A|0|4|104|1|6|48|1
+1|1|Archmage Robes|5|250|7|0|0|A|0|1|135|1|4|58|1
+1|1|Crown of the Primordial|5|250|7|49|0|A|0|0|130|6|1|60|2|60|3|60|4|60|5|60|6|60|1
+1|1|Primordial Plate|5|250|-1|18|0|A|2|1|150|6|1|58|2|58|3|58|4|58|5|58|6|58|1
+1|1|Gloves of Creation|5|250|-1|12|0|A|0|2|118|6|1|56|2|56|3|56|4|56|5|56|6|56|1
+1|1|Boots of the First Age|5|250|-1|16|0|A|0|4|116|6|1|55|2|55|3|55|4|55|5|55|6|55|1
+1|1|Manaheart Crown|5|250|8|35|32|A|0|0|134|1|4|70|1
+1|1|Robes of the Infinite Weave|5|250|8|41|13|A|0|1|138|1|4|68|1
+1|1|Construct's Plated Carapace|5|250|-1|20|17|A|2|1|155|1|4|62|1
+1|1|Spell-Etched Gloves|5|250|8|43|0|A|0|2|126|1|4|60|1
+1|1|Leggings of the Arcane Path|5|250|-1|36|0|A|0|3|128|1|4|58|1
+1|1|Boots of Mana Conduit|5|250|8|38|0|A|0|4|125|1|4|62|1
+1|1|Chronolord's Helm|5|250|9|49|17|A|0|0|145|6|1|65|2|65|3|65|4|65|5|65|6|65|1
+1|1|Robes of the Timeless Weave|5|250|9|14|33|A|0|1|140|1|4|70|1
+1|1|Temporal Plate of the Infinite|5|250|-1|18|20|A|2|1|165|6|1|60|2|60|3|60|4|60|5|60|6|60|1
+1|1|Gauntlets of Frozen Time|5|250|9|29|0|A|0|2|130|6|1|58|2|58|3|58|4|58|5|58|6|58|1
+1|1|Leggings of the Void Walk|5|250|-1|16|0|A|0|3|132|1|4|62|1
+1|1|Sandals of Dimensional Rift|5|250|-1|15|24|A|0|4|128|6|1|60|2|60|3|60|4|60|5|60|6|60|1
+1|1|Frostweaver's Crown|5|250|11|0|0|A|0|0|135|1|2|60|1
+1|1|Frostweaver's Robe|5|250|11|0|0|A|0|1|140|1|2|62|1
+1|1|Coin-Lord's Crown|5|250|12|0|0|A|0|0|70|6|1|25|2|25|3|25|4|25|5|25|6|25|1
+1|1|Merchant Prince's Vest|5|250|12|0|0|A|0|1|80|6|1|28|2|28|3|28|4|28|5|28|6|28|1
+1|1|Merchant's Traveling Cloak|5|250|17|15|51|A|0|1|102|1|4|48|1
+1|1|Bullion Greaves|5|250|-1|21|51|A|2|4|64|1|2|26|1
+1|1|Gilded Bracers|5|250|-1|9|51|A|2|2|76|1|1|35|1
+1|1|Bulwark Plate|5|250|14|18|20|A|2|1|80|1|0|30|1
+1|1|Warlord's Casque|5|250|14|27|18|A|2|0|98|1|3|38|1
+1|1|Drakeplate Gauntlets|5|250|14|19|23|A|2|2|76|1|1|36|1
+1|1|Primordial Leather Vest|5|250|-1|16|6|A|1|1|122|2|0|55|3|55|1
+1|1|Vestments of the Martyr|5|250|15|22|31|A|0|1|118|1|6|62|1
+1|1|Halo of the Redeemed|5|250|15|17|33|A|0|0|110|1|6|54|1
+1|1|Gauntlets of Grace|5|250|15|21|34|A|0|2|92|1|6|48|1
+1|1|Treads of the Pilgrim|5|250|-1|49|24|A|1|4|64|1|6|26|1
+1|1|Pathfinder's Cap|5|250|16|16|9|A|1|0|64|1|5|28|1
+1|1|Wyrmhide Jerkin|5|250|16|6|15|A|1|1|80|1|1|36|1
+1|1|Shadowstalker Grips|5|250|16|9|5|A|1|2|102|1|0|45|1
+1|1|Galewalkers|5|250|-1|16|8|A|1|4|120|1|3|55|1
+1|1|Shadow Cloak|5|250|-1|16|32|A|0|1|132|1|4|62|1
+1|1|Hero's Crown|5|250|-1|18|50|A|2|0|140|1|6|60|1
+1|1|Merchant's Crown|5|250|-1|51|50|A|0|0|130|6|1|55|2|55|3|55|4|55|5|55|6|55|1
+1|1|Abyssal Aegis|5|250|-1|18|20|A|2|1|105|2|4|52|6|48|1
+1|1|Void Empress's Mantle|5|250|-1|36|14|A|0|1|78|1|4|55|1
+1|1|Stormforged Plate|5|250|-1|16|23|A|2|4|88|1|3|40|1
+1|1|Plagueveil Shroud|5|250|-1|11|49|A|1|1|90|1|5|42|1
+1|1|Chrono-Woven Wraps|5|250|-1|44|38|A|0|2|74|1|4|40|1
+1|2|Ring of the Harvest|5|250|-1|51|0|AC|140|100|0|20|1
+1|2|Pendant of the Landlord|5|250|-1|50|0|AC|130|95|0|20|1
+1|2|Ring of Living Wood|5|250|-1|48|0|AC|200|105|0|20|1
+1|2|Amulet of the Forest Heart|5|250|-1|32|0|AC|185|120|0|20|1
+1|2|Ring of the Drowned King|5|250|-1|48|0|AC|260|130|2|35|1
+1|2|Abyssal Pearl Pendant|5|250|-1|37|0|AC|245|150|2|40|1
+1|2|Ring of the Broodmother|5|250|-1|49|0|AC|370|155|1|40|1
+1|2|Heart of the Dragon|5|250|-1|12|0|AC|350|180|1|55|1
+1|2|Signet of the Warlord|5|250|-1|49|0|AC|480|180|0|20|1
+1|2|Amulet of Broken Chains|5|250|-1|23|0|AC|460|190|0|20|1
+1|2|Band of the Void Lord|5|250|-1|49|0|AC|590|230|4|45|1
+1|2|Pendant of Entropy|5|250|-1|44|0|AC|570|250|4|50|1
+1|2|Radiant Band|5|250|-1|49|0|AC|680|260|6|40|1
+1|2|Amulet of the Divine Eye|5|250|-1|33|0|AC|665|280|6|50|1
+1|2|Ring of the Primordial|5|250|7|49|0|AC|900|330|4|40|1
+1|2|Amulet of the End|5|250|-1|30|0|AC|880|350|4|45|1
+1|2|Band of the Construct|5|250|-1|49|0|AC|1090|380|4|50|1
+1|2|Pendant of the Forgotten Lore|5|250|-1|44|32|AC|1070|400|4|60|1
+1|2|Loop of Eternity|5|250|9|49|32|AC|1120|380|4|45|1
+1|2|Pendant of the Time Ender|5|250|-1|31|43|AC|1100|410|4|70|1
+1|2|Frostweaver's Focus|5|250|11|0|0|AC|1060|460|2|65|1
+1|2|Gilded Signet|5|250|12|0|0|AC|180|120|4|30|1
+1|2|Ring of the Golden Touch|5|250|17|51|50|AC|650|230|6|35|1
+1|2|Amulet of Prosperity|5|250|17|50|32|AC|1060|330|4|40|1
+1|2|Warlord's Signet|5|250|-1|20|49|AC|580|200|0|20|1
+1|2|Amulet of Iron Will|5|250|-1|23|17|AC|660|230|0|20|1
+1|2|Pendant of Devotion|5|250|-1|31|33|AC|1060|360|6|40|1
+1|2|Band of the Oathkeeper|5|250|-1|30|17|AC|250|160|6|35|1
+1|2|Ranger's Focus|5|250|-1|10|7|AC|140|95|0|30|1
+1|2|Pendant of the Hunt|5|250|-1|8|9|AC|1055|300|5|35|1
+1|2|Gatherer's Pouch|5|250|-1|51|50|AC|1040|320|0|20|1
+1|2|Explorer's Compass|5|250|-1|16|50|AC|1050|310|0|20|1
+1|2|World Map|5|250|-1|49|33|AC|1060|340|0|20|1
+1|2|Tycoon's Ring|5|250|-1|51|51|AC|1070|320|0|20|1
+1|2|Archivist's Satchel|5|250|-1|50|32|AC|1050|330|4|30|1
+1|2|Monarch's Coronet|5|250|-1|49|33|AC|280|170|4|105|1
+1|2|Unbroken Will|5|250|-1|30|17|AC|350|140|6|100|1
+1|2|Chrono Paradox|5|250|-1|41|39|AC|250|210|4|130|1
+1|6|Sentinel's Bulwark|5|250|1|18|20|OH|105|40|20|0|30|1
+1|6|Dragonfire Aegis|5|250|-1|25|18|OH|108|40|20|0|30|1
+1|6|Bulwark of the Void|5|250|-1|18|23|OH|122|40|20|0|30|1
+1|6|Titan's Ward|5|250|-1|18|20|OH|125|40|20|0|30|1
+1|6|Aegis of the Eternal|5|250|-1|31|18|OH|140|40|20|0|30|1
+1|6|Orb of Eternal Flame|5|250|-1|1|33|OH|35|105|100|1|30|1
+1|6|Glacial Heart|5|250|-1|2|14|OH|36|120|115|1|30|1
+1|6|Stormlord's Focus|5|250|-1|3|41|OH|35|108|102|1|30|1
+1|6|Voidbinder Shard|5|250|-1|42|38|OH|47|125|118|1|30|1
+1|0|Archmage's Focus|4|100|10|0|0|W|288|30|4|65|8|1
+1|6|Tome of Divine Light|5|250|-1|45|22|OH|35|105|80|2|30|1
+1|6|Gospel of the Undying|5|250|-1|31|12|OH|36|120|95|2|30|1
+1|6|Scripture of the Faithful|5|250|-1|36|14|OH|47|125|98|2|30|1
+1|6|Codex of Infinite Mercy|5|250|-1|45|35|OH|48|140|110|2|30|1
+1|6|Quiver of the Crimson Flame|5|250|-1|7|9|OH|36|40|20|4|88|1
+1|6|Quiver of the Frozen Wind|5|250|-1|10|8|OH|37|40|20|4|102|1
+1|6|Quiver of the Storm King|5|250|-1|7|8|OH|36|40|20|4|105|1
+1|6|Shadowveil Quiver|5|250|-1|10|16|OH|48|40|20|4|120|1
+1|6|Windrunner's Legacy|5|250|-1|7|10|OH|49|40|20|4|135|1
+none
+none
+none
+none
+none
+none
+none
+none
+none
+none
+1
+Common Attack|1|0|0|10|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0
+1
+Common Attack
+0
+4
+0 50 0 0 0 0 0
+0 0 0 0 0
+1 1 0 0 0 0 0
+0 0 0 0 0
+2 1 0 0 0 0 0
+0 0 0 0 0
+3 1 0 0 0 0 0
+0 0 0 0 0
+
+0
+0
+0
+0
+0 0
+||0||
+0
+
+
+
+
+0
+0 0 0 0 0 0 0 0 0 0 
+0
+0
+0
+0
+0 0 0 0 0 0 0 0 0 0 0 0 
+0
+0

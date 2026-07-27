@@ -1,5 +1,4 @@
 #include "Player.hpp"
-#include <iostream>
 #include <algorithm>
 #include "../Skills/CommonSkills/CommonAttack.hpp"
 #include "../Skills/ClassSkills/Warrior/Warrior.hpp"
@@ -25,7 +24,7 @@ Player::Player(const std::string& name, CharacterClass characterClass, Character
 
 int Player::GetBagBonus() const
 {
-    auto oh = std::dynamic_pointer_cast<Offhand>(equipment.offhand);
+    auto oh = item_cast<Offhand>(equipment.offhand);
     if (oh && oh->offhandType == OffhandType::Bag)
         return oh->defense * 2; // Each bag defense point adds 2 capacity
     return 0;
@@ -229,7 +228,7 @@ bool Player::CanEquip(const std::shared_ptr<Item>& item) const
 
     ClassData classData = ClassDatabase::Get(characterClass);
 
-    if (auto weapon = std::dynamic_pointer_cast<Weapon>(item))
+    if (auto weapon = item_cast<Weapon>(item))
     {
         for (auto wt : classData.allowedWeaponTypes)
         {
@@ -237,7 +236,7 @@ bool Player::CanEquip(const std::shared_ptr<Item>& item) const
         }
         return false;
     }
-    else if (auto armor = std::dynamic_pointer_cast<Armor>(item))
+    else if (auto armor = item_cast<Armor>(item))
     {
         for (auto at : classData.allowedArmorTypes)
         {
@@ -245,7 +244,7 @@ bool Player::CanEquip(const std::shared_ptr<Item>& item) const
         }
         return false;
     }
-    else if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
+    else if (auto oh = item_cast<Offhand>(item))
     {
         switch (oh->offhandType)
         {
@@ -275,7 +274,7 @@ bool Player::EquipItem(std::shared_ptr<Item> item)
 
     if (!CanEquip(item)) return false;
 
-    if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
+    if (auto oh = item_cast<Offhand>(item))
     {
         int oldMaxHP = GetMaxHealth();
         int oldMaxMP = GetMaxMana();
@@ -294,22 +293,22 @@ bool Player::EquipItem(std::shared_ptr<Item> item)
 
         return true;
     }
-    else if (auto weapon = std::dynamic_pointer_cast<Weapon>(item))
+    else if (auto weapon = item_cast<Weapon>(item))
     {
         if (!equipment.weapon)
         {
-            equipment.weapon = std::dynamic_pointer_cast<Weapon>(item->Clone());
+            equipment.weapon = item_cast<Weapon>(item->Clone());
         }
         else
         {
             // Replace existing weapon — old weapon goes back to inventory
             inventory.AddItem(equipment.weapon);
-            equipment.weapon = std::dynamic_pointer_cast<Weapon>(item->Clone());
+            equipment.weapon = item_cast<Weapon>(item->Clone());
         }
         inventory.RemoveOneItem(idx);
         return true;
     }
-    else if (auto armor = std::dynamic_pointer_cast<Armor>(item))
+    else if (auto armor = item_cast<Armor>(item))
     {
         std::shared_ptr<Armor>* slot = nullptr;
         switch (armor->piece)
@@ -323,25 +322,25 @@ bool Player::EquipItem(std::shared_ptr<Item> item)
         if (slot)
         {
             if (*slot) inventory.AddItem(*slot);
-            *slot = std::dynamic_pointer_cast<Armor>(item->Clone());
+            *slot = item_cast<Armor>(item->Clone());
             inventory.RemoveOneItem(idx);
             return true;
         }
     }
-    else if (auto accessory = std::dynamic_pointer_cast<Accessory>(item))
+    else if (auto accessory = item_cast<Accessory>(item))
     {
         int oldMaxHP = GetMaxHealth();
         int oldMaxMP = GetMaxMana();
 
         if (!equipment.ring1)
-            equipment.ring1 = std::dynamic_pointer_cast<Accessory>(item->Clone());
+            equipment.ring1 = item_cast<Accessory>(item->Clone());
         else if (!equipment.ring2)
-            equipment.ring2 = std::dynamic_pointer_cast<Accessory>(item->Clone());
+            equipment.ring2 = item_cast<Accessory>(item->Clone());
         else
         {
             if (equipment.amulet)
                 inventory.AddItem(equipment.amulet);
-            equipment.amulet = std::dynamic_pointer_cast<Accessory>(item->Clone());
+            equipment.amulet = item_cast<Accessory>(item->Clone());
         }
         inventory.RemoveOneItem(idx);
 
@@ -382,55 +381,6 @@ bool Player::UnequipItem(const std::string& slotName)
         }
     }
     return false;
-}
-
-void Player::ListEquipment() const
-{
-    std::cout << "\n=== EQUIPMENT ===\n";
-    auto print = [](const std::string& slot, const auto& item)
-    {
-        std::cout << slot << ": ";
-        if (item)
-        {
-            std::cout << item->name;
-            if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
-                std::cout << " (DEF:" << oh->defense << " Mana:" << oh->manaBonus << ")";
-            else if (auto w = std::dynamic_pointer_cast<Weapon>(item))
-                std::cout << " (DMG:" << w->damage << " Mana:" << w->manaCost << ")";
-            else if (auto a = std::dynamic_pointer_cast<Armor>(item))
-                std::cout << " (DEF:" << a->defense << ")";
-            else if (auto ac = std::dynamic_pointer_cast<Accessory>(item))
-                std::cout << " (HP:" << ac->bonusHealth << " Mana:" << ac->bonusMana << ")";
-        }
-        else
-            std::cout << "(empty)";
-        std::cout << "\n";
-    };
-    print("Weapon", equipment.weapon);
-    print("Offhand", equipment.offhand);
-    print("Helmet", equipment.helmet);
-    print("Chest", equipment.chest);
-    print("Gloves", equipment.gloves);
-    print("Pants", equipment.pants);
-    print("Boots", equipment.boots);
-    print("Ring 1", equipment.ring1);
-    print("Ring 2", equipment.ring2);
-    print("Amulet", equipment.amulet);
-    std::cout << "Total Defense Bonus: " << equipment.GetTotalDefense() << "\n";
-
-    int totalHP = 0, totalMana = 0;
-    auto addStats = [&](const auto& item) {
-        if (auto ac = std::dynamic_pointer_cast<Accessory>(item))
-        {
-            totalHP += ac->bonusHealth;
-            totalMana += ac->bonusMana;
-        }
-    };
-    addStats(equipment.ring1);
-    addStats(equipment.ring2);
-    addStats(equipment.amulet);
-    if (totalHP > 0 || totalMana > 0)
-        std::cout << "Accessory Bonuses: +" << totalHP << " HP, +" << totalMana << " Mana\n";
 }
 
 void Player::SetSkillLoadout(const std::vector<int>& loadout)
@@ -475,13 +425,13 @@ bool Player::IsInLoadout(int skillIndex) const
 
 void Player::CheckNewSkills()
 {
-    auto addIfMissing = [this](const std::string& name, auto factory)
+    auto addIfMissing = [this](const std::string& name, auto factory, bool forceAdd = false)
     {
         if (!skills.GetSkillByName(name))
         {
             auto skill = factory();
             skill->characterClass = characterClass;
-            if (level >= skill->requiredLevel)
+            if (forceAdd || level >= skill->requiredLevel)
             {
                 skills.AddSkill(skill);
                 return true;
@@ -495,8 +445,8 @@ void Player::CheckNewSkills()
     switch (characterClass)
     {
         case CharacterClass::Warrior:
-            learned |= addIfMissing("Power Strike", []{ return std::make_shared<PowerStrike>(); });
-            learned |= addIfMissing("Whirlwind", []{ return std::make_shared<Whirlwind>(); });
+            learned |= addIfMissing("Power Strike", []{ return std::make_shared<PowerStrike>(); }, true);
+            learned |= addIfMissing("Whirlwind", []{ return std::make_shared<Whirlwind>(); }, true);
             learned |= addIfMissing("Defensive Stance", []{ return std::make_shared<DefensiveStance>(); });
             learned |= addIfMissing("War Cry", []{ return std::make_shared<WarCry>(); });
             learned |= addIfMissing("Shield Bash", []{ return std::make_shared<ShieldBash>(); });
@@ -523,8 +473,8 @@ void Player::CheckNewSkills()
             break;
 
         case CharacterClass::Mage:
-            learned |= addIfMissing("Fireball", []{ return std::make_shared<Fireball>(); });
-            learned |= addIfMissing("Ice Bolt", []{ return std::make_shared<IceBolt>(); });
+            learned |= addIfMissing("Fireball", []{ return std::make_shared<Fireball>(); }, true);
+            learned |= addIfMissing("Ice Bolt", []{ return std::make_shared<IceBolt>(); }, true);
             learned |= addIfMissing("Arcane Bolt", []{ return std::make_shared<ArcaneBolt>(); });
             learned |= addIfMissing("Meteor", []{ return std::make_shared<Meteor>(); });
             learned |= addIfMissing("Frost Ward", []{ return std::make_shared<FrostWard>(); });
@@ -551,8 +501,8 @@ void Player::CheckNewSkills()
             break;
 
         case CharacterClass::Priest:
-            learned |= addIfMissing("Holy Smite", []{ return std::make_shared<HolySmite>(); });
-            learned |= addIfMissing("Heal", []{ return std::make_shared<Heal>(); });
+            learned |= addIfMissing("Holy Smite", []{ return std::make_shared<HolySmite>(); }, true);
+            learned |= addIfMissing("Heal", []{ return std::make_shared<Heal>(); }, true);
             learned |= addIfMissing("Mass Heal", []{ return std::make_shared<MassHeal>(); });
             learned |= addIfMissing("Divine Shield", []{ return std::make_shared<DivineShield>(); });
             learned |= addIfMissing("Smite", []{ return std::make_shared<Smite>(); });
@@ -585,7 +535,7 @@ void Player::CheckNewSkills()
             break;
 
         case CharacterClass::Archer:
-            learned |= addIfMissing("Piercing Shot", []{ return std::make_shared<PiercingShot>(); });
+            learned |= addIfMissing("Piercing Shot", []{ return std::make_shared<PiercingShot>(); }, true);
             learned |= addIfMissing("Multi Shot", []{ return std::make_shared<MultiShot>(); });
             learned |= addIfMissing("Rain of Arrows", []{ return std::make_shared<RainOfArrows>(); });
             learned |= addIfMissing("Quick Shot", []{ return std::make_shared<QuickShot>(); });
@@ -619,7 +569,7 @@ void Player::CheckNewSkills()
             break;
 
         case CharacterClass::Merchant:
-            learned |= addIfMissing("Throw Coin", []{ return std::make_shared<ThrowCoin>(); });
+            learned |= addIfMissing("Throw Coin", []{ return std::make_shared<ThrowCoin>(); }, true);
             learned |= addIfMissing("Appraise", []{ return std::make_shared<Appraise>(); });
             learned |= addIfMissing("Haggle", []{ return std::make_shared<Haggle>(); });
             learned |= addIfMissing("Bribery", []{ return std::make_shared<Bribery>(); });
@@ -633,13 +583,6 @@ void Player::CheckNewSkills()
 
     if (learned)
     {
-        std::cout << "\n* You learned new skills! *\n";
-        for (size_t i = 0; i < skills.GetSkillCount(); ++i)
-        {
-            auto s = skills.GetSkill(i);
-            if (s && s->requiredLevel == level)
-                std::cout << "  - " << s->name << "\n";
-        }
         AutoFillLoadout();
     }
 }

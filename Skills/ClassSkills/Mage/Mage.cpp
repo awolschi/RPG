@@ -18,6 +18,7 @@ void Fireball::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.ApplyEffect(EffectType::Burn, 2 + GetTotalEffectDurationBonus(), 5 + caster.GetStats().intelligence / 5 + GetTotalEffectDamageBonus(), caster.GetName());
     GainXP(1);
@@ -37,6 +38,7 @@ void IceBolt::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(1);
     ResetCooldown();
@@ -59,6 +61,7 @@ void ArcaneBolt::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence / 4) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(1);
     ResetCooldown();
@@ -81,6 +84,7 @@ void Meteor::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -122,6 +126,7 @@ void ArcaneSurge::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -143,6 +148,7 @@ void ManaSiphon::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     caster.RestoreMana(10 + caster.GetStats().intelligence / 5 + GetTotalHealBonus());
     GainXP(1);
@@ -166,6 +172,7 @@ void ChainLightning::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
@@ -188,6 +195,7 @@ void LightningBolt::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.ApplyEffect(EffectType::Stun, 1, 0, caster.GetName());
     GainXP(2);
@@ -211,6 +219,7 @@ void ArcaneMissiles::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence * 3 / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
@@ -257,6 +266,7 @@ void ManaBomb::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence * 2) + (bonus * 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -279,6 +289,7 @@ void BlazingOrb::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     caster.RestoreHealth(10 + caster.GetStats().intelligence / 6 + GetTotalHealBonus());
     GainXP(2);
@@ -302,6 +313,7 @@ void FrostNova::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.ApplyEffect(EffectType::Freeze, 1 + GetTotalEffectDurationBonus(), 0, caster.GetName());
     GainXP(2);
@@ -325,6 +337,7 @@ void ArcaneBarrage::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
@@ -347,6 +360,7 @@ void TimeWarp::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     caster.IncreaseTempDefense(6 + GetTotalDefenseBonus());
     GainXP(2);
@@ -370,6 +384,7 @@ void GlacialSpike::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence * 3 / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     double multiplier = 1.0;
     if (target.GetCurrentHealth() < target.GetStats().health / 2)
         multiplier = 1.5;
@@ -414,6 +429,7 @@ void Pyroblast::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -436,6 +452,7 @@ void Blizzard::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence * 3 / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.ReduceMana(15);
     GainXP(3);
@@ -479,6 +496,7 @@ void IceLance::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     double multiplier = 1.0;
     if (target.GetCurrentMana() < target.GetStats().mana / 2)
         multiplier = 1.6;
@@ -504,6 +522,7 @@ void Inferno::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(4);
     ResetCooldown();
@@ -526,6 +545,7 @@ void ElementalFury::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence * 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(4);
     ResetCooldown();
@@ -548,6 +568,7 @@ void ArchmageCataclysm::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().intelligence * 4) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     caster.RestoreMana(20 + GetTotalHealBonus());
     GainXP(5);

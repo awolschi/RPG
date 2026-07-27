@@ -2,7 +2,6 @@
 #include "../Inventory/Inventory.hpp"
 #include "../Achievements/Achievement.hpp"
 #include "../Engine/RNG.hpp"
-#include <iostream>
 #include <sstream>
 
 JobSystem::JobSystem()
@@ -41,19 +40,6 @@ void JobSystem::ReduceAllFatigue(int amount)
     for (auto& job : jobs)
     {
         job.ReduceFatigue(amount);
-    }
-}
-
-void JobSystem::DisplayAllJobs() const
-{
-    std::cout << "\n=== YOUR JOBS ===" << std::endl;
-    for (size_t i = 0; i < jobs.size(); ++i)
-    {
-        int required = Job::RequiredXP(jobs[i].level);
-        std::cout << i + 1 << ". ";
-        std::cout << jobs[i].GetJobName() << " - Level " << jobs[i].level
-                  << ", XP: " << jobs[i].experience << "/" << required
-                  << ", Points: " << jobs[i].jobPoints << "\n";
     }
 }
 

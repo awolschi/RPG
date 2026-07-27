@@ -1,6 +1,7 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include <array>
 #include <memory>
 #include <string>
 #include <vector>
@@ -368,7 +369,7 @@ private:
     bool chronosDefeated = false;
 
     // Citadel boss tracking
-    int citadelBossKillCounts[10] = {};
+    std::array<int, 10> citadelBossKillCounts = {};
     uint32_t legendaryRecipesUnlocked = 0;
 
     // Citadel boss state

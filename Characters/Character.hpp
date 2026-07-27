@@ -58,6 +58,7 @@ public:
 
     // Health/Mana management
     void TakeDamage(int damage, ElementType element = ElementType::Physical);
+    void TakeDamageRaw(int damage);
     void RestoreHealth(int amount);
     void RestoreMana(int amount);
     void ReduceMana(int amount);
@@ -128,9 +129,6 @@ public:
     virtual void LevelUp();
     virtual void OnOverflowXP(int /*xp*/) {}
     static int CalculateRequiredXP(int level);
-
-    // Display
-    void DisplayStats() const;
 
 protected:
     std::string name;

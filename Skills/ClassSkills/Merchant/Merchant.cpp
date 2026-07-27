@@ -19,6 +19,7 @@ void ThrowCoin::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(1);
     ResetCooldown();
@@ -67,6 +68,7 @@ void Bribery::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().wisdom / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
@@ -99,6 +101,7 @@ void CoinStorm::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 4) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
@@ -118,6 +121,7 @@ void GoldenHurricane::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(4);
     ResetCooldown();
@@ -170,6 +174,7 @@ void PurchaseOrder::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(1);
     ResetCooldown();
@@ -193,6 +198,7 @@ void AssessWeakness::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(1);
     ResetCooldown();
@@ -233,6 +239,7 @@ void MarketSwing::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(1);
     ResetCooldown();
@@ -256,6 +263,7 @@ void BulkDeal::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 4) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(1);
@@ -281,6 +289,7 @@ void Liquidate::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
@@ -304,6 +313,7 @@ void HostileTakeover::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.ReduceMana(15);
     GainXP(2);
@@ -345,6 +355,7 @@ void ShortSell::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
@@ -368,6 +379,7 @@ void PredatoryLending::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.ReduceMana(20);
     GainXP(2);
@@ -409,6 +421,7 @@ void MarginCall::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 3) / 2 + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -449,6 +462,7 @@ void MarketCrash::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 3) / 2 + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -472,6 +486,7 @@ void Taxation::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 3) / 2 + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.ReduceMana(25);
     GainXP(3);
@@ -496,6 +511,7 @@ void Plunder::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 3) / 2 + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -537,6 +553,7 @@ void FortunesFavor::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -560,6 +577,7 @@ void HostileBid::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -583,6 +601,7 @@ void EconomicCollapse::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -606,6 +625,7 @@ void Monopolize::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -629,6 +649,7 @@ void HostileMerger::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -652,6 +673,7 @@ void GoldenHandshake::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 5) / 2 + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -675,6 +697,7 @@ void LegendaryBargain::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();

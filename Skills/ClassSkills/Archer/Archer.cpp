@@ -14,6 +14,7 @@ void PiercingShot::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.ApplyEffect(EffectType::Poison, 3 + GetTotalEffectDurationBonus(), 3 + caster.GetStats().dexterity / 5 + GetTotalEffectDamageBonus(), caster.GetName());
     GainXP(1);
@@ -33,6 +34,7 @@ void MultiShot::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.TakeDamage(damage / 2, caster.GetEffectiveElement(element));
     GainXP(2);
@@ -52,6 +54,7 @@ void RainOfArrows::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.TakeDamage(damage / 2, caster.GetEffectiveElement(element));
     GainXP(3);
@@ -71,6 +74,7 @@ void QuickShot::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(1);
     ResetCooldown();
@@ -89,6 +93,7 @@ void Snipe::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
@@ -107,6 +112,7 @@ void ArrowStorm::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
@@ -126,6 +132,7 @@ void DeathMark::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(4);
     ResetCooldown();
@@ -189,6 +196,7 @@ void PoisonedArrow::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.ApplyEffect(EffectType::Poison, 2 + GetTotalEffectDurationBonus(), 3 + caster.GetStats().dexterity / 5 + GetTotalEffectDamageBonus(), caster.GetName());
     GainXP(1);
@@ -234,6 +242,7 @@ void AimedShot::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(1);
     ResetCooldown();
@@ -258,6 +267,7 @@ void Volley::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
@@ -284,6 +294,7 @@ void TrapShot::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.ApplyEffect(EffectType::Poison, 3 + GetTotalEffectDurationBonus(), 3 + caster.GetStats().dexterity / 5 + GetTotalEffectDamageBonus(), caster.GetName());
     GainXP(2);
@@ -329,6 +340,7 @@ void ExploitWeakness::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
@@ -353,6 +365,7 @@ void ConcussiveShot::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.ReduceMana(15);
     GainXP(2);
@@ -398,6 +411,7 @@ void DoubleTap::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
@@ -424,6 +438,7 @@ void ScatterShot::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
@@ -468,6 +483,7 @@ void Headshot::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 3 / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(2);
     ResetCooldown();
@@ -492,6 +508,7 @@ void Barrage::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
@@ -539,6 +556,7 @@ void StormOfBlades::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 3 / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -585,6 +603,7 @@ void RapidFire::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 3) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
@@ -612,6 +631,7 @@ void Windrunner::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -636,6 +656,7 @@ void PiercingBarrage::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
@@ -684,6 +705,7 @@ void WindArrow::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -708,6 +730,7 @@ void EaglesWrath::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 5 / 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     GainXP(3);
     ResetCooldown();
@@ -732,6 +755,7 @@ void PhantomVolley::Use(Character& caster, Character& target)
     int damage = (baseDamage / 4) + (caster.GetStats().dexterity * 2) + caster.GetWeaponDamage();
     damage += caster.GetElementalBonus(element);
     damage = ApplyDamageBonus(damage);
+    damage = ApplyCharacterMasteryBonus(damage, caster);
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.TakeDamage(damage, caster.GetEffectiveElement(element));
     target.TakeDamage(damage, caster.GetEffectiveElement(element));

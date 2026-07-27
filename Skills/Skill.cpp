@@ -175,6 +175,13 @@ int Skill::ApplyDamageBonus(int damage) const
     return damage * (100 + bonus) / 100;
 }
 
+int Skill::ApplyCharacterMasteryBonus(int damage, const Character& caster) const
+{
+    float charMasteryBonus = caster.GetMasteryDamageBonus();
+    if (charMasteryBonus <= 0.0f) return damage;
+    return damage + static_cast<int>(damage * charMasteryBonus);
+}
+
 int Skill::GetEffectiveManaCost() const
 {
     return std::max(0, manaCost - GetTotalManaCostReduction() - GetMasteryManaCostReduction());

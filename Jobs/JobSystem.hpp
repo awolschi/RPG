@@ -35,7 +35,6 @@ public:
 
     void AddJob(JobType type);
     Job& GetJob(JobType type);
-    void DisplayAllJobs() const;
     std::string WorkJob(JobType type, int hours, Inventory& inventory, AchievementSystem* achSystem = nullptr);
     std::vector<Job>& GetJobs() { return jobs; }
     void ResetAllFatigue();

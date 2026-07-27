@@ -1,6 +1,5 @@
 #include "Character.hpp"
 #include "../Items/Passives.hpp"
-#include <iostream>
 #include <algorithm>
 
 Character::Character(const std::string& name, const Stats& baseStats)
@@ -58,6 +57,14 @@ void Character::TakeDamage(int damage, ElementType element)
     mitigatedDamage = std::max(1, mitigatedDamage);
     currentHealth -= mitigatedDamage;
 
+    if (currentHealth < 0)
+        currentHealth = 0;
+}
+
+void Character::TakeDamageRaw(int damage)
+{
+    if (damage <= 0) return;
+    currentHealth -= damage;
     if (currentHealth < 0)
         currentHealth = 0;
 }
@@ -166,10 +173,8 @@ void Character::ApplyEffect(EffectType type, int duration, int potency, const st
 std::string Character::ProcessEffects()
 {
     std::string msg;
-    std::vector<size_t> toRemove;
-    for (size_t i = 0; i < effects.size(); ++i)
+    for (auto& e : effects)
     {
-        auto& e = effects[i];
         if (e.type == EffectType::Poison)
         {
             TakeDamage(e.potency);
@@ -187,11 +192,12 @@ std::string Character::ProcessEffects()
             else if (e.type == EffectType::Burn) msg += "Burn fades from " + name + ". ";
             else if (e.type == EffectType::Stun) msg += name + " recovers from stun. ";
             else if (e.type == EffectType::Freeze) msg += name + " thaws out. ";
-            toRemove.push_back(i);
         }
     }
-    for (auto it = toRemove.rbegin(); it != toRemove.rend(); ++it)
-        effects.erase(effects.begin() + *it);
+    effects.erase(
+        std::remove_if(effects.begin(), effects.end(),
+            [](const ActiveEffect& e) { return e.duration <= 0; }),
+        effects.end());
     return msg;
 }
 
@@ -260,17 +266,3 @@ void Character::LevelUp()
     // Stats increase is handled by subclasses
 }
 
-void Character::DisplayStats() const
-{
-    std::cout << "\n=== " << name << " (Level " << level << ") ===" << std::endl;
-    std::cout << "Health: " << currentHealth << "/" << GetMaxHealth() << std::endl;
-    std::cout << "Mana: " << currentMana << "/" << GetMaxMana() << std::endl;
-    std::cout << "Strength: " << stats.strength << std::endl;
-    std::cout << "Vitality: " << stats.vitality << std::endl;
-    std::cout << "Intelligence: " << stats.intelligence << std::endl;
-    std::cout << "Wisdom: " << stats.wisdom << std::endl;
-    std::cout << "Dexterity: " << stats.dexterity << std::endl;
-    std::cout << "Defense: " << stats.defense << std::endl;
-    std::cout << "Experience: " << experience << "/" << CalculateRequiredXP(level) << std::endl;
-    std::cout << "Skills: " << skills.GetSkillCount() << std::endl;
-}

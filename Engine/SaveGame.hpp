@@ -25,7 +25,7 @@ struct SaveSlotInfo
 class SaveGameManager
 {
 public:
-    static constexpr int SLOT_COUNT = 5;
+    static constexpr int SLOT_COUNT = 10;
     static constexpr int SAVE_VERSION = 15; // v15: character mastery system
 
     SaveGameManager();

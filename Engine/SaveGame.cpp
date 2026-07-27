@@ -16,6 +16,15 @@ static int SafeStoi(const std::string& s, int fallback = 0)
     catch (...) { return fallback; }
 }
 
+template<typename T>
+static bool SafeRead(std::ifstream& file, T& value, T fallback = T{})
+{
+    if (!file.good()) { value = fallback; return false; }
+    file >> value;
+    if (!file.good()) { value = fallback; return false; }
+    return true;
+}
+
 template<typename E>
 static E SafeCastEnum(int v, int maxValid, E fallback)
 {
@@ -29,27 +38,27 @@ static void SerializeItem(std::ostream& file, const std::shared_ptr<Item>& item,
     file << item->count << "|" << static_cast<int>(item->type) << "|" << item->name << "|" << item->rarity << "|" << item->sellValue
          << "|" << item->setId << "|" << static_cast<int>(item->passive1) << "|" << static_cast<int>(item->passive2);
 
-    if (auto oh = std::dynamic_pointer_cast<Offhand>(item))
+    if (auto oh = item_cast<Offhand>(item))
         file << "|OH|" << oh->defense << "|" << oh->manaBonus << "|" << oh->arcaneDamage << "|" << static_cast<int>(oh->offhandType) << "|" << oh->damageBonus;
-    else if (auto w = std::dynamic_pointer_cast<Weapon>(item))
+    else if (auto w = item_cast<Weapon>(item))
         file << "|W|" << w->damage << "|" << w->manaCost << "|" << static_cast<int>(w->element) << "|" << w->elementDamage
              << "|" << static_cast<int>(w->weaponType);
-    else if (auto a = std::dynamic_pointer_cast<Armor>(item))
+    else if (auto a = item_cast<Armor>(item))
     {
         file << "|A|" << static_cast<int>(a->armorType) << "|" << static_cast<int>(a->piece) << "|" << a->defense;
         file << "|" << a->elementalResist.size();
         for (const auto& [elem, val] : a->elementalResist)
             file << "|" << static_cast<int>(elem) << "|" << val;
     }
-    else if (auto ac = std::dynamic_pointer_cast<Accessory>(item))
+    else if (auto ac = item_cast<Accessory>(item))
         file << "|AC|" << ac->bonusHealth << "|" << ac->bonusMana << "|" << static_cast<int>(ac->element) << "|" << ac->elementDamage;
     else if (includeConsumableResource)
     {
-        if (auto c = std::dynamic_pointer_cast<Consumable>(item))
+        if (auto c = item_cast<Consumable>(item))
             file << "|C|" << c->healAmount << "|" << c->manaAmount;
-        else if (auto r = std::dynamic_pointer_cast<Resource>(item))
+        else if (auto r = item_cast<Resource>(item))
             file << "|R|" << r->tier << "|" << static_cast<int>(r->quality) << "|" << r->healAmount << "|" << r->manaAmount;
-        else if (auto s = std::dynamic_pointer_cast<SummoningItem>(item))
+        else if (auto s = item_cast<SummoningItem>(item))
             file << "|S|" << s->bossName;
     }
     file << "|" << item->requiredLevel << "\n";
@@ -412,22 +421,35 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
         std::string playerName;
         std::getline(file, playerName);
 
-        int classInt;
-        file >> classInt; file.ignore();
+        int classInt = 0;
+        SafeRead(file, classInt);
+        file.ignore();
         CharacterClass cc = SafeCastEnum<CharacterClass>(classInt, 4, CharacterClass::Warrior);
 
-        int raceInt;
-        file >> raceInt; file.ignore();
+        int raceInt = 0;
+        SafeRead(file, raceInt);
+        file.ignore();
         CharacterRace cr = SafeCastEnum<CharacterRace>(raceInt, 4, CharacterRace::Aran);
 
         auto player = std::make_shared<Player>(playerName, cc, cr);
 
-        int level, xp, hp, mana;
-        file >> level >> xp >> hp >> mana; file.ignore();
+        int level = 1, xp = 0, hp = 100, mana = 50;
+        SafeRead(file, level);
+        SafeRead(file, xp);
+        SafeRead(file, hp);
+        SafeRead(file, mana);
+        file.ignore();
 
-        Stats st;
-        file >> st.health >> st.mana >> st.strength >> st.vitality
-             >> st.intelligence >> st.wisdom >> st.dexterity >> st.defense; file.ignore();
+        Stats st = {};
+        SafeRead(file, st.health);
+        SafeRead(file, st.mana);
+        SafeRead(file, st.strength);
+        SafeRead(file, st.vitality);
+        SafeRead(file, st.intelligence);
+        SafeRead(file, st.wisdom);
+        SafeRead(file, st.dexterity);
+        SafeRead(file, st.defense);
+        file.ignore();
 
         player->SetStats(st);
         player->SetCurrentHealth(hp);
@@ -439,9 +461,11 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
         player->GetSkills().AddSkill(std::make_shared<CommonAttack>());
         player->CheckNewSkills();
 
-        size_t invCount;
-        int gold;
-        file >> invCount >> gold; file.ignore();
+        size_t invCount = 0;
+        int gold = 0;
+        SafeRead(file, invCount);
+        SafeRead(file, gold);
+        file.ignore();
         player->GetInventory().AddGold(gold);
 
         for (size_t i = 0; i < invCount; ++i)
@@ -525,21 +549,22 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
             if (item)
             {
                 // Assign to equipment slot based on index with proper casting
-                if (i == 0) player->GetEquipment().weapon = std::dynamic_pointer_cast<Weapon>(item);
+                if (i == 0) player->GetEquipment().weapon = item_cast<Weapon>(item);
                 else if (i == 1) player->GetEquipment().offhand = item;
-                else if (i == 2) player->GetEquipment().helmet = std::dynamic_pointer_cast<Armor>(item);
-                else if (i == 3) player->GetEquipment().chest = std::dynamic_pointer_cast<Armor>(item);
-                else if (i == 4) player->GetEquipment().gloves = std::dynamic_pointer_cast<Armor>(item);
-                else if (i == 5) player->GetEquipment().pants = std::dynamic_pointer_cast<Armor>(item);
-                else if (i == 6) player->GetEquipment().boots = std::dynamic_pointer_cast<Armor>(item);
-                else if (i == 7) player->GetEquipment().ring1 = std::dynamic_pointer_cast<Accessory>(item);
-                else if (i == 8) player->GetEquipment().ring2 = std::dynamic_pointer_cast<Accessory>(item);
-                else if (i == 9) player->GetEquipment().amulet = std::dynamic_pointer_cast<Accessory>(item);
+                else if (i == 2) player->GetEquipment().helmet = item_cast<Armor>(item);
+                else if (i == 3) player->GetEquipment().chest = item_cast<Armor>(item);
+                else if (i == 4) player->GetEquipment().gloves = item_cast<Armor>(item);
+                else if (i == 5) player->GetEquipment().pants = item_cast<Armor>(item);
+                else if (i == 6) player->GetEquipment().boots = item_cast<Armor>(item);
+                else if (i == 7) player->GetEquipment().ring1 = item_cast<Accessory>(item);
+                else if (i == 8) player->GetEquipment().ring2 = item_cast<Accessory>(item);
+                else if (i == 9) player->GetEquipment().amulet = item_cast<Accessory>(item);
             }
         }
 
-        size_t skillCount;
-        file >> skillCount; file.ignore();
+        size_t skillCount = 0;
+        SafeRead(file, skillCount);
+        file.ignore();
 
         struct SavedSkillData { std::string name; int level, xp, cd, dmg, pts; std::vector<bool> unlocked;
             int masteryXP = 0, masteryLevel = 0, masteryPoints = 0;
@@ -633,7 +658,8 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
         if (saveVersion >= 2)
         {
             size_t loadoutCount = 0;
-            file >> loadoutCount; file.ignore();
+            SafeRead(file, loadoutCount);
+            file.ignore();
             std::vector<int> loadoutIndices;
             for (size_t l = 0; l < loadoutCount; ++l)
             {
@@ -657,17 +683,23 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
         if (saveVersion >= 11 && file.peek() != std::char_traits<char>::eof())
         {
             int atkIdx = 0;
-            file >> atkIdx; file.ignore();
+            SafeRead(file, atkIdx);
+            file.ignore();
             player->SetAttackSkillIndex(atkIdx);
         }
 
-        size_t jobCount;
-        file >> jobCount; file.ignore();
+        size_t jobCount = 0;
+        SafeRead(file, jobCount);
+        file.ignore();
         auto& jobs = player->GetJobSystem().GetJobs();
         for (size_t i = 0; i < jobCount && i < jobs.size(); ++i)
         {
-            int jt, jl, je, jp, jsp = 0;
-            file >> jt >> jl >> je >> jp >> jsp;
+            int jt = 0, jl = 1, je = 0, jp = 0, jsp = 0;
+            SafeRead(file, jt);
+            SafeRead(file, jl);
+            SafeRead(file, je);
+            SafeRead(file, jp);
+            SafeRead(file, jsp);
             jobs[i].level = jl;
             jobs[i].experience = je;
             jobs[i].jobPoints = jp;
@@ -677,16 +709,16 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
             // Read specialization (v3+ saves have this field)
             if (saveVersion >= 3)
             {
-                int specInt;
-                file >> specInt;
+                int specInt = 0;
+                SafeRead(file, specInt);
                 jobs[i].specialization = SafeCastEnum<SpecializationType>(specInt, 8, SpecializationType::None);
             }
 
             // Read fatigue (v13+ saves have this field)
             if (saveVersion >= 13)
             {
-                int fatigueVal;
-                file >> fatigueVal;
+                int fatigueVal = 0;
+                SafeRead(file, fatigueVal);
                 jobs[i].fatigue = std::max(0, std::min(fatigueVal, Job::MAX_FATIGUE));
             }
 
@@ -694,8 +726,8 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
 
             for (size_t p = 0; p < jobs[i].perks.size(); ++p)
             {
-                int unlocked;
-                file >> unlocked;
+                int unlocked = 0;
+                SafeRead(file, unlocked);
                 jobs[i].perks[p].unlocked = (unlocked == 1);
             }
             file.ignore();
@@ -713,20 +745,26 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
         // Extended save data (area, religion, quests) — only if present
         if (file.peek() != std::char_traits<char>::eof())
         {
-            file >> outAreaIndex; file.ignore();
+            SafeRead(file, outAreaIndex);
+            file.ignore();
 
             player->GetQuestManager().ClearQuests();
 
-            int godInt;
-            file >> godInt; file.ignore();
-            int devotion, donated;
-            file >> devotion >> donated; file.ignore();
+            int godInt = 0;
+            SafeRead(file, godInt);
+            file.ignore();
+            int devotion = 0, donated = 0;
+            SafeRead(file, devotion);
+            SafeRead(file, donated);
+            file.ignore();
             outReligion.RestoreState(SafeCastEnum<GodType>(godInt, 4, GodType::None), devotion, donated);
             // Read extended religion quest data
             if (file.peek() != std::char_traits<char>::eof())
             {
-                int qc, ac;
-                file >> qc >> ac; file.ignore();
+                int qc = 0, ac = 0;
+                SafeRead(file, qc);
+                SafeRead(file, ac);
+                file.ignore();
                 if (outReligion.GetGod() != GodType::None)
                 {
                     outReligion.EnsureQuest();
@@ -754,8 +792,9 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                 }
             }
 
-            size_t questCount;
-            file >> questCount; file.ignore();
+            size_t questCount = 0;
+            SafeRead(file, questCount);
+            file.ignore();
             for (size_t i = 0; i < questCount; ++i)
             {
                 std::string line;
@@ -825,26 +864,29 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
 
                 // Citadel boss kill counts
                 for (int i = 0; i < 10; ++i)
-                    file >> outCitadelBossKillCounts[i];
+                    SafeRead(file, outCitadelBossKillCounts[i]);
                 file.ignore();
 
                 // Legendary recipes unlocked bitmask
-                file >> outLegendaryRecipesUnlocked;
+                SafeRead(file, outLegendaryRecipesUnlocked);
                 file.ignore();
 
                 // Character mastery data (v15+)
                 if (saveVersion >= 15 && file.peek() != std::char_traits<char>::eof())
                 {
-                    int cmXP, cmLevel, cmPoints;
-                    file >> cmXP >> cmLevel >> cmPoints; file.ignore();
+                    int cmXP = 0, cmLevel = 0, cmPoints = 0;
+                    SafeRead(file, cmXP);
+                    SafeRead(file, cmLevel);
+                    SafeRead(file, cmPoints);
+                    file.ignore();
                     player->charMasteryXP = cmXP;
                     player->charMasteryLevel = cmLevel;
                     player->charMasteryPoints = cmPoints;
                     for (int b = 0; b < Player::CHAR_MASTERY_BRANCHES; ++b)
                         for (int n = 0; n < Player::CHAR_MASTERY_NODES_PER_BRANCH; ++n)
                         {
-                            int val;
-                            file >> val;
+                            int val = 0;
+                            SafeRead(file, val);
                             player->charMasteryNodes[b][n] = (val == 1);
                         }
                     file.ignore();
@@ -852,7 +894,8 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
 
                     // Class evolution flag (v15+)
                     int evolvedFlag = 0;
-                    file >> evolvedFlag; file.ignore();
+                    SafeRead(file, evolvedFlag);
+                    file.ignore();
                     if (evolvedFlag == 1 && !player->HasClassEvolved())
                         player->EvolveClass();
 
@@ -860,7 +903,8 @@ std::shared_ptr<Player> SaveGameManager::LoadGame(int slot, int& outAreaIndex, R
                     if (file.peek() != '\n' && !file.eof())
                     {
                         int masteredFlag = 0;
-                        file >> masteredFlag; file.ignore();
+                        SafeRead(file, masteredFlag);
+                        file.ignore();
                         if (masteredFlag == 1 && !player->HasMastered())
                             player->MasterClass();
                     }
@@ -918,14 +962,16 @@ SaveSlotInfo SaveGameManager::GetSlotInfo(int slot)
             info.playerName = firstLine;
         }
 
-        int classInt;
-        file >> classInt; file.ignore();
+        int classInt = 0;
+        SafeRead(file, classInt);
+        file.ignore();
         info.characterClass = SafeCastEnum<CharacterClass>(classInt, 4, CharacterClass::Warrior);
 
-        int raceDummy;
-        file >> raceDummy; file.ignore();
+        int raceDummy = 0;
+        SafeRead(file, raceDummy);
+        file.ignore();
 
-        file >> info.level;
+        SafeRead(file, info.level);
 
         info.occupied = true;
         file.close();

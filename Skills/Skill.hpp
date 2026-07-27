@@ -84,6 +84,7 @@ public:
     int GetTotalHealBonus() const;
     int GetTotalDefenseBonus() const;
     int ApplyDamageBonus(int damage) const;
+    int ApplyCharacterMasteryBonus(int damage, const Character& caster) const;
     int GetEffectiveManaCost() const;
     int GetEffectiveCooldown() const;
 
